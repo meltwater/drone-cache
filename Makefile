@@ -16,7 +16,7 @@ docker.build: drone-s3-cache Dockerfile
 	docker build -t blacksquaremedia/drone-s3-cache:latest .
 
 docker.push: docker.build
-	docker push blacksquaremedia/drone:latest
+	docker push blacksquaremedia/drone-s3-cache:latest
 
 .PHONY: docker.build docker.push
 
