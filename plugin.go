@@ -9,10 +9,10 @@ import (
 	"strings"
 	"time"
 
-	"bitbucket.org/bsm/drone-s3-cache/cache"
 	"github.com/Sirupsen/logrus"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
+	"github.com/bsm/drone-s3-cache/cache"
 )
 
 // Plugin for caching directories to an SFTP server.

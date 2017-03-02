@@ -1,6 +1,6 @@
 # drone-s3-cache
 
-[![Go Doc](https://godoc.org/bitbucket.org/bsm/drone-s3-cache?status.svg)](http://godoc.org/bitbucket.org/bsm/drone-s3-cache)
+[![Go Doc](https://godoc.org/github.com/bsm/drone-s3-cache?status.svg)](http://godoc.org/github.com/bsm/drone-s3-cache)
 
 Drone plugin for caching artifacts to a S3 bucket. For the
 usage information and a listing of the available options please take a look at
