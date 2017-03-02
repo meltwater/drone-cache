@@ -1,0 +1,11 @@
+package: bitbucket.org/bsm/drone-s3-cache
+import:
+- package: github.com/Sirupsen/logrus
+- package: github.com/aws/aws-sdk-go
+  subpackages:
+  - aws
+  - aws/credentials
+  - aws/session
+  - service/s3
+- package: github.com/joho/godotenv
+- package: github.com/urfave/cli
