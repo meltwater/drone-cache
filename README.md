@@ -20,8 +20,8 @@ go test
 Build the docker image with the following commands:
 
 ```
-CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -tags netgo
-docker build --rm=true -t plugins/s3-cache .
+make drone-s3-cache
+make docker.build
 ```
 
 Please note incorrectly building the image for the correct x64 linux and with
@@ -47,5 +47,5 @@ docker run --rm \
   -e PLUGIN_BUCKET=<bucket> \
   -e AWS_ACCESS_KEY_ID=<token> \
   -e AWS_SECRET_ACCESS_KEY=<secret> \
-  plugins/s3-cache
+  kakkoyun/drone-s3-cache
 ```
