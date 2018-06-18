@@ -1,4 +1,4 @@
-package: github.com/kakkoyun/drone-s3-cache
+package: github.com/meltwater/drone-s3-cache
 import:
 - package: github.com/Sirupsen/logrus
 - package: github.com/aws/aws-sdk-go

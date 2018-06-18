@@ -24,10 +24,10 @@ fetch-dependecies: install-glide
 .PHONY: install-glide fetch-dependecies
 
 docker.build: drone-s3-cache Dockerfile
-	docker build -t kakkoyun/drone-s3-cache:latest .
+	docker build -t meltwater/drone-s3-cache:latest .
 
 docker.push: docker.build
-	docker push kakkoyun/drone-s3-cache:latest
+	docker push meltwater/drone-s3-cache:latest
 
 .PHONY: docker.build docker.push
 

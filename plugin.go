@@ -12,7 +12,7 @@ import (
 	"github.com/Sirupsen/logrus"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
-	"github.com/kakkoyun/drone-s3-cache/cache"
+	"github.com/meltwater/drone-s3-cache/cache"
 )
 
 // Plugin for caching directories to an SFTP server.

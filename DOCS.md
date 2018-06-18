@@ -33,7 +33,7 @@ The following is a sample configuration in your .drone.yml file:
 pipeline:
   s3_cache:
     bucket: my-drone-bucket
-    image: kakkoyun/drone-s3-cache
+    image: meltwater/drone-s3-cache
     restore: true
   	mount:
   	  - node_modules
@@ -45,7 +45,7 @@ pipeline:
 
   s3_cache:
     bucket: my-drone-bucket
-    image: kakkoyun/drone-s3-cache
+    image: meltwater/drone-s3-cache
     rebuild: true
   	mount:
   	  - node_modules

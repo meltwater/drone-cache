@@ -2,7 +2,7 @@
 FROM golang:alpine AS builder
 RUN apk add --update make curl git
 
-ENV SRC ${GOPATH}/src/github.com/kakkoyun/drone-s3-cache
+ENV SRC ${GOPATH}/src/github.com/meltwater/drone-s3-cache
 
 COPY glide.* Makefile $SRC/
 WORKDIR $SRC

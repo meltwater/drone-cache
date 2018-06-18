@@ -1,6 +1,6 @@
 # drone-s3-cache
 
-[![Go Doc](https://godoc.org/github.com/kakkoyun/drone-s3-cache?status.svg)](http://godoc.org/github.com/kakkoyun/drone-s3-cache)
+[![Go Doc](https://godoc.org/github.com/meltwater/drone-s3-cache?status.svg)](http://godoc.org/github.com/meltwater/drone-s3-cache)
 
 Drone plugin for caching artifacts to a S3 bucket. For the
 usage information and a listing of the available options please take a look at
@@ -47,5 +47,5 @@ docker run --rm \
   -e PLUGIN_BUCKET=<bucket> \
   -e AWS_ACCESS_KEY_ID=<token> \
   -e AWS_SECRET_ACCESS_KEY=<secret> \
-  kakkoyun/drone-s3-cache
+  meltwater/drone-s3-cache
 ```
