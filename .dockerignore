@@ -1,2 +1,2 @@
-*
-!drone-s3-cache
+*.md
+*_test.go
