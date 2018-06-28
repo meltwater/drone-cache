@@ -1,0 +1,50 @@
+branches:
+  - master
+
+pipeline:
+  deps:
+    image: golang:alpine
+    pull: true
+    commands:
+      - go build
+  
+  test:
+    image: golang:alpine
+    commands:
+      - go test
+
+  ecr-latest:
+    image: plugins/docker
+    pull: true
+    repo: meltwater/drone-s3-cache
+    tags: latest
+    secrets: [ docker_username, docker_password ]
+    when:
+      branch: [ master ]
+      event: [ push ]
+
+  ecr-tag:
+    image: plugins/docker
+    repo: meltwater/drone-s3-cache
+    tags: "${DRONE_TAG}"
+    secrets: [ docker_username, docker_password ]
+    when:
+      event: tag
+      status: success
+      ref: refs/tags/*
+
+  slack:
+    group: notifications
+    image: plugins/slack
+    pull: true
+    webhook: https://hooks.slack.com/services/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
+    icon_url: https://logo.clearbit.com/drone.io
+    username: 'Drone'
+    channel: haven
+    template: |
+      :drone-{{build.status}}: *<{{build.link}}|{{uppercasefirst repo.name}} Drone Build {{build.number}}>* completed in {{build.status}}. It took {{since build.started}}
+      :github: <https://github.com/{{repo.owner}}/{{repo.name}}/commit/{{build.commit}}|{{repo.owner}}/{{repo.name}}#{{truncate build.commit 8}}>
+      > {{build.message}} by <https://github.com/{{build.author}}|{{build.author}}>
+    when:
+      local: false
+      status: [ changed, failure ]
