@@ -19,8 +19,8 @@ The following parameters are used to configure the plugin:
 
 The following secret values can be set to configure the plugin.
 
-* **AWS_ACCESS_KEY_ID** - corresponds to **access_key**
-* **AWS_SECRET_ACCESS_KEY** - corresponds to **secret_key**
+* **AWS_ACCESS_KEY_ID** or **CACHE_AWS_ACCESS_KEY_ID** - corresponds to **access_key**
+* **AWS_SECRET_ACCESS_KEY** or **CACHE_AWS_SECRET_ACCESS_KEY** - corresponds to **secret_key**
 * **S3_BUCKET** - corresponds to **bucket**
 * **S3_REGION** - corresponds to **region**
 * **PLUGIN_ENDPOINT** - corresponds to **endpoint**
@@ -30,23 +30,25 @@ The following secret values can be set to configure the plugin.
 The following is a sample configuration in your .drone.yml file:
 
 ```yaml
+
 pipeline:
-  s3_cache:
+  s3_cache_restore:
     bucket: my-drone-bucket
     image: meltwater/drone-s3-cache
     restore: true
-  	mount:
-  	  - node_modules
+    mount:
+    - node_modules
 
   build:
     image: node:latest
     commands:
-      - npm install
+    - npm install
 
-  s3_cache:
+  s3_cache_rebuild:
     bucket: my-drone-bucket
     image: meltwater/drone-s3-cache
     rebuild: true
-  	mount:
-  	  - node_modules
+    mount:
+    - node_modules
+
 ```
