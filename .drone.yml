@@ -1,6 +1,7 @@
 branches:
   - master
 
+
 pipeline:
   deps:
     image: golang:alpine
