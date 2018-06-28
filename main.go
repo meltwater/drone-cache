@@ -13,7 +13,7 @@ func main() {
 	app.Name = "S3 cache plugin"
 	app.Usage = "S3 cache plugin"
 	app.Action = run
-	app.Version = "0.8.0"
+	app.Version = "0.8.1"
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
 			Name:   "repo.name",
@@ -54,12 +54,12 @@ func main() {
 		cli.StringFlag{
 			Name:   "access-key",
 			Usage:  "aws access key",
-			EnvVar: "PLUGIN_ACCESS_KEY,AWS_ACCESS_KEY_ID",
+			EnvVar: "PLUGIN_ACCESS_KEY,AWS_ACCESS_KEY_ID,CACHE_AWS_ACCESS_KEY_ID",
 		},
 		cli.StringFlag{
 			Name:   "secret-key",
 			Usage:  "aws secret key",
-			EnvVar: "PLUGIN_SECRET_KEY,AWS_SECRET_ACCESS_KEY",
+			EnvVar: "PLUGIN_SECRET_KEY,AWS_SECRET_ACCESS_KEY,CACHE_AWS_SECRET_ACCESS_KEY",
 		},
 		cli.StringFlag{
 			Name:   "bucket",
