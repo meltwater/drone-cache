@@ -6,12 +6,14 @@ pipeline:
     image: golang:alpine
     pull: true
     commands:
-      - go build
+      - apk add --update make curl git
+      - make fetch-dependecies
   
-  test:
+  build:
     image: golang:alpine
     commands:
-      - go test
+      - apk add --update make curl git
+      - make drone-s3-cache
 
   ecr-latest:
     image: plugins/docker
