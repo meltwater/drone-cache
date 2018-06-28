@@ -1,22 +1,16 @@
 branches:
   - master
 
-
 pipeline:
-  deps:
+  build:
     image: golang:alpine
     pull: true
     commands:
       - apk add --update make curl git
       - make fetch-dependecies
-  
-  build:
-    image: golang:alpine
-    commands:
-      - apk add --update make curl git
       - make drone-s3-cache
 
-  ecr-latest:
+  docker-latest:
     image: plugins/docker
     pull: true
     repo: meltwater/drone-s3-cache
@@ -26,7 +20,7 @@ pipeline:
       branch: [ master ]
       event: [ push ]
 
-  ecr-tag:
+  docker-tag:
     image: plugins/docker
     repo: meltwater/drone-s3-cache
     tags: "${DRONE_TAG}"
