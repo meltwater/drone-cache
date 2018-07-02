@@ -1,5 +1,5 @@
 branches:
-  - docker_hub
+  - master
 
 pipeline:
   build:
@@ -21,7 +21,7 @@ pipeline:
     tags: latest
     secrets: [ docker_username, docker_password ]
     when:
-      branch: [ docker_hub ]
+      branch: [ master ]
       event: [ push ]
 
   docker-tag:
@@ -34,18 +34,18 @@ pipeline:
       status: success
       ref: refs/tags/*
 
-  # slack:
-  #   group: notifications
-  #   image: plugins/slack
-  #   pull: true
-  #   webhook: https://hooks.slack.com/services/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
-  #   icon_url: https://logo.clearbit.com/drone.io
-  #   username: 'Drone'
-  #   channel: haven
-  #   template: |
-  #     :drone-{{build.status}}: *<{{build.link}}|{{uppercasefirst repo.name}} Drone Build {{build.number}}>* completed in {{build.status}}. It took {{since build.started}}
-  #     :github: <https://github.com/{{repo.owner}}/{{repo.name}}/commit/{{build.commit}}|{{repo.owner}}/{{repo.name}}#{{truncate build.commit 8}}>
-  #     > {{build.message}} by <https://github.com/{{build.author}}|{{build.author}}>
-  #   when:
-  #     local: false
-  #     status: [ changed, failure ]
+  slack:
+    group: notifications
+    image: plugins/slack
+    pull: true
+    webhook: https://hooks.slack.com/services/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
+    icon_url: https://logo.clearbit.com/drone.io
+    username: 'Drone'
+    channel: haven
+    template: |
+      :drone-{{build.status}}: *<{{build.link}}|{{uppercasefirst repo.name}} Drone Build {{build.number}}>* completed in {{build.status}}. It took {{since build.started}}
+      :github: <https://github.com/{{repo.owner}}/{{repo.name}}/commit/{{build.commit}}|{{repo.owner}}/{{repo.name}}#{{truncate build.commit 8}}>
+      > {{build.message}} by <https://github.com/{{build.author}}|{{build.author}}>
+    when:
+      local: false
+      status: [ changed, failure ]
