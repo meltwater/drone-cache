@@ -14,7 +14,8 @@ pipeline:
     image: golang:alpine
     pull: true
     commands:
-      - go vet -v -all -mod=vendor
+      - apk add --update build-base
+      - go vet -all -mod=vendor
 
   test:
     image: golang:alpine
