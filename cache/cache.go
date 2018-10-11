@@ -8,15 +8,14 @@ import (
 	"path/filepath"
 )
 
-// Cache implements operations for caching files.
-type Cache interface {
+// Provider implements operations for caching files.
+type Provider interface {
 	Get(string) (io.ReadCloser, error)
 	Put(string, io.ReadSeeker) error
 }
 
-// RebuildCmd is a helper function that pushes the archived file to the cache.
-func RebuildCmd(c Cache, src, dst string) (err error) {
-
+// Upload is a helper function that pushes the archived file to the cache.
+func Upload(c Provider, src, dst string) (err error) {
 	src = filepath.Clean(src)
 	src, err = filepath.Abs(src)
 	if err != nil {
@@ -47,9 +46,9 @@ func RebuildCmd(c Cache, src, dst string) (err error) {
 	return c.Put(dst, f)
 }
 
-// RestoreCmd is a helper function that fetches the archived file from the cache
+// Download is a helper function that fetches the archived file from the cache
 // and restores to the host machine's file system.
-func RestoreCmd(c Cache, src, dst string) error {
+func Download(c Provider, src, dst string) error {
 	rc, err := c.Get(src)
 	if err != nil {
 		return err
@@ -71,7 +70,7 @@ func RestoreCmd(c Cache, src, dst string) error {
 		return err
 	}
 
-	// cleanup after ourself
+	// cleanup after ourselves
 	temp.Close()
 
 	// run extraction command
