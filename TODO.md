@@ -15,12 +15,12 @@
 * [ ] Add unit tests
 
 * [ ] Introduce compress and extract methods in Cache package
-* [ ] Add more build information (using drone-start-pluging https://github.com/drone/drone-plugin-starter/) 
+* [ ] Add more build information (using drone-start-pluging https://github.com/drone/drone-plugin-starter/)
+    * Introduce plugin/definitions 
 * [ ] Remove logrus
 * [ ] Add pkg/errors
 * [ ] Add more useful log messages
 * [ ] Make flags mutually exclusive, throw an error
-
 
 ### Features
 
