@@ -1,9 +1,9 @@
 package main
 
 import (
+	"log"
 	"os"
 
-	"github.com/Sirupsen/logrus"
 	"github.com/meltwater/drone-s3-cache/plugin"
 	"github.com/urfave/cli"
 )
@@ -88,11 +88,11 @@ func main() {
 			Name:   "encryption",
 			Usage:  "server-side encryption algorithm, defaults to none",
 			EnvVar: "PLUGIN_ENCRYPTION",
-		}
+		},
 	}
 
 	if err := app.Run(os.Args); err != nil {
-		logrus.Fatal(err)
+		log.Fatal(err)
 	}
 }
 

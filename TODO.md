@@ -7,16 +7,15 @@
 * [x] Use latest Go
 * [x] Migrate to Go modules
 * [x] Add UPX for binary compression
-
 * [x] Add scaffold tests
 * [x] Improve Drone build pipeline (add go static analyzers, test)
+* [x] Remove logrus
 
 * [ ] Add integration tests (docker-compose, minio)
 
 * [ ] Introduce compress and extract methods in Cache package
 * [ ] Add more build information (using drone-start-pluging https://github.com/drone/drone-plugin-starter/)
     * Introduce plugin/definitions 
-* [ ] Remove logrus
 * [ ] Add pkg/errors
 * [ ] Add more useful log messages
 * [ ] Make flags mutually exclusive, throw an error
