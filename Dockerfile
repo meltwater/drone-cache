@@ -1,6 +1,6 @@
 # build stage
 FROM golang:1.11.1-alpine AS builder
-RUN apk add --update make git
+RUN apk add --update make git upx
 
 ENV BUILD_DIR /build
 
@@ -19,6 +19,7 @@ RUN ls .
 RUN echo "HEDE"
 
 RUN make drone-s3-cache
+RUN make compress
 RUN cp drone-s3-cache /bin
 
 # final stage
