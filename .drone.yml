@@ -20,7 +20,7 @@ pipeline:
     image: golang:alpine
     pull: true
     commands:
-    - go test -v ./...
+      - go test -v -mod=vendor ./...
 
   release-latest:
     image: plugins/docker
