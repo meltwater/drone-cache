@@ -15,7 +15,15 @@ For the usage information and a listing of the available options please take a l
 
 Execute from the working directory:
 
+Using executable:
+
+```bash
+$ ./drone-s3-cache help
 ```
+
+with Environment variables, using Docker:
+
+```bash
 $ docker run --rm \
       -e DRONE_REPO=octocat/hello-world \
       -e DRONE_REPO_BRANCH=master \

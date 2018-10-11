@@ -7,7 +7,6 @@ require (
 	github.com/go-ini/ini v0.0.0-20170223222215-c437d20015c2 // indirect
 	github.com/gopherjs/gopherjs v0.0.0-20181004151105-1babbf986f6f // indirect
 	github.com/jmespath/go-jmespath v0.0.0-20160803190731-bd40a432e4c7 // indirect
-	github.com/joho/godotenv v0.0.0-20170221214941-d10b3fbe007d
 	github.com/jtolds/gls v4.2.1+incompatible // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/smartystreets/assertions v0.0.0-20180927180507-b2de0cb4f26d // indirect
