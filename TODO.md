@@ -2,7 +2,7 @@
 
 ### Maintenance
 
-* [ ] Add Drone badge 
+* [x] Add Drone badge
 * [ ] Merge DOCS.md and README.md
 * [ ] Add tests
 * [ ] Add pkg/errors

@@ -1,6 +1,8 @@
 # drone-s3-cache
 
 [![Go Doc](https://godoc.org/github.com/meltwater/drone-s3-cache?status.svg)](http://godoc.org/github.com/meltwater/drone-s3-cache)
+[![Drone](https://drone.meltwater.io/api/badges/meltwater/drone-s3-cache/status.svg)](https://drone.meltwater.io/meltwater/drone-s3-cache)
+[![Maintenance](https://img.shields.io/maintenance/yes/2018.svg)](https://github.com/meltwater/drone-s3-cache/commits/master)
 
 Drone plugin for caching artifacts to a S3 bucket. For the
 usage information and a listing of the available options please take a look at
