@@ -14,7 +14,7 @@ pipeline:
       - make fetch-dependecies
       - make drone-s3-cache
 
-  docker-latest:
+  release-latest:
     image: plugins/docker
     pull: true
     repo: meltwater/drone-s3-cache
@@ -24,7 +24,7 @@ pipeline:
       branch: [ master ]
       event: [ push ]
 
-  docker-tag:
+  release-tag:
     image: plugins/docker
     repo: meltwater/drone-s3-cache
     tags: "${DRONE_TAG}"
