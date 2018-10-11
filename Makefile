@@ -1,29 +1,20 @@
-PKG=$(shell glide nv)
-
-default: vet test
-
-vet:
-	go vet $(PKG)
-
-test:
-	go test $(PKG)
-
+default: drone-s3-cache
 all: drone-s3-cache
+
+drone-s3-cache: fetch-dependecies main.go $(wildcard *.go) $(wildcard */*.go)
+	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -mod=vendor -a -ldflags '-w' -o $@ .
 
 clean:
 	rm -f drone-s3-cache
 
-.PHONY: default vet test clean all
+.PHONY: default all clean
 
-install-glide:
-	curl https://glide.sh/get | sh
+fetch-dependecies:
+	go mod vendor
 
-fetch-dependecies: install-glide
-	glide install
+.PHONY: fetch-dependecies
 
-.PHONY: install-glide fetch-dependecies
-
-docker-build: drone-s3-cache Dockerfile
+docker-build: Dockerfile
 	docker build -t meltwater/drone-s3-cache:latest .
 
 docker-push: docker-build
@@ -31,5 +22,3 @@ docker-push: docker-build
 
 .PHONY: docker-build docker-push
 
-drone-s3-cache: main.go $(wildcard *.go) $(wildcard */*.go)
-	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -ldflags '-w' -o $@ .

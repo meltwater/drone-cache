@@ -1,16 +1,24 @@
 # build stage
-FROM golang:alpine AS builder
-RUN apk add --update make curl git
+FROM golang:1.11.1-alpine AS builder
+RUN apk add --update make git
 
-ENV SRC ${GOPATH}/src/github.com/meltwater/drone-s3-cache
+ENV BUILD_DIR /build
 
-COPY glide.* Makefile $SRC/
-WORKDIR $SRC
+COPY go.* Makefile $BUILD_DIR/
+WORKDIR $BUILD_DIR
 RUN make fetch-dependecies
 
-ADD . $SRC
-RUN make drone-s3-cache
+RUN pwd
+RUN ls .
+RUN echo "HEDE"
 
+COPY . $BUILD_DIR
+
+RUN pwd
+RUN ls .
+RUN echo "HEDE"
+
+RUN make drone-s3-cache
 RUN cp drone-s3-cache /bin
 
 # final stage
