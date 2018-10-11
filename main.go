@@ -4,7 +4,6 @@ import (
 	"os"
 
 	"github.com/Sirupsen/logrus"
-	"github.com/joho/godotenv"
 	"github.com/meltwater/drone-s3-cache/plugin"
 	"github.com/urfave/cli"
 )
@@ -14,7 +13,7 @@ func main() {
 	app.Name = "S3 cache plugin"
 	app.Usage = "S3 cache plugin"
 	app.Action = run
-	app.Version = "0.8.1"
+	app.Version = "0.9.0"
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
 			Name:   "repo.name",
@@ -89,11 +88,7 @@ func main() {
 			Name:   "encryption",
 			Usage:  "server-side encryption algorithm, defaults to none",
 			EnvVar: "PLUGIN_ENCRYPTION",
-		},
-		cli.StringFlag{
-			Name:  "env-file",
-			Usage: "source env file",
-		},
+		}
 	}
 
 	if err := app.Run(os.Args); err != nil {
@@ -102,10 +97,6 @@ func main() {
 }
 
 func run(c *cli.Context) error {
-	if c.String("env-file") != "" {
-		_ = godotenv.Load(c.String("env-file"))
-	}
-
 	plugin := plugin.Plugin{
 		Rebuild:    c.Bool("rebuild"),
 		Restore:    c.Bool("restore"),
