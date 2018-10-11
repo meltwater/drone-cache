@@ -1,10 +1,10 @@
-package cache
+package provider
 
 import (
 	"testing"
 )
 
-func TestCacheTruth(t *testing.T) {
+func TestS3Truth(t *testing.T) {
 	if true != true {
 		t.Error("everything I know is wrong")
 	}

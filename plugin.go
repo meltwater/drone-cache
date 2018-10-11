@@ -9,6 +9,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/meltwater/drone-s3-cache/provider"
+
 	"github.com/Sirupsen/logrus"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
@@ -61,15 +63,15 @@ func (p *Plugin) Exec() error {
 		S3ForcePathStyle: aws.Bool(p.PathStyle),
 	}
 
-	//Allowing to use the instance role or provide a key and secret
+	// Allowing to use the instance role or provide a key and secret
 	if p.Key != "" && p.Secret != "" {
 		conf.Credentials = credentials.NewStaticCredentials(p.Key, p.Secret, "")
 	}
 
-	cc := cache.New(p.Bucket, p.ACL, p.Encryption, conf)
+	cacheProvider := provider.NewS3(p.Bucket, p.ACL, p.Encryption, conf)
 	if p.Rebuild {
 		now := time.Now()
-		if err := p.ProcessRebuild(cc); err != nil {
+		if err := p.processRebuild(cacheProvider); err != nil {
 			logrus.Println(err)
 		} else {
 			logrus.Printf("cache built in %v", time.Since(now))
@@ -78,7 +80,7 @@ func (p *Plugin) Exec() error {
 
 	if p.Restore {
 		now := time.Now()
-		if err := p.ProcessRestore(cc); err != nil {
+		if err := p.processRestore(cacheProvider); err != nil {
 			logrus.Println(err)
 		} else {
 			logrus.Printf("cache restored in %v", time.Since(now))
@@ -88,14 +90,16 @@ func (p *Plugin) Exec() error {
 	return nil
 }
 
+// Helpers
+
 // Rebuild the remote cache from the local environment.
-func (p Plugin) ProcessRebuild(c cache.Cache) error {
+func (p Plugin) processRebuild(c cache.Provider) error {
 	for _, mount := range p.Mount {
-		hash := hasher(mount, p.Branch)
-		path := filepath.Join(p.Repo, hash)
+		cacheKey := hash(mount, p.Branch)
+		path := filepath.Join(p.Repo, cacheKey)
 
 		log.Printf("archiving directory <%s> to remote cache <%s>", mount, path)
-		err := cache.RebuildCmd(c, mount, path)
+		err := cache.Upload(c, mount, path)
 		if err != nil {
 			return err
 		}
@@ -104,13 +108,13 @@ func (p Plugin) ProcessRebuild(c cache.Cache) error {
 }
 
 // Restore the local environment from the remote cache.
-func (p Plugin) ProcessRestore(c cache.Cache) error {
+func (p Plugin) processRestore(c cache.Provider) error {
 	for _, mount := range p.Mount {
-		hash := hasher(mount, p.Branch)
-		path := filepath.Join(p.Repo, hash)
+		cacheKey := hash(mount, p.Branch)
+		path := filepath.Join(p.Repo, cacheKey)
 
 		log.Printf("restoring directory <%s> from remote cache <%s>", mount, path)
-		err := cache.RestoreCmd(c, path, mount)
+		err := cache.Download(c, path, mount)
 		if err != nil {
 			return err
 		}
@@ -118,8 +122,8 @@ func (p Plugin) ProcessRestore(c cache.Cache) error {
 	return nil
 }
 
-// helper function to hash a file name based on path and branch.
-func hasher(mount, branch string) string {
+// Helper function to hash a file name based on path and branch.
+func hash(mount, branch string) string {
 	parts := []string{mount, branch}
 
 	// calculate the hash using the branch

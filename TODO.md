@@ -8,14 +8,19 @@
 * [x] Migrate to Go modules
 * [x] Add UPX for binary compression
 
+* [x] Add scaffold tests
+* [x] Improve Drone build pipeline (add go static analyzers, test)
+
 * [ ] Add integration tests (docker-compose, minio)
-* [ ] Add tests and examples
+* [ ] Add unit tests
 
-* [ ] Improve Drone build pipeline (add go static analyzers, test)
-
+* [ ] Introduce compress and extract methods in Cache package
+* [ ] Add more build information (using drone-start-pluging https://github.com/drone/drone-plugin-starter/) 
+* [ ] Remove logrus
 * [ ] Add pkg/errors
 * [ ] Add more useful log messages
 * [ ] Make flags mutually exclusive, throw an error
+
 
 ### Features
 
@@ -28,7 +33,8 @@
 * [ ] Make object storage layer pluggable
 
 * [ ] Copyright
-* [ ] Add documentation using go docs 
+* [ ] Add reference to original author
+* [ ] Add documentation and examples, using go docs 
     * ! (there is no canonical way to generate static docs and go doc requires an accessible github repo)
 * [ ] GitHub pages for documentation (like Distillery), MkDocs
 * [ ] Open Source :tada:

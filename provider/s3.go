@@ -1,4 +1,4 @@
-package cache
+package provider
 
 import (
 	"io"
@@ -6,20 +6,21 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
+	"github.com/meltwater/drone-s3-cache/cache"
 )
 
-// cacher is an SFTP implementation of the Cache.
-type cacher struct {
+// s3provider is an S3 implementation of the Provider.
+type s3provider struct {
 	bucket     string
 	acl        string
 	encryption string
 	client     *s3.S3
 }
 
-// New returns a new SFTP remote Cache implementated.
-func New(bucket, acl, encryption string, conf *aws.Config) Cache {
+// NewS3 returns a new SFTP remote Provider implemented.
+func NewS3(bucket, acl, encryption string, conf *aws.Config) cache.Provider {
 	client := s3.New(session.New(), conf)
-	return &cacher{
+	return &s3provider{
 		bucket:     bucket,
 		acl:        acl,
 		encryption: encryption,
@@ -28,7 +29,7 @@ func New(bucket, acl, encryption string, conf *aws.Config) Cache {
 }
 
 // Get returns an io.Reader for reading the contents of the file.
-func (c *cacher) Get(p string) (io.ReadCloser, error) {
+func (c *s3provider) Get(p string) (io.ReadCloser, error) {
 	out, err := c.client.GetObject(&s3.GetObjectInput{
 		Bucket: aws.String(c.bucket),
 		Key:    aws.String(p),
@@ -40,7 +41,7 @@ func (c *cacher) Get(p string) (io.ReadCloser, error) {
 }
 
 // Put uploads the contents of the io.ReadSeeker
-func (c *cacher) Put(p string, src io.ReadSeeker) error {
+func (c *s3provider) Put(p string, src io.ReadSeeker) error {
 	in := &s3.PutObjectInput{
 		Bucket: aws.String(c.bucket),
 		Key:    aws.String(p),

@@ -2,12 +2,25 @@ branches:
   - master
 
 pipeline:
+
   build:
     image: golang:alpine
     pull: true
     commands:
       - apk add --update make git
       - make drone-s3-cache
+
+  analyze:
+    image: golang:alpine
+    pull: true
+    commands:
+      - go vet -v -all
+
+  test:
+    image: golang:alpine
+    pull: true
+    commands:
+    - go test -v ./...
 
   release-latest:
     image: plugins/docker
