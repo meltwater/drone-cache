@@ -26,4 +26,4 @@ _testmain.go
 
 coverage.out
 drone-s3-cache
-vendor/
+vendor

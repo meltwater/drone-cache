@@ -12,7 +12,6 @@
 * [x] Improve Drone build pipeline (add go static analyzers, test)
 
 * [ ] Add integration tests (docker-compose, minio)
-* [ ] Add unit tests
 
 * [ ] Introduce compress and extract methods in Cache package
 * [ ] Add more build information (using drone-start-pluging https://github.com/drone/drone-plugin-starter/)
@@ -21,6 +20,8 @@
 * [ ] Add pkg/errors
 * [ ] Add more useful log messages
 * [ ] Make flags mutually exclusive, throw an error
+
+* [ ] Add unit tests
 
 ### Features
 
