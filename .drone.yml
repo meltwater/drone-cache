@@ -21,7 +21,7 @@ pipeline:
     image: golang:alpine
     pull: true
     commands:
-      - apk add --update gcc
+      - apk add --update build-base
       - go test -v -mod=vendor ./...
 
   release-latest:
