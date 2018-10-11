@@ -6,12 +6,7 @@ pipeline:
     image: golang:alpine
     pull: true
     commands:
-      - export SRC=$GOPATH/src/github.com/meltwater/drone-s3-cache
-      - apk add --update make curl git
-      - mkdir -p $SRC
-      - cp -R * $SRC
-      - cd $SRC
-      - make fetch-dependecies
+      - apk add --update make git
       - make drone-s3-cache
 
   release-latest:
