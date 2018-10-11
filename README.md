@@ -26,7 +26,7 @@ Build the docker image with the following commands:
 
 ```
 make drone-s3-cache
-make docker.build
+make docker-build
 ```
 
 Please note incorrectly building the image for the correct x64 linux and with

@@ -19,16 +19,16 @@ pipeline:
     pull: true
     repo: meltwater/drone-s3-cache
     tags: latest
-    secrets: [ docker_username, docker_password ]
+    secrets: [docker_username, docker_password]
     when:
-      branch: [ master ]
-      event: [ push ]
+      branch: [master]
+      event: [push]
 
   release-tag:
     image: plugins/docker
     repo: meltwater/drone-s3-cache
-    tags: "${DRONE_TAG}"
-    secrets: [ docker_username, docker_password ]
+    tags: '${DRONE_TAG}'
+    secrets: [docker_username, docker_password]
     when:
       event: tag
       status: success
@@ -48,4 +48,4 @@ pipeline:
       > {{build.message}} by <https://github.com/{{build.author}}|{{build.author}}>
     when:
       local: false
-      status: [ changed, failure ]
+      status: [changed, failure]
