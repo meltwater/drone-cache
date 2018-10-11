@@ -14,7 +14,7 @@ pipeline:
     image: golang:alpine
     pull: true
     commands:
-      - go vet -v -all
+      - go vet -v -all -mod=vendor
 
   test:
     image: golang:alpine
