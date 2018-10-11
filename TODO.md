@@ -7,7 +7,6 @@
 * [x] Use latest Go
 * [x] Migrate to Go modules
 * [x] Add UPX for binary compression
-* [ ] Add documentation using go docs
 
 * [ ] Add integration tests (docker-compose, minio)
 * [ ] Add tests and examples
@@ -29,5 +28,7 @@
 * [ ] Make object storage layer pluggable
 
 * [ ] Copyright
+* [ ] Add documentation using go docs 
+    * ! (there is no canonical way to generate static docs and go doc requires an accessible github repo)
 * [ ] GitHub pages for documentation (like Distillery), MkDocs
 * [ ] Open Source :tada:
