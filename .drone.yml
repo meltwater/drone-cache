@@ -15,12 +15,13 @@ pipeline:
     pull: true
     commands:
       - apk add --update build-base
-      - go vet -all -mod=vendor
+      - go vet -v -all -mod=vendor
 
   test:
     image: golang:alpine
     pull: true
     commands:
+      - apk add --update gcc
       - go test -v -mod=vendor ./...
 
   release-latest:
