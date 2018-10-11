@@ -11,7 +11,6 @@ import (
 
 	"github.com/meltwater/drone-s3-cache/provider"
 
-	"github.com/Sirupsen/logrus"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/meltwater/drone-s3-cache/cache"
@@ -73,18 +72,18 @@ func (p *Plugin) Exec() error {
 	if p.Rebuild {
 		now := time.Now()
 		if err := p.processRebuild(cacheProvider); err != nil {
-			logrus.Println(err)
+			log.Println(err)
 		} else {
-			logrus.Printf("cache built in %v", time.Since(now))
+			log.Printf("cache built in %v", time.Since(now))
 		}
 	}
 
 	if p.Restore {
 		now := time.Now()
 		if err := p.processRestore(cacheProvider); err != nil {
-			logrus.Println(err)
+			log.Println(err)
 		} else {
-			logrus.Printf("cache restored in %v", time.Since(now))
+			log.Printf("cache restored in %v", time.Since(now))
 		}
 	}
 

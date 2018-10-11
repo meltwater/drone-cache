@@ -1,7 +1,6 @@
 module github.com/meltwater/drone-s3-cache
 
 require (
-	github.com/Sirupsen/logrus v0.11.4
 	github.com/aws/aws-sdk-go v1.6.13
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/go-ini/ini v0.0.0-20170223222215-c437d20015c2 // indirect
@@ -13,5 +12,4 @@ require (
 	github.com/smartystreets/goconvey v0.0.0-20180222194500-ef6db91d284a // indirect
 	github.com/stretchr/testify v1.2.2 // indirect
 	github.com/urfave/cli v0.0.0-20170215051705-2526b57c56f3
-	golang.org/x/sys v0.0.0-20170217003442-075e574b89e4 // indirect
 )
