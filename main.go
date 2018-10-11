@@ -5,6 +5,7 @@ import (
 
 	"github.com/Sirupsen/logrus"
 	"github.com/joho/godotenv"
+	"github.com/meltwater/drone-s3-cache/plugin"
 	"github.com/urfave/cli"
 )
 
@@ -105,7 +106,7 @@ func run(c *cli.Context) error {
 		_ = godotenv.Load(c.String("env-file"))
 	}
 
-	plugin := Plugin{
+	plugin := plugin.Plugin{
 		Rebuild:    c.Bool("rebuild"),
 		Restore:    c.Bool("restore"),
 		Mount:      c.StringSlice("mount"),

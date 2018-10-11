@@ -1,4 +1,4 @@
-package main
+package plugin
 
 import (
 	"crypto/md5"
@@ -17,7 +17,7 @@ import (
 	"github.com/meltwater/drone-s3-cache/cache"
 )
 
-// Plugin for caching directories to an SFTP server.
+// Plugin for caching directories using given Providers.
 type Plugin struct {
 	Rebuild bool
 	Restore bool
@@ -55,6 +55,7 @@ type Plugin struct {
 	Default string // default master branch
 }
 
+// Exec entry point of Plugin, where the magic happens.
 func (p *Plugin) Exec() error {
 	conf := &aws.Config{
 		Region:           aws.String(p.Region),
@@ -92,7 +93,7 @@ func (p *Plugin) Exec() error {
 
 // Helpers
 
-// Rebuild the remote cache from the local environment.
+// processRebuild the remote cache from the local environment.
 func (p Plugin) processRebuild(c cache.Provider) error {
 	for _, mount := range p.Mount {
 		cacheKey := hash(mount, p.Branch)
@@ -107,7 +108,7 @@ func (p Plugin) processRebuild(c cache.Provider) error {
 	return nil
 }
 
-// Restore the local environment from the remote cache.
+// processRestore the local environment from the remote cache.
 func (p Plugin) processRestore(c cache.Provider) error {
 	for _, mount := range p.Mount {
 		cacheKey := hash(mount, p.Branch)
@@ -122,7 +123,7 @@ func (p Plugin) processRestore(c cache.Provider) error {
 	return nil
 }
 
-// Helper function to hash a file name based on path and branch.
+// hash a file name based on path and branch.
 func hash(mount, branch string) string {
 	parts := []string{mount, branch}
 
