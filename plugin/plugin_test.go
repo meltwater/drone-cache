@@ -10,12 +10,12 @@ import (
 )
 
 const (
-	endpoint        = "127.0.0.1:9000"
-	accessKeyId     = "AKIAIOSFODNN7EXAMPLE"
-	secretAccessKey = "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
-	bucket          = "meltwater-drone-test"
-	region          = "eu-west-1"
-	useSSL          = false
+	defaultEndpoint        = "127.0.0.1:9000"
+	defaultAccessKey       = "AKIAIOSFODNN7EXAMPLE"
+	defaultSecretAccessKey = "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
+	bucket                 = "meltwater-drone-test"
+	region                 = "eu-west-1"
+	useSSL                 = false
 )
 
 func TestRebuild(t *testing.T) {
@@ -118,25 +118,25 @@ func TestRestore(t *testing.T) {
 
 func newTestPlugin(rebuild bool, restore bool, mount []string) Plugin {
 	return Plugin{
-		Rebuild:    rebuild,
-		Restore:    restore,
-		Mount:      mount,
-		Endpoint:   endpoint,
-		Key:        accessKeyId,
-		Secret:     secretAccessKey,
-		Bucket:     bucket,
-		Region:     region,
 		ACL:        "private",
-		Encryption: "",
-		PathStyle:  true, // Should be true for minio and false for AWS.
-		Repo:       "drone-s3-cache",
-		Default:    "master",
 		Branch:     "master",
+		Bucket:     bucket,
+		Default:    "master",
+		Encryption: "",
+		Endpoint:   endpoint(),
+		Key:        accessKey(),
+		Mount:      mount,
+		PathStyle:  true, // Should be true for minio and false for AWS.
+		Rebuild:    rebuild,
+		Region:     region,
+		Repo:       "drone-s3-cache",
+		Restore:    restore,
+		Secret:     secretAccessKey(),
 	}
 }
 
 func newMinioClient() (*minio.Client, error) {
-	minioClient, err := minio.New(endpoint, accessKeyId, secretAccessKey, useSSL)
+	minioClient, err := minio.New(endpoint(), accessKey(), secretAccessKey(), useSSL)
 	if err != nil {
 		return nil, err
 	}
@@ -189,4 +189,28 @@ func removeAllObjects(minioClient *minio.Client, bucketName string) error {
 	}
 
 	return nil
+}
+
+func endpoint() string {
+	value, ok := os.LookupEnv("TEST_ENDPOINT")
+	if !ok {
+		return defaultEndpoint
+	}
+	return value
+}
+
+func accessKey() string {
+	value, ok := os.LookupEnv("TEST_ACCESS_KEY")
+	if !ok {
+		return defaultAccessKey
+	}
+	return value
+}
+
+func secretAccessKey() string {
+	value, ok := os.LookupEnv("TEST_SECRET_KEY")
+	if !ok {
+		return defaultSecretAccessKey
+	}
+	return value
 }
