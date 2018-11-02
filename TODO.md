@@ -10,7 +10,9 @@
 - [x] Add scaffold tests
 - [x] Improve Drone build pipeline (add go static analyzers, test)
 - [x] Remove logrus
-- [ ] Add integration tests (docker-compose, minio)
+- [ ] Add integration tests
+  - [x] docker-compose
+  - [x] minio
 - [ ] Introduce compress and extract methods in Cache package
 - [ ] Add more build information
   - (using drone-start-pluging https://github.com/drone/drone-plugin-starter/)
@@ -21,7 +23,6 @@
 - [ ] Add short names for Flags
   - (you can set alternate (or short) names for flags by providing a comma-delimited list for the Name.)
 - [ ] Remove unused flags, simplify
-
 - [ ] Add unit tests
 
 ## Features
