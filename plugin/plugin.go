@@ -57,9 +57,11 @@ type Plugin struct {
 // Exec entry point of Plugin, where the magic happens.
 func (p *Plugin) Exec() error {
 	conf := &aws.Config{
-		Region:           aws.String(p.Region),
-		Endpoint:         &p.Endpoint,
-		DisableSSL:       aws.Bool(strings.HasPrefix(p.Endpoint, "http://")),
+		Region:   aws.String(p.Region),
+		Endpoint: &p.Endpoint,
+		// TODO: Check any consequences?
+		// DisableSSL:       aws.Bool(strings.HasPrefix(p.Endpoint, "http://")),
+		DisableSSL:       aws.Bool(!strings.HasPrefix(p.Endpoint, "https://")),
 		S3ForcePathStyle: aws.Bool(p.PathStyle),
 	}
 

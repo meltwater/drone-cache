@@ -10,19 +10,19 @@
 - [x] Add scaffold tests
 - [x] Improve Drone build pipeline (add go static analyzers, test)
 - [x] Remove logrus
-- [ ] Add integration tests
+- [x] Add integration tests
   - [x] docker-compose
   - [x] minio
-- [ ] Introduce compress and extract methods in Cache package
-- [ ] Add more build information
-  - (using drone-start-pluging https://github.com/drone/drone-plugin-starter/)
-  - Introduce plugin/definitions
 - [ ] Add pkg/errors
-- [ ] Add more useful log messages
+- [ ] Add more useful log messages and debug logs
 - [ ] Make flags mutually exclusive, throw an error
 - [ ] Add short names for Flags
   - (you can set alternate (or short) names for flags by providing a comma-delimited list for the Name.)
 - [ ] Remove unused flags, simplify
+- [ ] Introduce compress and extract methods in Cache package
+- [ ] Add more build information
+  - (using drone-start-pluging https://github.com/drone/drone-plugin-starter/)
+  - Introduce plugin/definitions
 - [ ] Add unit tests
 
 ## Features
