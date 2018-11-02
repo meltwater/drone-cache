@@ -6,6 +6,8 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
+	"github.com/pkg/errors"
+
 	"github.com/meltwater/drone-s3-cache/cache"
 )
 
@@ -35,8 +37,9 @@ func (c *s3provider) Get(p string) (io.ReadCloser, error) {
 		Key:    aws.String(p),
 	})
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "couldn't get the object")
 	}
+
 	return out.Body, nil
 }
 
@@ -52,5 +55,5 @@ func (c *s3provider) Put(p string, src io.ReadSeeker) error {
 		in.ServerSideEncryption = aws.String(c.encryption)
 	}
 	_, err := c.client.PutObject(in)
-	return err
+	return errors.Wrap(err, "couldn't put the object")
 }
