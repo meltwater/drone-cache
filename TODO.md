@@ -17,14 +17,14 @@
 - [x] Fix broken tests, use ENV VARS to configure target object storage
 - [x] Add more useful log messages and debug logs, clear useless log messages
 
+- [ ] Introduce compress and extract methods in Cache package
+
 - [ ] Remove unused flags, simplify
 - [ ] Make flags mutually exclusive, throw an error
 - [ ] Add more build information
   - (using drone-start-pluging https://github.com/drone/drone-plugin-starter/)
   - Introduce plugin/definitions
-- [ ] Add short names for Flags
-  - (you can set alternate (or short) names for flags by providing a comma-delimited list for the Name.)
-- [ ] Introduce compress and extract methods in Cache package
+- [ ] Add short names for Flags (you can set alternate (or short) names for flags by providing a comma-delimited list for the Name.)
 - [ ] Refactor tests
 - [ ] Clean up TODOs
 
@@ -38,11 +38,10 @@
 - [ ] Add unit tests
 - [ ] Consider changing command-line framework
 - [ ] Make object storage layer pluggable, introduces several providers
-- [ ] Add documentation and examples, using go docs
-  - ! (there is **no canonical way** to generate static docs and go doc requires an accessible github repo)
+- [ ] Add documentation and examples, using go docs (there is **no canonical way** to generate static docs and go doc requires an accessible github repo)
+- [ ] GitHub pages for documentation (like Distillery), MkDocs
 - [ ] Copyright
 - [ ] Add reference to original author
-- [ ] GitHub pages for documentation (like Distillery), MkDocs
 - [ ] Provide Code of conduct
 - [ ] Provide Contributors
 - [ ] Provide PR template
