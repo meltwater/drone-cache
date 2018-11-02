@@ -7,11 +7,11 @@ services:
       MINIO_SECRET_KEY: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
       MINIO_REGION: eu-west-1
     ports:
-      - 8000:9000
+      - 9000:9000
     command: server /data
   configure-buckets:
     image: minio/mc:RELEASE.2018-09-26T00-42-43Z
     entrypoint: sh
     depends_on:
       - filestorage
-    command: -c "sleep 5 && mc config host add minio http://filestorage:9000 AKIAIOSFODNN7EXAMPLE wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY && mc mb --region=eu-west-1 minio/meltwater-drone"
+    command: -c "sleep 5 && mc config host add minio http://filestorage:9000 AKIAIOSFODNN7EXAMPLE wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY && mc mb --region=eu-west-1 minio/meltwater-drone-default"

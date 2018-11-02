@@ -64,7 +64,7 @@ func main() {
 		cli.StringFlag{
 			Name:   "bucket",
 			Usage:  "aws bucket",
-			Value:  "us-east-1",
+			Value:  "mw-drone-prod-ew1dro1",
 			EnvVar: "PLUGIN_BUCKET,S3_BUCKET",
 		},
 		cli.StringFlag{
