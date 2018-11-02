@@ -15,21 +15,18 @@
   - [x] minio
 - [x] Add pkg/errors
 - [x] Fix broken tests, use ENV VARS to configure target object storage
-- [ ] Add more useful log messages and debug logs, clear useless log messages
+- [x] Add more useful log messages and debug logs, clear useless log messages
 
-- [ ] Make flags mutually exclusive, throw an error
-- [ ] Add short names for Flags
-  - (you can set alternate (or short) names for flags by providing a comma-delimited list for the Name.)
 - [ ] Remove unused flags, simplify
-
-- [ ] Introduce compress and extract methods in Cache package
+- [ ] Make flags mutually exclusive, throw an error
 - [ ] Add more build information
-
   - (using drone-start-pluging https://github.com/drone/drone-plugin-starter/)
   - Introduce plugin/definitions
-
-- [ ] Add unit tests
+- [ ] Add short names for Flags
+  - (you can set alternate (or short) names for flags by providing a comma-delimited list for the Name.)
+- [ ] Introduce compress and extract methods in Cache package
 - [ ] Refactor tests
+- [ ] Clean up TODOs
 
 ## Features
 
@@ -38,6 +35,7 @@
 
 ## In future
 
+- [ ] Add unit tests
 - [ ] Consider changing command-line framework
 - [ ] Make object storage layer pluggable, introduces several providers
 - [ ] Add documentation and examples, using go docs

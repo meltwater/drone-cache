@@ -2,7 +2,6 @@ package plugin
 
 import (
 	"fmt"
-	"log"
 	"os"
 	"testing"
 
@@ -54,8 +53,8 @@ func TestRestore(t *testing.T) {
 	setup(t)
 	defer cleanUp(t)
 
-	if mkErr := os.MkdirAll("./tmp/1", 0755); mkErr != nil {
-		t.Fatal(mkErr)
+	if err := os.MkdirAll("./tmp/1", 0755); err != nil {
+		t.Fatal(err)
 	}
 
 	file, cErr := os.Create("./tmp/1/file_to_cache.txt")
@@ -75,14 +74,14 @@ func TestRestore(t *testing.T) {
 		t.Fatal(mkErr1)
 	}
 
-	file1, cErr1 := os.Create("./tmp/1/file1_to_cache.txt")
-	if cErr1 != nil {
-		t.Fatal(cErr1)
+	file1, ferr1 := os.Create("./tmp/1/file1_to_cache.txt")
+	if ferr1 != nil {
+		t.Fatal(ferr1)
 	}
 
-	_, wErr1 := file1.WriteString("some content\n")
-	if wErr1 != nil {
-		t.Fatal(wErr1)
+	_, werr1 := file1.WriteString("some content\n")
+	if werr1 != nil {
+		t.Fatal(werr1)
 	}
 
 	file1.Sync()
@@ -90,12 +89,12 @@ func TestRestore(t *testing.T) {
 
 	plugin := newTestPlugin(true, false, []string{"./tmp/1"})
 
-	if xErr := plugin.Exec(); xErr != nil {
-		t.Errorf("plugin (rebuild mode) exec failed, error: %v\n", xErr)
+	if err := plugin.Exec(); err != nil {
+		t.Errorf("plugin (rebuild mode) exec failed, error: %v\n", err)
 	}
 
-	if rErr := os.RemoveAll("./tmp"); rErr != nil {
-		t.Fatal(rErr)
+	if err := os.RemoveAll("./tmp"); err != nil {
+		t.Fatal(err)
 	}
 
 	plugin.Rebuild = false
@@ -109,8 +108,8 @@ func TestRestore(t *testing.T) {
 	}
 
 	// TODO: Move as clean up
-	if rErr := os.RemoveAll("./tmp"); rErr != nil {
-		t.Fatal(rErr)
+	if err := os.RemoveAll("./tmp"); err != nil {
+		t.Fatal(err)
 	}
 }
 
@@ -170,22 +169,27 @@ func cleanUp(t *testing.T) {
 }
 
 func removeAllObjects(minioClient *minio.Client, bucketName string) error {
-	objectsCh := make(chan string)
+	objects := make(chan string)
+	errors := make(chan error)
 
 	go func() {
-		defer close(objectsCh)
+		defer close(objects)
+		defer close(errors)
 
 		for object := range minioClient.ListObjects(bucketName, "", true, nil) {
 			if object.Err != nil {
-				// TODO: Log statement!
-				log.Fatalln(object.Err)
+				// TODO: Remove
+				// log.Fatalln(object.Err)
+				errors <- object.Err
 			}
-			objectsCh <- object.Key
+			objects <- object.Key
 		}
 	}()
 
-	for rErr := range minioClient.RemoveObjects(bucketName, objectsCh) {
-		return fmt.Errorf("remove all objects failed, %v", rErr)
+	// TODO: return and error if you receive error from errors, or use Context
+
+	for err := range minioClient.RemoveObjects(bucketName, objects) {
+		return fmt.Errorf("remove all objects failed, %v", err)
 	}
 
 	return nil

@@ -100,7 +100,6 @@ func (p Plugin) processRebuild(c cache.Provider) error {
 		path := filepath.Join(p.Repo, cacheKey)
 
 		log.Printf("archiving directory <%s> to remote cache <%s>", mount, path)
-
 		if err := cache.Upload(c, mount, path); err != nil {
 			return errors.Wrap(err, "could not upload")
 		}
@@ -117,7 +116,6 @@ func (p Plugin) processRestore(c cache.Provider) error {
 		path := filepath.Join(p.Repo, cacheKey)
 
 		log.Printf("restoring directory <%s> from remote cache <%s>", mount, path)
-
 		if err := cache.Download(c, path, mount); err != nil {
 			return errors.Wrap(err, "could not download")
 		}
