@@ -98,20 +98,20 @@ func main() {
 
 func run(c *cli.Context) error {
 	plugin := plugin.Plugin{
-		Rebuild:    c.Bool("rebuild"),
-		Restore:    c.Bool("restore"),
-		Mount:      c.StringSlice("mount"),
+		ACL:        c.String("acl"),
+		Branch:     c.String("commit.branch"),
+		Bucket:     c.String("bucket"),
+		Default:    c.String("repo.branch"),
+		Encryption: c.String("encryption"),
 		Endpoint:   c.String("endpoint"),
 		Key:        c.String("access-key"),
-		Secret:     c.String("secret-key"),
-		Bucket:     c.String("bucket"),
-		Region:     c.String("region"),
-		ACL:        c.String("acl"),
-		Encryption: c.String("encryption"),
+		Mount:      c.StringSlice("mount"),
 		PathStyle:  c.Bool("path-style"),
+		Rebuild:    c.Bool("rebuild"),
+		Region:     c.String("region"),
 		Repo:       c.String("repo.name"),
-		Default:    c.String("repo.branch"),
-		Branch:     c.String("commit.branch"),
+		Restore:    c.Bool("restore"),
+		Secret:     c.String("secret-key"),
 	}
 
 	return plugin.Exec()

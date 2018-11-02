@@ -13,17 +13,23 @@
 - [x] Add integration tests
   - [x] docker-compose
   - [x] minio
-- [ ] Add pkg/errors
-- [ ] Add more useful log messages and debug logs
+- [x] Add pkg/errors
+- [x] Fix broken tests, use ENV VARS to configure target object storage
+- [ ] Add more useful log messages and debug logs, clear useless log messages
+
 - [ ] Make flags mutually exclusive, throw an error
 - [ ] Add short names for Flags
   - (you can set alternate (or short) names for flags by providing a comma-delimited list for the Name.)
 - [ ] Remove unused flags, simplify
+
 - [ ] Introduce compress and extract methods in Cache package
 - [ ] Add more build information
+
   - (using drone-start-pluging https://github.com/drone/drone-plugin-starter/)
   - Introduce plugin/definitions
+
 - [ ] Add unit tests
+- [ ] Refactor tests
 
 ## Features
 
