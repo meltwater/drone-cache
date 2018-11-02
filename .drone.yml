@@ -22,6 +22,7 @@ pipeline:
     pull: true
     environment:
       CGO_ENABLED: '0'
+      TEST_ENDPOINT: filestorage:9000
     commands:
       - go test -v -mod=vendor ./...
 
@@ -69,5 +70,5 @@ services:
       MINIO_SECRET_KEY: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
       MINIO_REGION: eu-west-1
     ports:
-      - 8000:9000
+      - 9000:9000
     command: server /data
