@@ -31,14 +31,14 @@ func TestRebuild(t *testing.T) {
 		t.Fatal(mkErr1)
 	}
 
-	file, ferr := os.Create("./tmp/1/file_to_cache.txt")
-	if ferr != nil {
-		t.Fatal(ferr)
+	file, fErr := os.Create("./tmp/1/file_to_cache.txt")
+	if fErr != nil {
+		t.Fatal(fErr)
 	}
 
-	_, werr := file.WriteString("some content\n")
-	if werr != nil {
-		t.Fatal(werr)
+	_, wErr := file.WriteString("some content\n")
+	if wErr != nil {
+		t.Fatal(wErr)
 	}
 	file.Sync()
 	file.Close()
@@ -80,14 +80,14 @@ func TestRestore(t *testing.T) {
 		t.Fatal(mkErr1)
 	}
 
-	file1, ferr1 := os.Create("./tmp/1/file1_to_cache.txt")
-	if ferr1 != nil {
-		t.Fatal(ferr1)
+	file1, fErr1 := os.Create("./tmp/1/file1_to_cache.txt")
+	if fErr1 != nil {
+		t.Fatal(fErr1)
 	}
 
-	_, werr1 := file1.WriteString("some content\n")
-	if werr1 != nil {
-		t.Fatal(werr1)
+	_, wErr1 := file1.WriteString("some content\n")
+	if wErr1 != nil {
+		t.Fatal(wErr1)
 	}
 
 	file1.Sync()
@@ -184,19 +184,27 @@ func removeAllObjects(minioClient *minio.Client, bucketName string) error {
 
 		for object := range minioClient.ListObjects(bucketName, "", true, nil) {
 			if object.Err != nil {
-				// TODO: Remove
-				// log.Fatalln(object.Err)
 				errors <- object.Err
 			}
 			objects <- object.Key
 		}
 	}()
 
-	// TODO: return and error if you receive error from errors,
-	// - use select or use Context
-
-	for err := range minioClient.RemoveObjects(bucketName, objects) {
-		return fmt.Errorf("remove all objects failed, %v", err)
+	for {
+		select {
+		case object, open := <-objects:
+			if !open {
+				return nil
+			}
+			if err := minioClient.RemoveObject(bucketName, object); err != nil {
+				return fmt.Errorf("remove all objects failed, %v", err)
+			}
+		case err, open := <-errors:
+			if !open { // Unlikely to happend, I guess, still learning!
+				return nil
+			}
+			return fmt.Errorf("remove all objects failed, while fetching %v", err)
+		}
 	}
 
 	return nil
