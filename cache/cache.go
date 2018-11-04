@@ -1,6 +1,7 @@
 package cache
 
 import (
+	"bytes"
 	"io"
 	"io/ioutil"
 	"log"
@@ -35,12 +36,13 @@ func Upload(storage Provider, src, dst string) error {
 	// run archive command
 	log.Printf("archiving directory <%s>", src)
 	cmd := exec.Command("tar", "-cf", tar, src)
-	// TODO: Could we prefix them like log statements
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
+	var stdout, stderr bytes.Buffer
+	cmd.Stdout = &stdout
+	cmd.Stderr = &stderr
 	if err := cmd.Run(); err != nil {
 		return errors.Wrap(err, "external command (tart) run failed")
 	}
+	log.Printf("command stout: <%s>, stderr: <%s>", string(stdout.Bytes()), string(stderr.Bytes()))
 
 	// upload file to server
 	f, err := os.Open(tar)
@@ -56,7 +58,7 @@ func Upload(storage Provider, src, dst string) error {
 // Download fetches the archived file from the cache
 // and restores to the host machine's file system
 func Download(storage Provider, src, dst string) error {
-	log.Printf("dowloading archived directory <%s> to <%s>", src, dst)
+	log.Printf("dowloading archived directory <%s>", src)
 	rc, err := storage.Get(src)
 	if err != nil {
 		return errors.Wrap(err, "could not get file from storage")
@@ -79,10 +81,12 @@ func Download(storage Provider, src, dst string) error {
 	}
 
 	// run extraction command
-	log.Printf("extracting archived directory <%s>", src)
+	log.Printf("extracting archived directory <%s> to <%s>", src, dst)
 	cmd := exec.Command("tar", "-xf", temp.Name(), "-C", "/")
-	// TODO: Could we prefix them like log statements
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
+	var stdout, stderr bytes.Buffer
+	cmd.Stdout = &stdout
+	cmd.Stderr = &stderr
+	defer log.Printf("command stout: <%s>, stderr: <%s>", string(stdout.Bytes()), string(stderr.Bytes()))
+
 	return errors.Wrap(cmd.Run(), "could not open extract downloaded file")
 }
