@@ -16,6 +16,8 @@
 - [x] Add pkg/errors
 - [x] Fix broken tests, use ENV VARS to configure target object storage
 - [x] Add more useful log messages and debug logs, clear useless log messages
+- [x] Refactor tests
+- [x] Clean up TODOs
 
 - [ ] Remove unused flags, simplify
 - [ ] Make flags mutually exclusive, throw an error
@@ -23,8 +25,6 @@
   - (using drone-start-pluging https://github.com/drone/drone-plugin-starter/)
   - Introduce plugin/definitions
 - [ ] Add short names for Flags (you can set alternate (or short) names for flags by providing a comma-delimited list for the Name.)
-- [ ] Refactor tests
-- [ ] Clean up TODOs
 
 - [ ] Add CircleCI like go template cache keys
 - [ ] Make sure cache fallbacks to master for default branched based cache

@@ -51,21 +51,21 @@ type Plugin struct {
 
 // Exec entry point of Plugin, where the magic happens
 func (p *Plugin) Exec() error {
+	if p.Rebuild && p.Restore {
+		return errors.New("rebuild and restore are mutually exclusive, please set only one of them")
+	}
+
 	conf := &aws.Config{
 		Region:   aws.String(p.Region),
 		Endpoint: &p.Endpoint,
-		// TODO: Check any consequences?
-		// DisableSSL:       aws.Bool(strings.HasPrefix(p.Endpoint, "http://")),
+		// TODO: Check any consequences? DisableSSL:       aws.Bool(strings.HasPrefix(p.Endpoint, "http://")),
 		DisableSSL:       aws.Bool(!strings.HasPrefix(p.Endpoint, "https://")),
 		S3ForcePathStyle: aws.Bool(p.PathStyle),
 	}
-
 	// allowing to use the instance role or provide a key and secret
 	if p.Key != "" && p.Secret != "" {
 		conf.Credentials = credentials.NewStaticCredentials(p.Key, p.Secret, "")
 	}
-	// TODO: Else return and error
-	// TODO: Check if both (rebuild, restore) of them set.
 
 	cacheProvider := provider.NewS3(p.Bucket, p.ACL, p.Encryption, conf)
 
