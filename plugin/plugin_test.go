@@ -17,6 +17,12 @@ const (
 	useSSL                 = false
 )
 
+var (
+	endpoint        = getEnv("TEST_ENDPOINT", defaultEndpoint)
+	accessKey       = getEnv("TEST_ACCESS_KEY", defaultAccessKey)
+	secretAccessKey = getEnv("TEST_SECRET_KEY", defaultSecretAccessKey)
+)
+
 func TestRebuild(t *testing.T) {
 	setup(t)
 	defer cleanUp(t)
@@ -122,20 +128,20 @@ func newTestPlugin(rebuild bool, restore bool, mount []string) Plugin {
 		Bucket:     bucket,
 		Default:    "master",
 		Encryption: "",
-		Endpoint:   endpoint(),
-		Key:        accessKey(),
+		Endpoint:   endpoint,
+		Key:        accessKey,
 		Mount:      mount,
 		PathStyle:  true, // Should be true for minio and false for AWS.
 		Rebuild:    rebuild,
 		Region:     region,
 		Repo:       "drone-s3-cache",
 		Restore:    restore,
-		Secret:     secretAccessKey(),
+		Secret:     secretAccessKey,
 	}
 }
 
 func newMinioClient() (*minio.Client, error) {
-	minioClient, err := minio.New(endpoint(), accessKey(), secretAccessKey(), useSSL)
+	minioClient, err := minio.New(endpoint, accessKey, secretAccessKey, useSSL)
 	if err != nil {
 		return nil, err
 	}
@@ -186,7 +192,8 @@ func removeAllObjects(minioClient *minio.Client, bucketName string) error {
 		}
 	}()
 
-	// TODO: return and error if you receive error from errors, or use Context
+	// TODO: return and error if you receive error from errors,
+	// - use select or use Context
 
 	for err := range minioClient.RemoveObjects(bucketName, objects) {
 		return fmt.Errorf("remove all objects failed, %v", err)
@@ -195,26 +202,10 @@ func removeAllObjects(minioClient *minio.Client, bucketName string) error {
 	return nil
 }
 
-func endpoint() string {
-	value, ok := os.LookupEnv("TEST_ENDPOINT")
+func getEnv(key, defaultVal string) string {
+	value, ok := os.LookupEnv(key)
 	if !ok {
-		return defaultEndpoint
-	}
-	return value
-}
-
-func accessKey() string {
-	value, ok := os.LookupEnv("TEST_ACCESS_KEY")
-	if !ok {
-		return defaultAccessKey
-	}
-	return value
-}
-
-func secretAccessKey() string {
-	value, ok := os.LookupEnv("TEST_SECRET_KEY")
-	if !ok {
-		return defaultSecretAccessKey
+		return defaultVal
 	}
 	return value
 }
