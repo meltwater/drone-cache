@@ -17,8 +17,6 @@
 - [x] Fix broken tests, use ENV VARS to configure target object storage
 - [x] Add more useful log messages and debug logs, clear useless log messages
 
-- [ ] Introduce compress and extract methods in Cache package
-
 - [ ] Remove unused flags, simplify
 - [ ] Make flags mutually exclusive, throw an error
 - [ ] Add more build information
@@ -28,16 +26,15 @@
 - [ ] Refactor tests
 - [ ] Clean up TODOs
 
-## Features
-
 - [ ] Add CircleCI like go template cache keys
 - [ ] Make sure cache fallbacks to master for default branched based cache
-
-## In future
 
 - [ ] Add unit tests
 - [ ] Consider changing command-line framework
 - [ ] Make object storage layer pluggable, introduces several providers
+
+## In future
+
 - [ ] Add documentation and examples, using go docs (there is **no canonical way** to generate static docs and go doc requires an accessible github repo)
 - [ ] GitHub pages for documentation (like Distillery), MkDocs
 - [ ] Copyright

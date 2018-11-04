@@ -11,13 +11,13 @@ import (
 	"github.com/pkg/errors"
 )
 
-// Provider implements operations for caching files.
+// Provider implements operations for caching files
 type Provider interface {
 	Get(string) (io.ReadCloser, error)
 	Put(string, io.ReadSeeker) error
 }
 
-// Upload is a helper function that pushes the archived file to the cache.
+// Upload pushes the archived file to the cache
 func Upload(storage Provider, src, dst string) error {
 	var err error
 	src, err = filepath.Abs(filepath.Clean(src))
@@ -33,8 +33,9 @@ func Upload(storage Provider, src, dst string) error {
 	tar := filepath.Join(dir, "archive.tar")
 
 	// run archive command
-	log.Printf("compressing directory <%s>", src)
+	log.Printf("archiving directory <%s>", src)
 	cmd := exec.Command("tar", "-cf", tar, src)
+	// TODO: Could we prefix them like log statements
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	if err := cmd.Run(); err != nil {
@@ -44,7 +45,7 @@ func Upload(storage Provider, src, dst string) error {
 	// upload file to server
 	f, err := os.Open(tar)
 	if err != nil {
-		return errors.Wrap(err, "could not open compressed file to send")
+		return errors.Wrap(err, "could not open archived file to send")
 	}
 	defer f.Close()
 
@@ -52,8 +53,8 @@ func Upload(storage Provider, src, dst string) error {
 	return errors.Wrap(storage.Put(dst, f), "could not upload file")
 }
 
-// Download is a helper function that fetches the archived file from the cache
-// and restores to the host machine's file system.
+// Download fetches the archived file from the cache
+// and restores to the host machine's file system
 func Download(storage Provider, src, dst string) error {
 	log.Printf("dowloading archived directory <%s> to <%s>", src, dst)
 	rc, err := storage.Get(src)
@@ -80,6 +81,7 @@ func Download(storage Provider, src, dst string) error {
 	// run extraction command
 	log.Printf("extracting archived directory <%s>", src)
 	cmd := exec.Command("tar", "-xf", temp.Name(), "-C", "/")
+	// TODO: Could we prefix them like log statements
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	return errors.Wrap(cmd.Run(), "could not open extract downloaded file")
