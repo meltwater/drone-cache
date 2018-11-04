@@ -93,7 +93,7 @@ func (p Plugin) processRebuild(c cache.Provider) error {
 		cacheKey := hash(mount, p.Branch)
 		path := filepath.Join(p.Repo, cacheKey)
 
-		log.Printf("archiving directory <%s> to remote cache <%s>", mount, path)
+		log.Printf("rebuilding cache for directory <%s> to remote cache <%s>", mount, path)
 		if err := cache.Upload(c, mount, path); err != nil {
 			return errors.Wrap(err, "could not upload")
 		}
