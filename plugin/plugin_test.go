@@ -48,11 +48,6 @@ func TestRebuild(t *testing.T) {
 	if err := plugin.Exec(); err != nil {
 		t.Errorf("plugin exec failed, error: %v\n", err)
 	}
-
-	// TODO: Move as clean up
-	if rErr := os.RemoveAll("./tmp"); rErr != nil {
-		t.Fatal(rErr)
-	}
 }
 
 func TestRestore(t *testing.T) {
@@ -112,11 +107,6 @@ func TestRestore(t *testing.T) {
 	if _, err := os.Stat("./tmp/1/file_to_cache.txt"); os.IsNotExist(err) {
 		t.Fatal(err)
 	}
-
-	// TODO: Move as clean up
-	if err := os.RemoveAll("./tmp"); err != nil {
-		t.Fatal(err)
-	}
 }
 
 // Helpers
@@ -160,6 +150,10 @@ func setup(t *testing.T) {
 }
 
 func cleanUp(t *testing.T) {
+	if err := os.RemoveAll("./tmp"); err != nil {
+		t.Fatal(err)
+	}
+
 	minioClient, err := newMinioClient()
 	if err != nil {
 		t.Fatal(err)
