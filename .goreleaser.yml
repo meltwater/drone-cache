@@ -1,0 +1,52 @@
+before:
+  hooks:
+    - go mod download
+builds:
+- env:
+  - CGO_ENABLED=0
+- main: main.go
+  binary: drone-s3-cache
+  goos:
+    - windows
+    - darwin
+    - linux
+  goarch:
+    - amd64
+    - arm
+  goarm:
+    - 5
+    - 6
+    - 7
+  ldflags: >
+    -X main.Version={{.Version}}
+    -X main.DateBuilt={{.Date}}
+# archive:
+#   replacements:
+#     darwin: Darwin
+#     linux: Linux
+#     windows: Windows
+#     386: i386
+#     amd64: x86_64
+archive:
+  format: tar.gz
+  files:
+    - README.md
+    - CHANGELOG.md
+    - LICENSE
+dist: target/dist
+checksum:
+  name_template: 'checksums.txt'
+snapshot:
+  name_template: "{{ .Tag }}-next"
+changelog:
+  sort: asc
+  filters:
+    exclude:
+    - .*
+    - '^docs:'
+    - '^test:'
+release:
+  github:
+    owner: meltwater
+    name: drone-s3-cache
+  disable: false
