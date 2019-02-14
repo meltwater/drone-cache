@@ -85,7 +85,6 @@ func (c Cache) uploadArchive(dst, archivePath string) error {
 // Download fetches the archived file from the cache and restores to the host machine's file system
 func (c Cache) Download(src, dst string) error {
 	log.Printf("dowloading archived directory <%s>", src)
-
 	// 1. download archive
 	rc, err := c.b.Get(src)
 	if err != nil {
@@ -93,51 +92,27 @@ func (c Cache) Download(src, dst string) error {
 	}
 	defer rc.Close()
 
-	// 2. create temp file for archive
-	temp, err := ioutil.TempFile("", "")
-	if err != nil {
-		return errors.Wrap(err, "could not create tmp file to archive")
-	}
-	defer func() {
-		temp.Close()
-		os.Remove(temp.Name())
-	}()
-
-	// 3. write downloaded archive to temp file
-	if _, err := io.Copy(temp, rc); err != nil {
-		errors.Wrap(err, "could not copy downloaded file to tmp")
-	}
-	rc.Close()
-
-	// 4. extract archive
+	// w. extract archive
 	log.Printf("extracting archived directory <%s> to <%s>", src, dst)
-	tr := archiveReader(temp, c.archiveFmt)
-	return errors.Wrap(extractFilesFromArchive(tr, dst), "could not extract files from downloaded archive")
-
-	// // run extraction command
-	// cmd := exec.Command("tar", "-xf", temp.Name(), "-C", "/")
-	// var stdout, stderr bytes.Buffer
-	// cmd.Stdout = &stdout
-	// cmd.Stderr = &stderr
-	// defer log.Printf("command stout: <%s>, stderr: <%s>", string(stdout.Bytes()), string(stderr.Bytes()))
-
-	// return errors.Wrap(cmd.Run(), "could not open extract downloaded file")
+	tr := archiveReader(rc, c.archiveFmt)
+	return errors.Wrap(extractFilesFromArchive(tr, "/"), "could not extract files from downloaded archive")
 }
 
 // Helpers
 
 func archiveWriter(w io.Writer, archiveFmt string) (*tar.Writer, func()) {
-	tw := tar.NewWriter(w)
-	closer := func() { tw.Close() }
-	if archiveFmt == "gzip" {
+	switch archiveFmt {
+	case "gzip":
 		gw := gzip.NewWriter(w)
-		tw = tar.NewWriter(gw)
-		closer = func() {
+		tw := tar.NewWriter(gw)
+		return tw, func() {
 			gw.Close()
 			tw.Close()
 		}
+	default:
+		tw := tar.NewWriter(w)
+		return tw, func() { tw.Close() }
 	}
-	return tw, closer
 }
 
 func writeFileToArchive(tw *tar.Writer, src string) func(path string, fi os.FileInfo, err error) error {
@@ -174,54 +149,61 @@ func writeFileToArchive(tw *tar.Writer, src string) func(path string, fi os.File
 
 func archiveReader(r io.Reader, archiveFmt string) *tar.Reader {
 	tr := tar.NewReader(r)
-	if archiveFmt == "gzip" {
+	switch archiveFmt {
+	case "gzip":
 		gzr, err := gzip.NewReader(r)
 		if err != nil {
 			gzr.Close()
 			return tr
 		}
 		return tar.NewReader(gzr)
+	default:
+		return tr
 	}
-	return tr
 }
 
 func extractFilesFromArchive(tr *tar.Reader, dst string) error {
+	ensureDir := func(dirName string) error {
+		if _, err := os.Stat(dirName); err != nil {
+			if err := os.MkdirAll(dirName, os.FileMode(0755)); err != nil {
+				return errors.Wrap(err, fmt.Sprintf("could not create directory <%s>", dirName))
+			}
+		}
+		return nil
+	}
+
 	for {
 		h, err := tr.Next()
 		switch {
-		case err == io.EOF: // if no more files are found return
+		// if no more files are found return
+		case err == io.EOF:
 			return nil
-		case err != nil: // return any other error
-			return err
-		case h == nil: // if the header is nil,skip it
+		// return any other error
+		case err != nil:
+			return errors.Wrap(err, "tar reader failer")
+		// if the header is nil, skip it
+		case h == nil:
 			continue
 		}
 
-		target := filepath.Join(dst, h.Name) // the target location where the dir/file should be created
-
-		// the following switch could also be done using fi.Mode(), not sure if there
-		// a benefit of using one vs. the other.
-		// fi := header.FileInfo()
-
-		switch h.Typeflag {
-		case tar.TypeDir: // if its a dir and it doesn't exist create it
-			if _, err := os.Stat(target); err != nil {
-				if err := os.MkdirAll(target, 0755); err != nil {
-					return err
-				}
-			}
-
-		case tar.TypeReg: // if it's a file create it
-			f, err := os.OpenFile(target, os.O_CREATE|os.O_RDWR, os.FileMode(h.Mode))
-			if err != nil {
-				return err
-			}
-			if _, err := io.Copy(f, tr); err != nil {
-				f.Close()
-				return err
-			}
-
-			f.Close()
+		// the target location where the dir/file should be created
+		trt := filepath.Join(dst, h.Name)
+		if h.FileInfo().Mode().IsDir() {
+			ensureDir(trt)
+			continue
 		}
+
+		ensureDir(filepath.Dir(trt))
+
+		f, err := os.OpenFile(trt, os.O_CREATE|os.O_RDWR, os.FileMode(h.Mode))
+		if err != nil {
+			return errors.Wrap(err, fmt.Sprintf("could not open extracted file for writing <%s>", trt))
+		}
+
+		if _, err := io.Copy(f, tr); err != nil {
+			f.Close()
+			return errors.Wrap(err, fmt.Sprintf("could not copy extracted file for writing <%s>", trt))
+		}
+		f.Close()
 	}
 }
