@@ -19,26 +19,27 @@
 - [x] Refactor tests
 - [x] Clean up TODOs
 
-- [ ] Remove unused flags, simplify
-- [ ] Make flags mutually exclusive, throw an error
-- [ ] Add more build information
-  - (using drone-start-pluging https://github.com/drone/drone-plugin-starter/)
-  - Introduce plugin/definitions
-- [ ] Add short names for Flags (you can set alternate (or short) names for flags by providing a comma-delimited list for the Name.)
+- [x] Remove unused flags, simplify
+- [x] Make flags mutually exclusive, throw an error
+- [x] Add more build information
+- [x] Add short names for Flags (you can set alternate (or short) names for flags by providing a comma-delimited list for the Name.)
+- [ ] Add Goreleaser
 
 - [ ] Add CircleCI like go template cache keys
 - [ ] Make sure cache fallbacks to master for default branched based cache
+- [ ] Add volume/file storage
 
+- [ ] Tar/Zip
+- [ ] Add usage examples to README
+- [ ] Add all possible environment variables to README
 - [ ] Add unit tests
-- [ ] Consider changing command-line framework
-- [ ] Make object storage layer pluggable, introduces several providers
+- [ ] Rename Repo
 
-## In future
+## Road to Open Source!
 
-- [ ] Add documentation and examples, using go docs (there is **no canonical way** to generate static docs and go doc requires an accessible github repo)
-- [ ] GitHub pages for documentation (like Distillery), MkDocs
 - [ ] Copyright
 - [ ] Add reference to original author
+- [ ] LICENCE
 - [ ] Provide Code of conduct
 - [ ] Provide Contributors
 - [ ] Provide PR template

@@ -1,3 +1,4 @@
+// Package cache provides functionality for cache storage
 package cache
 
 import (
@@ -12,14 +13,14 @@ import (
 	"github.com/pkg/errors"
 )
 
-// Provider implements operations for caching files
-type Provider interface {
+// Backend implements operations for caching files
+type Backend interface {
 	Get(string) (io.ReadCloser, error)
 	Put(string, io.ReadSeeker) error
 }
 
 // Upload pushes the archived file to the cache
-func Upload(storage Provider, src, dst string) error {
+func Upload(b Backend, src, dst string) error {
 	var err error
 	src, err = filepath.Abs(filepath.Clean(src))
 	if err != nil {
@@ -52,16 +53,16 @@ func Upload(storage Provider, src, dst string) error {
 	defer f.Close()
 
 	log.Printf("uploading archived directory <%s> to <%s>", src, dst)
-	return errors.Wrap(storage.Put(dst, f), "could not upload file")
+	return errors.Wrap(b.Put(dst, f), "could not upload file")
 }
 
 // Download fetches the archived file from the cache
 // and restores to the host machine's file system
-func Download(storage Provider, src, dst string) error {
+func Download(b Backend, src, dst string) error {
 	log.Printf("dowloading archived directory <%s>", src)
-	rc, err := storage.Get(src)
+	rc, err := b.Get(src)
 	if err != nil {
-		return errors.Wrap(err, "could not get file from storage")
+		return errors.Wrap(err, "could not get file from storage backend")
 	}
 	defer rc.Close()
 
