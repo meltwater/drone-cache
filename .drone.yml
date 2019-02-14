@@ -64,17 +64,17 @@ pipeline:
     group: notifications
     image: plugins/slack
     pull: true
-    webhook: https://hooks.slack.com/services/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
+    webhook: https://hooks.slack.com/services/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
     icon_url: https://logo.clearbit.com/drone.io
-    username: 'Drone'
-    channel: haven
+    username: "Drone: ${DRONE_REPO_NAME}"
+    channel: shakespeare-events
     template: |
       :drone-{{build.status}}: *<{{build.link}}|{{uppercasefirst repo.name}} Drone Build {{build.number}}>* completed in {{build.status}}. It took {{since build.started}}
       :github: <https://github.com/{{repo.owner}}/{{repo.name}}/commit/{{build.commit}}|{{repo.owner}}/{{repo.name}}#{{truncate build.commit 8}}>
       > {{build.message}} by <https://github.com/{{build.author}}|{{build.author}}>
     when:
       local: false
-      status: [changed, failure]
+      status: [changed, failure] # success
 
 services:
   filestorage:
