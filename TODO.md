@@ -26,13 +26,13 @@
 - [x] Add Goreleaser
 
 - [x] Add CircleCI like go template cache keys
-- [ ] Tar/Zip
+- [x] Tar/Gzip
 - [ ] Add volume/file storage
 
 - [ ] Add usage examples to README
 - [ ] Add all possible environment variables to README
-
 - [ ] Rename Repo
+
 - [ ] Improve static analyzers
 - [ ] Improve Makefile
 - [ ] Docker from scratch

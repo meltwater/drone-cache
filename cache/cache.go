@@ -2,7 +2,10 @@
 package cache
 
 import (
+	"archive/tar"
 	"bytes"
+	"compress/gzip"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"log"
@@ -19,48 +22,70 @@ type Backend interface {
 	Put(string, io.ReadSeeker) error
 }
 
+// Cache contains configuration for Cache functionality
+type Cache struct {
+	b          Backend
+	archiveFmt string
+}
+
+// New creates a new cache with given parameters
+func New(b Backend, archiveFmt string) Cache {
+	return Cache{b: b, archiveFmt: archiveFmt}
+}
+
 // Upload pushes the archived file to the cache
-func Upload(b Backend, src, dst string) error {
-	var err error
-	src, err = filepath.Abs(filepath.Clean(src))
+func (c Cache) Upload(src, dst string) error {
+	// 1. check if source is reachable
+	src, err := filepath.Abs(filepath.Clean(src))
 	if err != nil {
 		return errors.Wrap(err, "could not read source directory")
 	}
 
-	// create a temporary file for the archive
+	log.Printf("archiving directory <%s>", src)
+
+	// 2. create a temporary file for the archive
 	dir, err := ioutil.TempDir("", "")
 	if err != nil {
-		return errors.Wrap(err, "could not create tmp folder to archive")
+		return errors.Wrap(err, "could not create tmp folder for archive")
 	}
-	tar := filepath.Join(dir, "archive.tar")
-
-	// run archive command
-	log.Printf("archiving directory <%s>", src)
-	cmd := exec.Command("tar", "-cf", tar, src)
-	var stdout, stderr bytes.Buffer
-	cmd.Stdout = &stdout
-	cmd.Stderr = &stderr
-	if err := cmd.Run(); err != nil {
-		return errors.Wrap(err, "external command (tart) run failed")
+	archivePath := filepath.Join(dir, "archive.tar")
+	file, err := os.Create(archivePath)
+	if err != nil {
+		return errors.Wrap(err, fmt.Sprintf("could not create tarball file <%s>", archivePath))
 	}
-	log.Printf("command stout: <%s>, stderr: <%s>", string(stdout.Bytes()), string(stderr.Bytes()))
+	tw, closer := archiveWriter(file, c.archiveFmt)
 
-	// upload file to server
-	f, err := os.Open(tar)
+	// 3. walk through source and add each file
+	err = filepath.Walk(src, writeFileToArchive(tw, src))
+	if err != nil {
+		closer()
+		file.Close()
+		return errors.Wrap(err, "could not add all files to archive")
+	}
+
+	// 4. Close resources before upload
+	closer()
+	file.Close()
+
+	// 5. upload archive file to server
+	log.Printf("uploading archived directory <%s> to <%s>", src, dst)
+	return c.uploadArchive(dst, archivePath)
+}
+
+func (c Cache) uploadArchive(dst, archivePath string) error {
+	f, err := os.Open(archivePath)
 	if err != nil {
 		return errors.Wrap(err, "could not open archived file to send")
 	}
 	defer f.Close()
 
-	log.Printf("uploading archived directory <%s> to <%s>", src, dst)
-	return errors.Wrap(b.Put(dst, f), "could not upload file")
+	return errors.Wrap(c.b.Put(dst, f), "could not upload file")
 }
 
-// Download fetches the archived file from the cache
-// and restores to the host machine's file system
-func Download(b Backend, src, dst string) error {
+// Download fetches the archived file from the cache and restores to the host machine's file system
+func (c Cache) Download(src, dst string) error {
 	log.Printf("dowloading archived directory <%s>", src)
-	rc, err := b.Get(src)
+	rc, err := c.b.Get(src)
 	if err != nil {
 		return errors.Wrap(err, "could not get file from storage backend")
 	}
@@ -90,4 +115,59 @@ func Download(b Backend, src, dst string) error {
 	defer log.Printf("command stout: <%s>, stderr: <%s>", string(stdout.Bytes()), string(stderr.Bytes()))
 
 	return errors.Wrap(cmd.Run(), "could not open extract downloaded file")
+}
+
+// Helpers
+
+func archiveWriter(w io.Writer, archiveFmt string) (*tar.Writer, func()) {
+	var tw *tar.Writer
+	var closer func()
+	switch archiveFmt {
+	case "tar":
+		tw = tar.NewWriter(w)
+		closer = func() { tw.Close() }
+	case "gzip":
+		gw := gzip.NewWriter(w)
+		tw = tar.NewWriter(gw)
+		closer = func() {
+			gw.Close()
+			tw.Close()
+		}
+	default:
+		tw = tar.NewWriter(w)
+		closer = func() { tw.Close() }
+	}
+	return tw, closer
+}
+
+func writeFileToArchive(tw *tar.Writer, rootPath string) func(path string, fi os.FileInfo, err error) error {
+	return func(path string, fi os.FileInfo, err error) error {
+		if !fi.Mode().IsRegular() { // skip on symbolic links or directories
+			return nil
+		}
+
+		f, err := os.Open(path)
+		if err != nil {
+			return errors.Wrap(err, fmt.Sprintf("could not open file <%s>", path))
+		}
+		defer f.Close()
+
+		h := &tar.Header{
+			Name:    path,
+			Size:    fi.Size(),
+			Mode:    int64(fi.Mode()),
+			ModTime: fi.ModTime(),
+		}
+
+		err = tw.WriteHeader(h)
+		if err != nil {
+			return errors.Wrap(err, fmt.Sprintf("could not write header for file <%s>", path))
+		}
+
+		if _, err := io.Copy(tw, f); err != nil {
+			return errors.Wrap(err, fmt.Sprintf("could not copy the file <%s> data to the tarball", path))
+		}
+
+		return nil
+	}
 }

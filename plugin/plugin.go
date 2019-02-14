@@ -71,9 +71,10 @@ type (
 		//     authenticated-read
 		//     bucket-owner-read
 		//     bucket-owner-full-control
-		ACL      string
-		Bucket   string
-		CacheKey string
+		ACL           string
+		ArchiveFormat string
+		Bucket        string
+		CacheKey      string
 		// if not "", enable server-side encryption
 		// valid values are:
 		//     AES256
@@ -115,27 +116,32 @@ func (p *Plugin) Exec() error {
 	}
 
 	// 2. Initialize backend
-	conf := &aws.Config{
+	cred := credentials.AnonymousCredentials
+	if c.Key != "" && c.Secret != "" {
+		// allowing to use the instance role or provide a key and secret
+		cred = credentials.NewStaticCredentials(c.Key, c.Secret, "")
+	}
+
+	backend := backend.NewS3(c.Bucket, c.ACL, c.Encryption, &aws.Config{
 		Region:           aws.String(c.Region),
 		Endpoint:         &c.Endpoint,
 		DisableSSL:       aws.Bool(!strings.HasPrefix(c.Endpoint, "https://")),
 		S3ForcePathStyle: aws.Bool(c.PathStyle),
-	}
-	if c.Key != "" && c.Secret != "" {
-		// allowing to use the instance role or provide a key and secret
-		conf.Credentials = credentials.NewStaticCredentials(c.Key, c.Secret, "")
-	}
-	cacheBackend := backend.NewS3(c.Bucket, c.ACL, c.Encryption, conf)
+		Credentials:      cred,
+	})
 
-	// 3. Select mode
+	// 3. Initialize cache
+	cch := cache.New(backend, c.ArchiveFormat)
+
+	// 4. Select mode
 	if c.Rebuild {
-		if err := p.processRebuild(cacheBackend); err != nil {
+		if err := p.processRebuild(cch); err != nil {
 			return errors.Wrap(err, "process rebuild failed")
 		}
 	}
 
 	if c.Restore {
-		if err := p.processRestore(cacheBackend); err != nil {
+		if err := p.processRestore(cch); err != nil {
 			return errors.Wrap(err, "process restore failed")
 		}
 	}
@@ -144,7 +150,7 @@ func (p *Plugin) Exec() error {
 }
 
 // processRebuild the remote cache from the local environment
-func (p Plugin) processRebuild(b cache.Backend) error {
+func (p Plugin) processRebuild(c cache.Cache) error {
 	now := time.Now()
 	branch := p.Commit.Branch
 
@@ -157,7 +163,7 @@ func (p Plugin) processRebuild(b cache.Backend) error {
 		path := filepath.Join(p.Repo.Name, key)
 
 		log.Printf("rebuilding cache for directory <%s> to remote cache <%s>\n", mount, path)
-		if err := cache.Upload(b, mount, path); err != nil {
+		if err := c.Upload(mount, path); err != nil {
 			return errors.Wrap(err, "could not upload")
 		}
 	}
@@ -166,7 +172,7 @@ func (p Plugin) processRebuild(b cache.Backend) error {
 }
 
 // processRestore the local environment from the remote cache
-func (p Plugin) processRestore(b cache.Backend) error {
+func (p Plugin) processRestore(c cache.Cache) error {
 	now := time.Now()
 	branch := p.Commit.Branch
 
@@ -179,7 +185,7 @@ func (p Plugin) processRestore(b cache.Backend) error {
 		path := filepath.Join(p.Repo.Name, key)
 
 		log.Printf("restoring directory <%s> from remote cache <%s>\n", mount, path)
-		if err := cache.Download(b, path, mount); err != nil {
+		if err := c.Download(path, mount); err != nil {
 			return errors.Wrap(err, "could not download")
 		}
 	}

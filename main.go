@@ -199,11 +199,15 @@ func main() {
 			Usage:  "restore the cache directories",
 			EnvVar: "PLUGIN_RESTORE",
 		},
-
 		cli.StringFlag{
-			Name:   "cache.key, chck",
+			Name:   "cache-key, chk",
 			Usage:  "cache key to use for the cache directories",
 			EnvVar: "PLUGIN_CACHE_KEY",
+		},
+		cli.StringFlag{
+			Name:   "archive-format, arcfmt",
+			Usage:  "archive format to use to store the cache directories, available formats: tar (default), gzip.",
+			EnvVar: "PLUGIN_ARCHIVE_FORMAT",
 		},
 
 		// Volume specific Config args
@@ -296,18 +300,19 @@ func run(c *cli.Context) error {
 			},
 		},
 		Config: plugin.Config{
-			ACL:        c.String("acl"),
-			Bucket:     c.String("bucket"),
-			CacheKey:   c.String("cache.key"),
-			Encryption: c.String("encryption"),
-			Endpoint:   c.String("endpoint"),
-			Key:        c.String("access-key"),
-			Mount:      c.StringSlice("mount"),
-			PathStyle:  c.Bool("path-style"),
-			Rebuild:    c.Bool("rebuild"),
-			Region:     c.String("region"),
-			Restore:    c.Bool("restore"),
-			Secret:     c.String("secret-key"),
+			ACL:           c.String("acl"),
+			ArchiveFormat: c.String("archive-format"),
+			Bucket:        c.String("bucket"),
+			CacheKey:      c.String("cache-key"),
+			Encryption:    c.String("encryption"),
+			Endpoint:      c.String("endpoint"),
+			Key:           c.String("access-key"),
+			Mount:         c.StringSlice("mount"),
+			PathStyle:     c.Bool("path-style"),
+			Rebuild:       c.Bool("rebuild"),
+			Region:        c.String("region"),
+			Restore:       c.Bool("restore"),
+			Secret:        c.String("secret-key"),
 		},
 	}
 
