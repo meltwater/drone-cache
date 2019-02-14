@@ -1,6 +1,6 @@
 # TODO
 
-## Maintenance
+## For v0.9.0
 
 - [x] Add Drone badge
 - [x] Merge DOCS.md and README.md
@@ -27,16 +27,20 @@
 
 - [x] Add CircleCI like go template cache keys
 - [x] Tar/Gzip
-- [ ] Add volume/file storage
 
 - [ ] Add usage examples to README
 - [ ] Add all possible environment variables to README
 - [ ] Rename Repo
 
+- [] MERGE !
+
 - [ ] Improve static analyzers
 - [ ] Improve Makefile
 - [ ] Docker from scratch
 
+## Before v1.0.0
+
+- [ ] Add volume/file storage
 - [ ] Add unit tests
 
 ## Road to Open Source

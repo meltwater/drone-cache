@@ -134,6 +134,10 @@ func TestRestore(t *testing.T) {
 	if _, err := os.Stat("./tmp/1/file_to_cache.txt"); os.IsNotExist(err) {
 		t.Fatal(err)
 	}
+
+	if _, err := os.Stat("./tmp/1/file1_to_cache.txt"); os.IsNotExist(err) {
+		t.Fatal(err)
+	}
 }
 
 func TestRestoreWithCacheKey(t *testing.T) {
@@ -191,6 +195,10 @@ func TestRestoreWithCacheKey(t *testing.T) {
 	}
 
 	if _, err := os.Stat("./tmp/1/file_to_cache.txt"); os.IsNotExist(err) {
+		t.Fatal(err)
+	}
+
+	if _, err := os.Stat("./tmp/1/file1_to_cache.txt"); os.IsNotExist(err) {
 		t.Fatal(err)
 	}
 }
