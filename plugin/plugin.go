@@ -146,8 +146,14 @@ func (p *Plugin) Exec() error {
 // processRebuild the remote cache from the local environment
 func (p Plugin) processRebuild(b cache.Backend) error {
 	now := time.Now()
+	branch := p.Commit.Branch
+
 	for _, mount := range p.Config.Mount {
-		key := p.cacheKey(mount, p.Commit.Branch)
+		key, err := p.cacheKey(mount)
+		if err != nil {
+			log.Printf("%v, falling back to default key\n", err)
+			key = hash(mount, branch)
+		}
 		path := filepath.Join(p.Repo.Name, key)
 
 		log.Printf("rebuilding cache for directory <%s> to remote cache <%s>\n", mount, path)
@@ -162,8 +168,14 @@ func (p Plugin) processRebuild(b cache.Backend) error {
 // processRestore the local environment from the remote cache
 func (p Plugin) processRestore(b cache.Backend) error {
 	now := time.Now()
+	branch := p.Commit.Branch
+
 	for _, mount := range p.Config.Mount {
-		key := p.cacheKey(mount, p.Commit.Branch)
+		key, err := p.cacheKey(mount)
+		if err != nil {
+			log.Printf("%v, falling back to default key\n", err)
+			key = hash(mount, branch)
+		}
 		path := filepath.Join(p.Repo.Name, key)
 
 		log.Printf("restoring directory <%s> from remote cache <%s>\n", mount, path)
@@ -175,41 +187,38 @@ func (p Plugin) processRestore(b cache.Backend) error {
 	return nil
 }
 
-// Helpers
-
 // cacheKey generates key from given template as parameter or fallbacks hash
-func (p Plugin) cacheKey(mount, branch string) string {
-	if p.Config.CacheKey != "" {
-		log.Println("using provided cache key template")
-		t, err := template.New("cacheKey").Parse(p.Config.CacheKey)
-		if err != nil {
-			log.Printf("could not parse <%s> as cache key template, falling back to default\n", p.Config.CacheKey)
-			return hash(mount, branch)
-		}
-
-		data := struct {
-			Build  Build
-			Commit Commit
-			Repo   Repo
-		}{
-			Build:  p.Build,
-			Commit: p.Commit,
-			Repo:   p.Repo,
-		}
-
-		var b strings.Builder
-		err = t.Execute(&b, data)
-		if err != nil {
-			log.Printf("could not build <%s> as cache key, falling back to default. error: %+v\n", p.Config.CacheKey, err)
-			return hash(mount, branch)
-		}
-
-		return b.String()
+func (p Plugin) cacheKey(mount string) (string, error) {
+	if p.Config.CacheKey == "" {
+		return "", errors.New("cache key template is empty")
 	}
 
-	// falling back to default key generation
-	return hash(mount, branch)
+	log.Println("using provided cache key template")
+	t, err := template.New("cacheKey").Parse(p.Config.CacheKey)
+	if err != nil {
+		return "", errors.Wrap(err, fmt.Sprintf("could not parse <%s> as cache key template, falling back to default\n", p.Config.CacheKey))
+	}
+
+	data := struct {
+		Build  Build
+		Commit Commit
+		Repo   Repo
+	}{
+		Build:  p.Build,
+		Commit: p.Commit,
+		Repo:   p.Repo,
+	}
+
+	var b strings.Builder
+	err = t.Execute(&b, data)
+	if err != nil {
+		return "", errors.Wrap(err, fmt.Sprintf("could not build <%s> as cache key, falling back to default. %+v\n", p.Config.CacheKey, err))
+	}
+
+	return fmt.Sprintf("%s/%s", b.String(), mount), nil
 }
+
+// Helpers
 
 // hash generates a key based on filename paths and branch
 func hash(mount, branch string) string {
