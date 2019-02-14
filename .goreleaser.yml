@@ -15,15 +15,14 @@ builds:
   ldflags: >
     -X main.Version={{.Version}}
     -X main.DateBuilt={{.Date}}
-# archive:
-#   replacements:
-#     darwin: Darwin
-#     linux: Linux
-#     windows: Windows
-#     386: i386
-#     amd64: x86_64
 archive:
   format: tar.gz
+  replacements:
+    darwin: Darwin
+    linux: Linux
+    windows: Windows
+    386: i386
+    amd64: x86_64
   files:
     - README.md
     - CHANGELOG.md
