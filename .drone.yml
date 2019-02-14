@@ -19,17 +19,15 @@ pipeline:
     environment:
       CGO_ENABLED: '0'
     commands:
-      - make fetch-dependencies
       - go vet -v -all -mod=vendor
 
   test:
     image: golang:1.11-alpine
     pull: true
     environment:
-      CGO_ENABLED: '0'
+      CGO_ENABLED: '1'
       TEST_ENDPOINT: filestorage:9000
     commands:
-      - make fetch-dependencies
       - go test -race -v -mod=vendor ./...
 
   docker-release-latest:
