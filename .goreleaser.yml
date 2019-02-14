@@ -6,12 +6,12 @@ builds:
   - CGO_ENABLED=0
 - main: main.go
   # binary: drone-s3-cache
-  goos:
-    - windows
-    - darwin
-    - linux
-  goarch:
-    - amd64
+  # goos:
+  #   - windows
+  #   - darwin
+  #   - linux
+  # goarch:
+  #   - amd64
   ldflags: >
     -s
     -w

@@ -34,6 +34,7 @@
 - [ ] Add all possible environment variables to README
 - [ ] Add unit tests
 - [ ] Rename Repo
+- [ ] Docker from scratch
 
 ## Road to Open Source!
 
