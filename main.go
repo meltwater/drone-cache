@@ -182,7 +182,7 @@ func main() {
 			EnvVar: "DRONE_PREV_COMMIT_SHA",
 		},
 
-		// Config ars
+		// Config args
 
 		cli.StringSliceFlag{
 			Name:   "mount, m",
@@ -198,6 +198,12 @@ func main() {
 			Name:   "restore, res",
 			Usage:  "restore the cache directories",
 			EnvVar: "PLUGIN_RESTORE",
+		},
+
+		cli.StringFlag{
+			Name:   "cache.key, chck",
+			Usage:  "cache key to use for the cache directories",
+			EnvVar: "PLUGIN_CACHE_KEY",
 		},
 
 		// Volume specific Config args
@@ -291,9 +297,8 @@ func run(c *cli.Context) error {
 		},
 		Config: plugin.Config{
 			ACL:        c.String("acl"),
-			Branch:     c.String("commit.branch"),
 			Bucket:     c.String("bucket"),
-			Default:    c.String("repo.branch"),
+			CacheKey:   c.String("cache.key"),
 			Encryption: c.String("encryption"),
 			Endpoint:   c.String("endpoint"),
 			Key:        c.String("access-key"),
@@ -301,7 +306,6 @@ func run(c *cli.Context) error {
 			PathStyle:  c.Bool("path-style"),
 			Rebuild:    c.Bool("rebuild"),
 			Region:     c.String("region"),
-			Repo:       c.String("repo.name"),
 			Restore:    c.Bool("restore"),
 			Secret:     c.String("secret-key"),
 		},
