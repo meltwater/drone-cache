@@ -40,8 +40,16 @@
 
 ## Before v1.0.0
 
+- [ ] Introduce mode: wrap_in_directory: true
 - [ ] Add volume/file storage
+    - [ ] https://docs.drone.io/user-guide/pipeline/volumes/
+    - [ ] http://plugins.drone.io/drillster/drone-volume-cache/
+    - [ ] https://github.com/Drillster/drone-volume-cache/blob/master/cacher.sh
 - [ ] Add unit tests
+- [ ] Badges
+    - [ ] Drone Pluging badges
+    - [ ] https://microbadger.com/images/meltwater/drone-s3-cache
+    - [ ] [![Go Report Card](https://goreportcard.com/badge/github.com/meltwater/drone-cache)](https://goreportcard.com/report/github.com/meltwater/drone-cache)
 
 ## Road to Open Source
 
@@ -51,5 +59,5 @@
 - [ ] Provide Code of conduct
 - [ ] Provide Contributors
 - [ ] Provide PR template
-- [ ] Provide issue template
+- [ ] Provide Issue template
 - [ ] Open Source :tada:
