@@ -19,6 +19,7 @@ pipeline:
     environment:
       CGO_ENABLED: '0'
     commands:
+      - make fetch-dependencies
       - go vet -v -all -mod=vendor
 
   test:
@@ -28,6 +29,7 @@ pipeline:
       CGO_ENABLED: '0'
       TEST_ENDPOINT: filestorage:9000
     commands:
+      - make fetch-dependencies
       - go test -race -v -mod=vendor ./...
 
   docker-release-latest:
