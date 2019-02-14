@@ -28,7 +28,7 @@ pipeline:
       CGO_ENABLED: '0'
       TEST_ENDPOINT: filestorage:9000
     commands:
-      - go test -v -mod=vendor ./...
+      - go test -v -mod=vendor ./... # NOTICE: -race: Needs CGO enabled
 
   docker-release-latest:
     image: plugins/docker

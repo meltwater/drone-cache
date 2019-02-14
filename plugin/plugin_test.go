@@ -98,8 +98,8 @@ func TestRestore(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	plugin.Rebuild = false
-	plugin.Restore = true
+	plugin.Config.Rebuild = false
+	plugin.Config.Restore = true
 	if err := plugin.Exec(); err != nil {
 		t.Errorf("plugin (restore mode) exec failed, error: %v\n", err)
 	}
