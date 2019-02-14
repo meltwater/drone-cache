@@ -5,7 +5,7 @@ builds:
 - env:
   - CGO_ENABLED=0
 - main: main.go
-  binary: drone-s3-cache
+  # binary: drone-s3-cache
   goos:
     - windows
     - darwin
@@ -13,6 +13,8 @@ builds:
   goarch:
     - amd64
   ldflags: >
+    -s
+    -w
     -X main.Version={{.Version}}
     -X main.DateBuilt={{.Date}}
 archive:
