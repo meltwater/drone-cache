@@ -43,7 +43,34 @@ func TestRebuild(t *testing.T) {
 	file.Sync()
 	file.Close()
 
-	plugin := newTestPlugin(true, false, []string{"./tmp/1"})
+	plugin := newTestPlugin(true, false, []string{"./tmp/1"}, "")
+
+	if err := plugin.Exec(); err != nil {
+		t.Errorf("plugin exec failed, error: %v\n", err)
+	}
+}
+
+func TestRebuildWithCacheKey(t *testing.T) {
+	setup(t)
+	defer cleanUp(t)
+
+	if mkErr1 := os.MkdirAll("./tmp/1", 0755); mkErr1 != nil {
+		t.Fatal(mkErr1)
+	}
+
+	file, fErr := os.Create("./tmp/1/file_to_cache.txt")
+	if fErr != nil {
+		t.Fatal(fErr)
+	}
+
+	_, wErr := file.WriteString("some content\n")
+	if wErr != nil {
+		t.Fatal(wErr)
+	}
+	file.Sync()
+	file.Close()
+
+	plugin := newTestPlugin(true, false, []string{"./tmp/1"}, "{{ .Repo.Name }}_{{ .Commit.Branch }}_{{ .Build.Number }}")
 
 	if err := plugin.Exec(); err != nil {
 		t.Errorf("plugin exec failed, error: %v\n", err)
@@ -88,7 +115,66 @@ func TestRestore(t *testing.T) {
 	file1.Sync()
 	file1.Close()
 
-	plugin := newTestPlugin(true, false, []string{"./tmp/1"})
+	plugin := newTestPlugin(true, false, []string{"./tmp/1"}, "")
+
+	if err := plugin.Exec(); err != nil {
+		t.Errorf("plugin (rebuild mode) exec failed, error: %v\n", err)
+	}
+
+	if err := os.RemoveAll("./tmp"); err != nil {
+		t.Fatal(err)
+	}
+
+	plugin.Config.Rebuild = false
+	plugin.Config.Restore = true
+	if err := plugin.Exec(); err != nil {
+		t.Errorf("plugin (restore mode) exec failed, error: %v\n", err)
+	}
+
+	if _, err := os.Stat("./tmp/1/file_to_cache.txt"); os.IsNotExist(err) {
+		t.Fatal(err)
+	}
+}
+
+func TestRestoreWithCacheKey(t *testing.T) {
+	setup(t)
+	defer cleanUp(t)
+
+	if err := os.MkdirAll("./tmp/1", 0755); err != nil {
+		t.Fatal(err)
+	}
+
+	file, cErr := os.Create("./tmp/1/file_to_cache.txt")
+	if cErr != nil {
+		t.Fatal(cErr)
+	}
+
+	_, wErr := file.WriteString("some content\n")
+	if wErr != nil {
+		t.Fatal(wErr)
+	}
+
+	file.Sync()
+	file.Close()
+
+	if mkErr1 := os.MkdirAll("./tmp/1", 0755); mkErr1 != nil {
+		t.Fatal(mkErr1)
+	}
+
+	file1, fErr1 := os.Create("./tmp/1/file1_to_cache.txt")
+	if fErr1 != nil {
+		t.Fatal(fErr1)
+	}
+
+	_, wErr1 := file1.WriteString("some content\n")
+	if wErr1 != nil {
+		t.Fatal(wErr1)
+	}
+
+	file1.Sync()
+	file1.Close()
+
+	plugin := newTestPlugin(true, false, []string{"./tmp/1"}, "{{ .Repo.Name }}_{{ .Commit.Branch }}_{{ .Build.Number }}")
 
 	if err := plugin.Exec(); err != nil {
 		t.Errorf("plugin (rebuild mode) exec failed, error: %v\n", err)
@@ -111,7 +197,7 @@ func TestRestore(t *testing.T) {
 
 // Helpers
 
-func newTestPlugin(rebuild bool, restore bool, mount []string) Plugin {
+func newTestPlugin(rebuild bool, restore bool, mount []string, cacheKey string) Plugin {
 	return Plugin{
 		Repo: Repo{
 			Branch: "master",
@@ -123,6 +209,7 @@ func newTestPlugin(rebuild bool, restore bool, mount []string) Plugin {
 		Config: Config{
 			ACL:        "private",
 			Bucket:     bucket,
+			CacheKey:   cacheKey,
 			Encryption: "",
 			Endpoint:   endpoint,
 			Key:        accessKey,
@@ -206,8 +293,6 @@ func removeAllObjects(minioClient *minio.Client, bucketName string) error {
 			return fmt.Errorf("remove all objects failed, while fetching %v", err)
 		}
 	}
-
-	return nil
 }
 
 func getEnv(key, defaultVal string) string {

@@ -26,8 +26,8 @@
 - [x] Add Goreleaser
 
 - [x] Add CircleCI like go template cache keys
-- [ ] Add volume/file storage
 - [ ] Tar/Zip
+- [ ] Add volume/file storage
 
 - [ ] Add usage examples to README
 - [ ] Add all possible environment variables to README
@@ -39,7 +39,7 @@
 
 - [ ] Add unit tests
 
-## Road to Open Source!
+## Road to Open Source
 
 - [ ] Copyright
 - [ ] Add reference to original author
