@@ -6,7 +6,7 @@ ENV BUILD_DIR /build
 
 COPY go.* Makefile $BUILD_DIR/
 WORKDIR $BUILD_DIR
-RUN make fetch-dependecies
+RUN make fetch-dependencies
 
 COPY . $BUILD_DIR
 
