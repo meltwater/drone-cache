@@ -25,8 +25,7 @@
 - [x] Add short names for Flags (you can set alternate (or short) names for flags by providing a comma-delimited list for the Name.)
 - [x] Add Goreleaser
 
-- [ ] Add CircleCI like go template cache keys
-- [ ] Make sure cache fallbacks to master for default branched based cache
+- [x] Add CircleCI like go template cache keys
 - [ ] Add volume/file storage
 - [ ] Tar/Zip
 

@@ -8,6 +8,7 @@ import (
 	"log"
 	"path/filepath"
 	"strings"
+	"text/template"
 	"time"
 
 	"github.com/aws/aws-sdk-go/aws"
@@ -21,43 +22,43 @@ import (
 type (
 	// Repo stores information about repository that is built
 	Repo struct {
-		Owner   string
-		Name    string
-		Link    string
 		Avatar  string
 		Branch  string
+		Link    string
+		Name    string
+		Owner   string
 		Private bool
 		Trusted bool
 	}
 
 	// Build stores information about current build
 	Build struct {
-		Number   int
-		Event    string
-		Status   string
-		Deploy   string
 		Created  int64
-		Started  int64
+		Deploy   string
+		Event    string
 		Finished int64
 		Link     string
+		Number   int
+		Started  int64
+		Status   string
 	}
 
 	// Commit stores information about current commit
 	Commit struct {
+		Author  Author
+		Branch  string
+		Link    string
+		Message string
+		Ref     string
 		Remote  string
 		Sha     string
-		Ref     string
-		Link    string
-		Branch  string
-		Message string
-		Author  Author
 	}
 
 	// Author stores information about current commit's author
 	Author struct {
-		Name   string
-		Email  string
 		Avatar string
+		Email  string
+		Name   string
 	}
 
 	// Config plugin-specific parameters and secrets
@@ -70,10 +71,9 @@ type (
 		//     authenticated-read
 		//     bucket-owner-read
 		//     bucket-owner-full-control
-		ACL     string
-		Branch  string
-		Bucket  string
-		Default string // default master branch
+		ACL      string
+		Bucket   string
+		CacheKey string
 		// if not "", enable server-side encryption
 		// valid values are:
 		//     AES256
@@ -87,40 +87,47 @@ type (
 		PathStyle bool
 		Rebuild   bool
 		Region    string
-		Repo      string
 		Restore   bool
 		Secret    string
 	}
 
 	// Plugin stores metadata about current plugin
 	Plugin struct {
-		Repo   Repo
 		Build  Build
 		Commit Commit
 		Config Config
+		Repo   Repo
 	}
 )
 
 // Exec entry point of Plugin, where the magic happens
 func (p *Plugin) Exec() error {
 	c := p.Config
+
+	// 1. Check paramaters
 	if c.Rebuild && c.Restore {
 		return errors.New("rebuild and restore are mutually exclusive, please set only one of them")
 	}
 
+	_, err := template.New("cacheKey").Parse(p.Config.CacheKey)
+	if err != nil {
+		return errors.Wrap(err, fmt.Sprintf("could not parse <%s> as cache key template, falling back to default", p.Config.CacheKey))
+	}
+
+	// 2. Initialize backend
 	conf := &aws.Config{
 		Region:           aws.String(c.Region),
 		Endpoint:         &c.Endpoint,
 		DisableSSL:       aws.Bool(!strings.HasPrefix(c.Endpoint, "https://")),
 		S3ForcePathStyle: aws.Bool(c.PathStyle),
 	}
-	// allowing to use the instance role or provide a key and secret
 	if c.Key != "" && c.Secret != "" {
+		// allowing to use the instance role or provide a key and secret
 		conf.Credentials = credentials.NewStaticCredentials(c.Key, c.Secret, "")
 	}
-
 	cacheBackend := backend.NewS3(c.Bucket, c.ACL, c.Encryption, conf)
 
+	// 3. Select mode
 	if c.Rebuild {
 		if err := p.processRebuild(cacheBackend); err != nil {
 			return errors.Wrap(err, "process rebuild failed")
@@ -136,18 +143,14 @@ func (p *Plugin) Exec() error {
 	return nil
 }
 
-// Helpers
-
 // processRebuild the remote cache from the local environment
 func (p Plugin) processRebuild(b cache.Backend) error {
-	c := p.Config
 	now := time.Now()
+	for _, mount := range p.Config.Mount {
+		key := p.cacheKey(mount, p.Commit.Branch)
+		path := filepath.Join(p.Repo.Name, key)
 
-	for _, mount := range c.Mount {
-		cacheKey := hash(mount, c.Branch)
-		path := filepath.Join(c.Repo, cacheKey)
-
-		log.Printf("rebuilding cache for directory <%s> to remote cache <%s>", mount, path)
+		log.Printf("rebuilding cache for directory <%s> to remote cache <%s>\n", mount, path)
 		if err := cache.Upload(b, mount, path); err != nil {
 			return errors.Wrap(err, "could not upload")
 		}
@@ -158,14 +161,12 @@ func (p Plugin) processRebuild(b cache.Backend) error {
 
 // processRestore the local environment from the remote cache
 func (p Plugin) processRestore(b cache.Backend) error {
-	c := p.Config
 	now := time.Now()
+	for _, mount := range p.Config.Mount {
+		key := p.cacheKey(mount, p.Commit.Branch)
+		path := filepath.Join(p.Repo.Name, key)
 
-	for _, mount := range c.Mount {
-		cacheKey := hash(mount, c.Branch)
-		path := filepath.Join(c.Repo, cacheKey)
-
-		log.Printf("restoring directory <%s> from remote cache <%s>", mount, path)
+		log.Printf("restoring directory <%s> from remote cache <%s>\n", mount, path)
 		if err := cache.Download(b, path, mount); err != nil {
 			return errors.Wrap(err, "could not download")
 		}
@@ -174,7 +175,43 @@ func (p Plugin) processRestore(b cache.Backend) error {
 	return nil
 }
 
-// hash a file name based on path and branch
+// Helpers
+
+// cacheKey generates key from given template as parameter or fallbacks hash
+func (p Plugin) cacheKey(mount, branch string) string {
+	if p.Config.CacheKey != "" {
+		log.Println("using provided cache key template")
+		t, err := template.New("cacheKey").Parse(p.Config.CacheKey)
+		if err != nil {
+			log.Printf("could not parse <%s> as cache key template, falling back to default\n", p.Config.CacheKey)
+			return hash(mount, branch)
+		}
+
+		data := struct {
+			Build  Build
+			Commit Commit
+			Repo   Repo
+		}{
+			Build:  p.Build,
+			Commit: p.Commit,
+			Repo:   p.Repo,
+		}
+
+		var b strings.Builder
+		err = t.Execute(&b, data)
+		if err != nil {
+			log.Printf("could not build <%s> as cache key, falling back to default. error: %+v\n", p.Config.CacheKey, err)
+			return hash(mount, branch)
+		}
+
+		return b.String()
+	}
+
+	// falling back to default key generation
+	return hash(mount, branch)
+}
+
+// hash generates a key based on filename paths and branch
 func hash(mount, branch string) string {
 	parts := []string{mount, branch}
 

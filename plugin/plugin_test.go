@@ -113,11 +113,16 @@ func TestRestore(t *testing.T) {
 
 func newTestPlugin(rebuild bool, restore bool, mount []string) Plugin {
 	return Plugin{
+		Repo: Repo{
+			Branch: "master",
+			Name:   "drone-s3-cache",
+		},
+		Commit: Commit{
+			Branch: "master",
+		},
 		Config: Config{
 			ACL:        "private",
-			Branch:     "master",
 			Bucket:     bucket,
-			Default:    "master",
 			Encryption: "",
 			Endpoint:   endpoint,
 			Key:        accessKey,
@@ -125,7 +130,6 @@ func newTestPlugin(rebuild bool, restore bool, mount []string) Plugin {
 			PathStyle:  true, // Should be true for minio and false for AWS.
 			Rebuild:    rebuild,
 			Region:     region,
-			Repo:       "drone-s3-cache",
 			Restore:    restore,
 			Secret:     secretAccessKey,
 		},
