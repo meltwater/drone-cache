@@ -2,15 +2,19 @@ branches:
   - master
 
 pipeline:
+  clone:
+    image: plugins/git
+    tags: true
+
   build:
-    image: golang:alpine
+    image: golang:1.11-alpine
     pull: true
     commands:
       - apk add --update make git
       - make drone-s3-cache
 
   analyze:
-    image: golang:alpine
+    image: golang:1.11-alpine
     pull: true
     environment:
       CGO_ENABLED: '0'
@@ -18,7 +22,7 @@ pipeline:
       - go vet -v -all -mod=vendor
 
   test:
-    image: golang:alpine
+    image: golang:1.11-alpine
     pull: true
     environment:
       CGO_ENABLED: '0'
@@ -26,7 +30,7 @@ pipeline:
     commands:
       - go test -race -v -mod=vendor ./...
 
-  release-latest:
+  docker-release-latest:
     image: plugins/docker
     pull: true
     repo: meltwater/drone-s3-cache
@@ -36,11 +40,21 @@ pipeline:
       branch: [master]
       event: [push]
 
-  release-tag:
+  docker-release-tag:
     image: plugins/docker
     repo: meltwater/drone-s3-cache
     tags: '${DRONE_TAG}'
     secrets: [docker_username, docker_password]
+    when:
+      event: tag
+      status: success
+      ref: refs/tags/*
+
+  release:
+    image: golang:1.11 # golang:1.11-alpine
+    secrets: [github_token]
+    commands:
+      curl -sL https://git.io/goreleaser | bash
     when:
       event: tag
       status: success
