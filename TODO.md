@@ -23,18 +23,22 @@
 - [x] Make flags mutually exclusive, throw an error
 - [x] Add more build information
 - [x] Add short names for Flags (you can set alternate (or short) names for flags by providing a comma-delimited list for the Name.)
-- [ ] Add Goreleaser
+- [x] Add Goreleaser
 
 - [ ] Add CircleCI like go template cache keys
 - [ ] Make sure cache fallbacks to master for default branched based cache
 - [ ] Add volume/file storage
-
 - [ ] Tar/Zip
+
 - [ ] Add usage examples to README
 - [ ] Add all possible environment variables to README
-- [ ] Add unit tests
+
 - [ ] Rename Repo
+- [ ] Improve static analyzers
+- [ ] Improve Makefile
 - [ ] Docker from scratch
+
+- [ ] Add unit tests
 
 ## Road to Open Source!
 
