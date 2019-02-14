@@ -4,22 +4,22 @@ before:
 builds:
 - env:
   - CGO_ENABLED=0
-- main: main.go
-  binary: drone-s3-cache
-  goos:
-    - windows
-    - darwin
-    - linux
-  goarch:
-    - amd64
-    - arm
-  goarm:
-    - 5
-    - 6
-    - 7
-  ldflags: >
-    -X main.Version={{.Version}}
-    -X main.DateBuilt={{.Date}}
+# - main: main.go
+#   binary: drone-s3-cache
+#   goos:
+#     - windows
+#     - darwin
+#     - linux
+#   goarch:
+#     - amd64
+#     - arm
+#   goarm:
+#     - 5
+#     - 6
+#     - 7
+#   ldflags: >
+#     -X main.Version={{.Version}}
+#     -X main.DateBuilt={{.Date}}
 # archive:
 #   replacements:
 #     darwin: Darwin
