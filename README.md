@@ -107,7 +107,7 @@ The following is a sample configuration in your .drone.yml file:
 ```yaml
 pipeline:
   restore-cache:
-    image: meltwater/drone-s3-cache
+    image: meltwater/drone-cache
     pull: true
     restore: true
     bucket: drone-cache-bucket
@@ -123,7 +123,7 @@ pipeline:
       - npm install
 
 rebuild-deps-cache:
-    image: meltwater/drone-s3-cache
+    image: meltwater/drone-cache
     pull: true
     rebuild: true
     bucket: drone-cache-bucket
@@ -138,7 +138,7 @@ rebuild-deps-cache:
 ```yaml
 pipeline:
   restore-cache:
-    image: meltwater/drone-s3-cache
+    image: meltwater/drone-cache
     pull: true
     restore: true
     cache_key: "{{ .Repo.Name }}_{{ .Commit.Branch }}_{{ .Build.Number }}"
@@ -155,7 +155,7 @@ pipeline:
       - npm install
 
 rebuild-deps-cache:
-    image: meltwater/drone-s3-cache
+    image: meltwater/drone-cache
     pull: true
     rebuild: true
     cache_key: "{{ .Repo.Name }}_{{ .Commit.Branch }}_{{ .Build.Number }}"
@@ -171,7 +171,7 @@ rebuild-deps-cache:
 ```yaml
 pipeline:
   restore-cache:
-    image: meltwater/drone-s3-cache
+    image: meltwater/drone-cache
     pull: true
     restore: true
     cache_key: "{{ .Repo.Name }}_{{ .Commit.Branch }}_{{ .Build.Number }}"
@@ -189,7 +189,7 @@ pipeline:
       - npm install
 
 rebuild-deps-cache:
-    image: meltwater/drone-s3-cache
+    image: meltwater/drone-cache
     pull: true
     rebuild: true
     cache_key: "{{ .Repo.Name }}_{{ .Commit.Branch }}_{{ .Build.Number }}"
@@ -206,7 +206,7 @@ rebuild-deps-cache:
 ```yaml
 pipeline:
   restore-cache:
-    image: meltwater/drone-s3-cache
+    image: meltwater/drone-cache
     pull: true
     restore: true
     debug: true
@@ -223,7 +223,7 @@ pipeline:
       - npm install
 
 rebuild-deps-cache:
-    image: meltwater/drone-s3-cache
+    image: meltwater/drone-cache
     pull: true
     rebuild: true
     debug: true

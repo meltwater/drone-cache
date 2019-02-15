@@ -43,7 +43,7 @@
   - [x] Drone Pluging badges
   - [x] https://microbadger.com/images/meltwater/drone-cache
   - [x] https://goreportcard.com/report/github.com/meltwater/drone-cache
-- [ ] Add volume/file storage
+- [ ] **Add volume/file storage**
   - [ ] https://docs.drone.io/user-guide/pipeline/volumes/
   - [ ] http://plugins.drone.io/drillster/drone-volume-cache/
   - [ ] https://github.com/Drillster/drone-volume-cache/blob/master/cacher.sh
