@@ -2,6 +2,10 @@ branches:
   - master
 
 pipeline:
+  clone:
+    image: plugins/git
+    tags: true
+
   restore-cache:
       image: meltwater/drone-cache
       pull: true
@@ -103,15 +107,15 @@ pipeline:
       branch: [master]
       event: [push]
 
-  docker-release-tag:
-    image: plugins/docker
-    repo: meltwater/drone-cache
-    tags: '${DRONE_TAG}'
-    secrets: [docker_username, docker_password]
-    when:
-      event: tag
-      status: success
-      ref: refs/tags/*
+  # docker-release-tag:
+  #   image: plugins/docker
+  #   repo: meltwater/drone-cache
+  #   tags: '${DRONE_TAG}'
+  #   secrets: [docker_username, docker_password]
+  #   when:
+  #     event: tag
+  #     status: success
+  #     ref: refs/tags/*
 
   release:
     image: golang:1.11 # golang:1.11-alpine
@@ -137,7 +141,7 @@ pipeline:
       > {{build.message}} by <https://github.com/{{build.author}}|{{build.author}}>
     when:
       local: false
-      status: [changed, failure] # success
+      status: [success, failure]
 
 services:
   filestorage:

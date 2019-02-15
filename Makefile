@@ -15,12 +15,15 @@ fetch-dependencies:
 .PHONY: fetch-dependencies
 
 compress: drone-cache
-	upx --brute drone-cache
+	upx drone-cache
 
 .PHONY: compress
 
 docker-build: Dockerfile
 	docker build -t meltwater/drone-cache:latest .
+
+docker-build-scratch: Dockerfile.scratch
+	docker build -f Dockerfile.scratch -t meltwater/drone-cache:latest .
 
 docker-push: docker-build
 	docker push meltwater/drone-cache:latest

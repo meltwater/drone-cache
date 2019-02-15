@@ -1,0 +1,21 @@
+# build stage
+FROM golang:1.11-alpine AS builder
+RUN apk add --update upx ca-certificates tzdata && update-ca-certificates
+
+RUN adduser -D -g '' appuser
+
+COPY drone-cache /bin/
+WORKDIR /bin
+RUN upx drone-cache
+
+# final stage
+FROM scratch
+
+COPY --from=builder /usr/share/zoneinfo /usr/share/zoneinfo
+COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
+COPY --from=builder /etc/passwd /etc/passwd
+COPY --from=builder /bin/drone-cache /bin/
+
+USER appuser
+
+ENTRYPOINT ["/bin/drone-cache"]

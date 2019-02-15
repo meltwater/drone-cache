@@ -1,5 +1,5 @@
 # build stage
-FROM golang:1.11.5-alpine AS builder
+FROM golang:1.11-alpine AS builder
 RUN apk add --update make git upx
 
 ENV BUILD_DIR /build
@@ -24,6 +24,7 @@ RUN set -ex \
   && rm -rf /var/cache/apk/*
 
 COPY scripts/entrypoint.sh /entrypoint.sh
-RUN chmod 755 /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
 ENTRYPOINT ["/entrypoint.sh"]
 CMD ["/bin/drone-cache"]
