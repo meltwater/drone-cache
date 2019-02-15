@@ -30,11 +30,11 @@
 - [x] Rename Repo
 - [x] TEST!
 - [x] MERGE !
+- [X] Docker from scratch
 
-- [ ] Docker from scratch
 - [ ] Gorelease Docker multiple arc
-- [ ] Improve Makefile
 
+- [ ] Improve Makefile
 - [ ] Improve static analyzers
 
 ## Before v1.0.0
@@ -48,11 +48,11 @@
   - [ ] http://plugins.drone.io/drillster/drone-volume-cache/
   - [ ] https://github.com/Drillster/drone-volume-cache/blob/master/cacher.sh
 - [ ] Introduce mode: wrap_in_directory: true/false
-- [ ] Add unit tests
 - [ ] Checkout
   - [ ] https://github.com/drone/drone-go
   - [ ] https://github.com/drone-plugins/drone-s3
   - [ ] New Drone Version
+- [ ] Add unit tests
 
 ## Road to Open Source
 
