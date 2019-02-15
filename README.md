@@ -4,7 +4,7 @@
 [![Drone](https://drone.meltwater.io/api/badges/meltwater/drone-cache/status.svg)](https://drone.meltwater.io/meltwater/drone-cache)
 [![Go Doc](https://godoc.org/github.com/meltwater/drone-cache?status.svg)](http://godoc.org/github.com/meltwater/drone-cache)
 [![Go Report Card](https://goreportcard.com/badge/github.com/meltwater/drone-cache)](https://goreportcard.com/report/github.com/meltwater/drone-cache)
-[![Docker](https://microbadger.com/images/meltwater/drone-cache)](https://microbadger.com/images/meltwater/drone-cache)
+[![](https://images.microbadger.com/badges/image/meltwater/drone-cache.svg)](https://microbadger.com/images/meltwater/drone-cache "Get your own image badge on microbadger.com")
 [![](https://images.microbadger.com/badges/version/meltwater/drone-cache.svg)](https://microbadger.com/images/meltwater/drone-cache "Get your own version badge on microbadger.com")
 
 Drone plugin for caching artifacts to a S3 bucket (or soon to a mounted volume).
