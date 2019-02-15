@@ -47,13 +47,33 @@ pipeline:
       - apk add --update make git
       - make drone-cache
 
-  analyze:
+  analyze-lint:
     image: golang:1.11-alpine
     pull: true
     environment:
       CGO_ENABLED: '0'
     commands:
-      - go vet -v -all -mod=vendor
+      - wget -O - -q https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh| sh -s v1.14.0
+      - golangci-lint run
+
+  analyze-security:
+    image: golang:1.11-alpine
+    pull: true
+    environment:
+      CGO_ENABLED: '0'
+    commands:
+      - wget -O - -q https://raw.githubusercontent.com/securego/gosec/master/install.sh | sh -s v1.2.0
+      - gosec ./...
+
+  analyze-reportcard:
+    image: golang:1.11-alpine
+    pull: true
+    environment:
+      CGO_ENABLED: '0'
+    commands:
+      - go get github.com/gojp/goreportcard/cmd/goreportcard-cli
+      - cd $GOPATH/src/github.com/gojp/goreportcard
+      - goreportcard-cli -v
 
   test:
     image: golang:1.11-alpine
