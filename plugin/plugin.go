@@ -155,13 +155,15 @@ func (p *Plugin) Exec() error {
 	// 4. Select mode
 	if c.Rebuild {
 		if err := p.processRebuild(cch); err != nil {
-			return errors.Wrap(err, "process rebuild failed")
+			log.Printf("WARNING: could not build cache. process rebuild failed, %+v\n", err)
+			return nil
 		}
 	}
 
 	if c.Restore {
 		if err := p.processRestore(cch); err != nil {
-			return errors.Wrap(err, "process restore failed")
+			log.Printf("WARNING: could not restore cache. process restore failed, %+v\n", err)
+			return nil
 		}
 	}
 
