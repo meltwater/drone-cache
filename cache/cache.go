@@ -42,7 +42,10 @@ func (c Cache) Upload(src, dst string) error {
 	log.Printf("archiving directory <%s>", src)
 
 	// 2. create a temporary file for the archive
-	ensureDir("/tmp")
+	if err := ensureDir("/tmp"); err != nil {
+		return errors.Wrap(err, "could not create tmp directory")
+	}
+
 	dir, err := ioutil.TempDir("", "")
 	if err != nil {
 		return errors.Wrap(err, "could not create tmp folder for archive")
@@ -117,7 +120,7 @@ func archiveWriter(w io.Writer, archiveFmt string) (*tar.Writer, func()) {
 }
 
 func writeFileToArchive(tw *tar.Writer, src string) func(path string, fi os.FileInfo, err error) error {
-	return func(path string, fi os.FileInfo, err error) error {
+	return func(path string, fi os.FileInfo, perr error) error {
 		if !fi.Mode().IsRegular() { // skip on symbolic links or directories
 			return nil
 		}
@@ -181,11 +184,16 @@ func extractFilesFromArchive(tr *tar.Reader, dst string) error {
 		// the target location where the dir/file should be created
 		trt := filepath.Join(dst, h.Name)
 		if h.FileInfo().Mode().IsDir() {
-			ensureDir(trt)
+			if err := ensureDir(trt); err != nil {
+				return errors.Wrap(err, fmt.Sprintf("could not create <%s> directory", trt))
+			}
 			continue
 		}
 
-		ensureDir(filepath.Dir(trt))
+		dir := filepath.Dir(trt)
+		if err := ensureDir(dir); err != nil {
+			return errors.Wrap(err, fmt.Sprintf("could not create <%s> directory", dir))
+		}
 
 		f, err := os.OpenFile(trt, os.O_CREATE|os.O_RDWR, os.FileMode(h.Mode))
 		if err != nil {

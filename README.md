@@ -14,6 +14,160 @@ This plugin can create and restore caches of any folders.
 For the usage information and a listing of the available options please take a look at
 [usage](#usage) and [examples](#examples).
 
+## Examples
+
+### Drone Config examples
+
+The following is a sample configuration in your .drone.yml file:
+
+#### Simple
+
+```yaml
+pipeline:
+  restore-cache:
+    image: meltwater/drone-cache
+    pull: true
+    restore: true
+    bucket: drone-cache-bucket
+    region: eu-west-1
+    secrets: [aws_access_key_id, aws_secret_access_key]
+    mount:
+      - 'deps'
+      - '_dialyzer'
+
+  deps:
+    image: elixir:1.6.5
+    pull: true
+    commands:
+      - mix local.hex --force
+      - mix local.rebar --force
+      - mix deps.get
+      - mix dialyzer --halt-exit-status
+
+rebuild-deps-cache:
+    image: meltwater/drone-cache
+    pull: true
+    rebuild: true
+    bucket: drone-cache-bucket
+    region: eu-west-1
+    secrets: [aws_access_key_id, aws_secret_access_key]
+    mount:
+      - 'deps'
+```
+
+#### With custom cache key prefix template
+
+```yaml
+pipeline:
+  restore-cache:
+    image: meltwater/drone-cache
+    pull: true
+    restore: true
+    cache_key: "{{ .Repo.Name }}_{{ .Commit.Branch }}_{{ .Build.Number }}"
+    bucket: drone-cache-bucket
+    region: eu-west-1
+    secrets: [aws_access_key_id, aws_secret_access_key]
+    mount:
+      - 'deps'
+      - '_dialyzer'
+
+deps:
+    image: elixir:1.6.5
+    pull: true
+    commands:
+      - mix local.hex --force
+      - mix local.rebar --force
+      - mix deps.get
+      - mix dialyzer --halt-exit-status
+
+rebuild-deps-cache:
+    image: meltwater/drone-cache
+    pull: true
+    rebuild: true
+    cache_key: "{{ .Repo.Name }}_{{ .Commit.Branch }}_{{ .Build.Number }}"
+    bucket: drone-cache-bucket
+    region: eu-west-1
+    secrets: [aws_access_key_id, aws_secret_access_key]
+    mount:
+      - 'deps'
+```
+
+#### With gzip compression
+
+```yaml
+pipeline:
+  restore-cache:
+    image: meltwater/drone-cache
+    pull: true
+    restore: true
+    cache_key: "{{ .Repo.Name }}_{{ .Commit.Branch }}_{{ .Build.Number }}"
+    archive_format: "gzip"
+    bucket: drone-cache-bucket
+    region: eu-west-1
+    secrets: [aws_access_key_id, aws_secret_access_key]
+    mount:
+      - 'deps'
+      - '_dialyzer'
+
+deps:
+    image: elixir:1.6.5
+    pull: true
+    commands:
+      - mix local.hex --force
+      - mix local.rebar --force
+      - mix deps.get
+      - mix dialyzer --halt-exit-status
+
+rebuild-deps-cache:
+    image: meltwater/drone-cache
+    pull: true
+    rebuild: true
+    cache_key: "{{ .Repo.Name }}_{{ .Commit.Branch }}_{{ .Build.Number }}"
+    archive_format: "gzip"
+    bucket: drone-cache-bucket
+    region: eu-west-1
+    secrets: [aws_access_key_id, aws_secret_access_key]
+    mount:
+      - 'deps'
+```
+
+#### Debug
+
+```yaml
+pipeline:
+  restore-cache:
+    image: meltwater/drone-cache
+    pull: true
+    restore: true
+    debug: true
+    bucket: drone-cache-bucket
+    region: eu-west-1
+    secrets: [aws_access_key_id, aws_secret_access_key]
+    mount:
+      - 'deps'
+      - '_dialyzer'
+
+deps:
+    image: elixir:1.6.5
+    pull: true
+    commands:
+      - mix local.hex --force
+      - mix local.rebar --force
+      - mix deps.get
+      - mix dialyzer --halt-exit-status
+
+rebuild-deps-cache:
+    image: meltwater/drone-cache
+    pull: true
+    rebuild: true
+    debug: true
+    bucket: drone-cache-bucket
+    region: eu-west-1
+    secrets: [aws_access_key_id, aws_secret_access_key]
+    mount:
+      - 'deps'
+```
+
 ## Usage
 
 ### Using executable (with CLI args)
@@ -94,144 +248,6 @@ $ docker run --rm \
       -e AWS_ACCESS_KEY_ID=<token> \
       -e AWS_SECRET_ACCESS_KEY=<secret> \
       meltwater/drone-cache
-```
-
-## Examples
-
-### Drone Config examples
-
-The following is a sample configuration in your .drone.yml file:
-
-#### Simple
-
-```yaml
-pipeline:
-  restore-cache:
-    image: meltwater/drone-cache
-    pull: true
-    restore: true
-    bucket: drone-cache-bucket
-    region: eu-west-1
-    secrets: [aws_access_key_id, aws_secret_access_key]
-    mount:
-      - 'deps'
-      - '_dialyzer'
-
-  build:
-    image: node:latest
-    commands:
-      - npm install
-
-rebuild-deps-cache:
-    image: meltwater/drone-cache
-    pull: true
-    rebuild: true
-    bucket: drone-cache-bucket
-    region: eu-west-1
-    secrets: [aws_access_key_id, aws_secret_access_key]
-    mount:
-      - 'deps'
-```
-
-#### With custom cache key prefix template
-
-```yaml
-pipeline:
-  restore-cache:
-    image: meltwater/drone-cache
-    pull: true
-    restore: true
-    cache_key: "{{ .Repo.Name }}_{{ .Commit.Branch }}_{{ .Build.Number }}"
-    bucket: drone-cache-bucket
-    region: eu-west-1
-    secrets: [aws_access_key_id, aws_secret_access_key]
-    mount:
-      - 'deps'
-      - '_dialyzer'
-
-  build:
-    image: node:latest
-    commands:
-      - npm install
-
-rebuild-deps-cache:
-    image: meltwater/drone-cache
-    pull: true
-    rebuild: true
-    cache_key: "{{ .Repo.Name }}_{{ .Commit.Branch }}_{{ .Build.Number }}"
-    bucket: drone-cache-bucket
-    region: eu-west-1
-    secrets: [aws_access_key_id, aws_secret_access_key]
-    mount:
-      - 'deps'
-```
-
-#### With gzip compression
-
-```yaml
-pipeline:
-  restore-cache:
-    image: meltwater/drone-cache
-    pull: true
-    restore: true
-    cache_key: "{{ .Repo.Name }}_{{ .Commit.Branch }}_{{ .Build.Number }}"
-    archive_format: "gzip"
-    bucket: drone-cache-bucket
-    region: eu-west-1
-    secrets: [aws_access_key_id, aws_secret_access_key]
-    mount:
-      - 'deps'
-      - '_dialyzer'
-
-  build:
-    image: node:latest
-    commands:
-      - npm install
-
-rebuild-deps-cache:
-    image: meltwater/drone-cache
-    pull: true
-    rebuild: true
-    cache_key: "{{ .Repo.Name }}_{{ .Commit.Branch }}_{{ .Build.Number }}"
-    archive_format: "gzip"
-    bucket: drone-cache-bucket
-    region: eu-west-1
-    secrets: [aws_access_key_id, aws_secret_access_key]
-    mount:
-      - 'deps'
-```
-
-#### Debug
-
-```yaml
-pipeline:
-  restore-cache:
-    image: meltwater/drone-cache
-    pull: true
-    restore: true
-    debug: true
-    bucket: drone-cache-bucket
-    region: eu-west-1
-    secrets: [aws_access_key_id, aws_secret_access_key]
-    mount:
-      - 'deps'
-      - '_dialyzer'
-
-  build:
-    image: node:latest
-    commands:
-      - npm install
-
-rebuild-deps-cache:
-    image: meltwater/drone-cache
-    pull: true
-    rebuild: true
-    debug: true
-    bucket: drone-cache-bucket
-    region: eu-west-1
-    secrets: [aws_access_key_id, aws_secret_access_key]
-    mount:
-      - 'deps'
 ```
 
 ## Development

@@ -31,11 +31,11 @@
 - [x] TEST!
 - [x] MERGE !
 - [X] Docker from scratch
-
-- [ ] Gorelease Docker multiple arc
+- [x] Gorelease Docker multiple arc
+- [X] Improve static analyzers
 
 - [ ] Improve Makefile
-- [ ] Improve static analyzers
+- [ ] Fix `gosec`
 
 ## Before v1.0.0
 
