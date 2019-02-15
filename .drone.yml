@@ -62,6 +62,7 @@ pipeline:
     environment:
       CGO_ENABLED: '0'
     commands:
+      - apk add --update git
       - wget -O - -q https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh| sh -s v1.14.0
       - ./bin/golangci-lint -v run
 
