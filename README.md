@@ -112,7 +112,7 @@ pipeline:
     restore: true
     bucket: drone-cache-bucket
     region: eu-west-1
-    secrets: [aws_access_key_id, aws_secret_key]
+    secrets: [aws_access_key_id, aws_secret_access_key]
     mount:
       - 'deps'
       - '_dialyzer'
@@ -128,7 +128,7 @@ rebuild-deps-cache:
     rebuild: true
     bucket: drone-cache-bucket
     region: eu-west-1
-    secrets: [aws_access_key_id, aws_secret_key]
+    secrets: [aws_access_key_id, aws_secret_access_key]
     mount:
       - 'deps'
 ```
@@ -144,7 +144,7 @@ pipeline:
     cache-key: "{{ .Repo.Name }}_{{ .Commit.Branch }}_{{ .Build.Number }}"
     bucket: drone-cache-bucket
     region: eu-west-1
-    secrets: [aws_access_key_id, aws_secret_key]
+    secrets: [aws_access_key_id, aws_secret_access_key]
     mount:
       - 'deps'
       - '_dialyzer'
@@ -161,7 +161,7 @@ rebuild-deps-cache:
     cache-key: "{{ .Repo.Name }}_{{ .Commit.Branch }}_{{ .Build.Number }}"
     bucket: drone-cache-bucket
     region: eu-west-1
-    secrets: [aws_access_key_id, aws_secret_key]
+    secrets: [aws_access_key_id, aws_secret_access_key]
     mount:
       - 'deps'
 ```
@@ -178,7 +178,7 @@ pipeline:
     archive_format: "gzip"
     bucket: drone-cache-bucket
     region: eu-west-1
-    secrets: [aws_access_key_id, aws_secret_key]
+    secrets: [aws_access_key_id, aws_secret_access_key]
     mount:
       - 'deps'
       - '_dialyzer'
@@ -196,7 +196,7 @@ rebuild-deps-cache:
     archive_format: "gzip"
     bucket: drone-cache-bucket
     region: eu-west-1
-    secrets: [aws_access_key_id, aws_secret_key]
+    secrets: [aws_access_key_id, aws_secret_access_key]
     mount:
       - 'deps'
 ```
