@@ -65,23 +65,24 @@ pipeline:
       - wget -O - -q https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh| sh -s v1.14.0
       - ./bin/golangci-lint -v run
 
-  analyze-security:
-    image: golang:1.11-alpine
-    pull: true
-    environment:
-      CGO_ENABLED: '0'
-      GOOS: linux
-      GOARCH: amd64
-    commands:
-      - export SRC=$GOPATH/src/github.com/meltwater/drone-cache
-      - apk add --update make curl git
-      - mkdir -p $SRC && cp -R * $SRC && cd $SRC
-      - curl https://glide.sh/get | sh
-      - cp ci/glide.* .
-      - glide install
-      - go build -a -ldflags '-w' .
-      - wget -O - -q https://raw.githubusercontent.com/securego/gosec/master/install.sh | sh -s 1.2.0
-      - ./bin/gosec ./...
+  # Disabled
+  # analyze-security:
+  #   image: golang:1.11-alpine
+  #   pull: true
+  #   environment:
+  #     CGO_ENABLED: '0'
+  #     GOOS: linux
+  #     GOARCH: amd64
+  #   commands:
+  #     - export SRC=$GOPATH/src/github.com/meltwater/drone-cache
+  #     - apk add --update make curl git
+  #     - mkdir -p $SRC && cp -R * $SRC && cd $SRC
+  #     - curl https://glide.sh/get | sh
+  #     - cp ci/glide.* .
+  #     - glide install
+  #     - go build -a -ldflags '-w' .
+  #     - wget -O - -q https://raw.githubusercontent.com/securego/gosec/master/install.sh | sh -s 1.2.0
+  #     - ./bin/gosec ./...
 
   analyze-reportcard:
     image: golang:1.11-alpine
