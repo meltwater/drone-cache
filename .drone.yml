@@ -1,10 +1,6 @@
 branches:
   - master
 
-clone:
-  image: plugins/git
-  tags: true
-
 pipeline:
   build:
     image: golang:1.11-alpine
