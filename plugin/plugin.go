@@ -83,13 +83,21 @@ type (
 		Endpoint   string
 		Key        string
 		Mount      []string
-		// Use path style instead of domain style
+		// Use path style instead of domain style.
 		// Should be true for minio and false for AWS
 		PathStyle bool
 		Rebuild   bool
-		Region    string
-		Restore   bool
-		Secret    string
+		// us-east-1
+		// us-west-1
+		// us-west-2
+		// eu-west-1
+		// ap-southeast-1
+		// ap-southeast-2
+		// ap-northeast-1
+		// sa-east-1
+		Region  string
+		Restore bool
+		Secret  string
 	}
 
 	// Plugin stores metadata about current plugin
@@ -116,10 +124,13 @@ func (p *Plugin) Exec() error {
 	}
 
 	// 2. Initialize backend
-	cred := credentials.AnonymousCredentials
+	var cred *credentials.Credentials
 	if c.Key != "" && c.Secret != "" {
 		// allowing to use the instance role or provide a key and secret
 		cred = credentials.NewStaticCredentials(c.Key, c.Secret, "")
+	} else {
+		cred = credentials.AnonymousCredentials
+		log.Println("AWS Key and/or Secret not provided (falling back to anonymous credentials)")
 	}
 
 	backend := backend.NewS3(c.Bucket, c.ACL, c.Encryption, &aws.Config{

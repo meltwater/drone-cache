@@ -32,9 +32,10 @@
 - [ ] TEST!
 - [ ] MERGE !
 
+- [ ] Docker from scratch
+- [ ] Gorelease Docker multiple arc
 - [ ] Improve static analyzers
 - [ ] Improve Makefile
-- [ ] Docker from scratch
 
 ## Before v1.0.0
 
@@ -46,7 +47,7 @@
     - [ ] https://docs.drone.io/user-guide/pipeline/volumes/
     - [ ] http://plugins.drone.io/drillster/drone-volume-cache/
     - [ ] https://github.com/Drillster/drone-volume-cache/blob/master/cacher.sh
-- [ ] Introduce mode: wrap_in_directory: true
+- [ ] Introduce mode: wrap_in_directory: true/false
 - [ ] Add unit tests
 
 ## Road to Open Source
