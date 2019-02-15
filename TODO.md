@@ -49,14 +49,14 @@
   - [ ] https://github.com/Drillster/drone-volume-cache/blob/master/cacher.sh
 - [ ] Introduce mode: wrap_in_directory: true/false
 - [ ] Add unit tests
+- [ ] Checkout
+  - [ ] https://github.com/drone/drone-go
+  - [ ] https://github.com/drone-plugins/drone-s3
+  - [ ] New Drone Version
 
 ## Road to Open Source
 
-- [ ] Copyright
-- [ ] Add reference to original author
-- [ ] LICENCE
-- [ ] Provide Code of conduct
-- [ ] Provide Contributors
-- [ ] Provide PR template
-- [ ] Provide Issue template
+- [ ] Add Copyright
+- [ ] Add credits for original author [@dim](https://github.com/dim)
+- [ ] Update LICENCE
 - [ ] Open Source :tada:
