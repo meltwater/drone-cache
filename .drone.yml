@@ -10,6 +10,8 @@ pipeline:
       secrets: [aws_access_key_id, aws_secret_access_key]
       region: eu-west-1
       path-style: true
+      envoronment:
+        DEBUG: true
       mount:
         - 'vendor'
 
