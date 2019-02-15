@@ -56,8 +56,8 @@ release:
   prerelease: auto # in case there is an indicator for this in the tag e.g. v1.0.0-rc1
   disable: false
 dockers:
-  # - &docker
-  - image_templates:
+  - &docker
+    image_templates:
       - "meltwater/drone-cache:latest"
       - "meltwater/drone-cache:{{ .Tag }}"
       - "meltwater/drone-cache:{{ .Major }}.{{ .Minor }}"
@@ -75,6 +75,9 @@ dockers:
       - "--label=maintainer=Kemal Akkoyun <kakkoyun@gmail.com>"
     extra_files:
       - scripts/entrypoint.sh
+  - <<: *docker
+    goos: linux
+    goarch: amd64
   # - <<: *docker
   #   goos: linux
   #   goarch: 386

@@ -97,15 +97,15 @@ pipeline:
       mount:
         - 'vendor'
 
-  docker-release-latest:
-    image: plugins/docker
-    pull: true
-    repo: meltwater/drone-cache
-    tags: latest
-    secrets: [docker_username, docker_password]
-    when:
-      branch: [master]
-      event: [push]
+  # docker-release-latest:
+  #   image: plugins/docker
+  #   pull: true
+  #   repo: meltwater/drone-cache
+  #   tags: latest
+  #   secrets: [docker_username, docker_password]
+  #   when:
+  #     branch: [master]
+  #     event: [push]
 
   # docker-release-tag:
   #   image: plugins/docker
