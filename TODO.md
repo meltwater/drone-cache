@@ -29,8 +29,7 @@
 - [x] Add all possible environment variables to README
 - [x] Rename Repo
 - [x] TEST!
-
-- [ ] MERGE !
+- [x] MERGE !
 
 - [ ] Docker from scratch
 - [ ] Gorelease Docker multiple arc

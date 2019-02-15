@@ -11,18 +11,16 @@ RUN make fetch-dependencies
 COPY . $BUILD_DIR
 
 RUN make drone-cache
-# RUN make compress # TODO: Enable before merge
+RUN make compress
 RUN cp drone-cache /bin
 
 # final stage
 FROM alpine:3.9 as runner
 COPY --from=builder /bin/drone-cache /bin
 
-# TODO: Remove tar!
 RUN set -ex \
   && apk add --no-cache \
     ca-certificates \
-    tar \
   && rm -rf /var/cache/apk/*
 
 COPY scripts/entrypoint.sh /entrypoint.sh
