@@ -12,6 +12,28 @@ pipeline:
       mount:
         - 'vendor'
 
+  restore-cache-with-key:
+      image: meltwater/drone-cache
+      pull: true
+      restore: true
+      cache_key: "{{ .Repo.Name }}_{{ .Commit.Branch }}_{{ .Build.Number }}"
+      bucket: drone-cache-bucket
+      secrets: [aws_access_key_id, aws_secret_access_key]
+      region: eu-west-1
+      mount:
+        - 'vendor'
+
+  restore-cache-with-gzip:
+      image: meltwater/drone-cache
+      pull: true
+      restore: true
+      archive_format: "gzip"
+      bucket: drone-cache-bucket
+      secrets: [aws_access_key_id, aws_secret_access_key]
+      region: eu-west-1
+      mount:
+        - 'vendor'
+
   build:
     image: golang:1.11-alpine
     pull: true
@@ -41,6 +63,28 @@ pipeline:
       image: meltwater/drone-cache
       pull: true
       rebuild: true
+      bucket: drone-cache-bucket
+      secrets: [aws_access_key_id, aws_secret_access_key]
+      region: eu-west-1
+      mount:
+        - 'vendor'
+
+  rebuild-cache-with-key:
+      image: meltwater/drone-cache
+      pull: true
+      rebuild: true
+      cache_key: "{{ .Repo.Name }}_{{ .Commit.Branch }}_{{ .Build.Number }}"
+      bucket: drone-cache-bucket
+      secrets: [aws_access_key_id, aws_secret_access_key]
+      region: eu-west-1
+      mount:
+        - 'vendor'
+
+  rebuild-cache-with-gzip:
+      image: meltwater/drone-cache
+      pull: true
+      rebuild: true
+      archive_format: "gzip"
       bucket: drone-cache-bucket
       secrets: [aws_access_key_id, aws_secret_access_key]
       region: eu-west-1
