@@ -3,7 +3,7 @@ branches:
 
 pipeline:
   restore-cache:
-      image: meltwater/drone-cache
+      image: meltwater/drone-s3-cache
       pull: true
       restore: true
       bucket: mw-drone-prod-ew1dro1
@@ -36,7 +36,7 @@ pipeline:
       - go test -v -mod=vendor ./... # NOTICE: -race: Needs CGO enabled
 
   rebuild-cache:
-      image: meltwater/drone-cache
+      image: meltwater/drone-s3-cache
       pull: true
       rebuild: true
       bucket: mw-drone-prod-ew1dro1
