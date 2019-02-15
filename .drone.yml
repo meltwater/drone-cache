@@ -70,11 +70,16 @@ pipeline:
     pull: true
     environment:
       CGO_ENABLED: '0'
+      GOOS: linux
+      GOARCH: amd64
     commands:
       - export SRC=$GOPATH/src/github.com/meltwater/drone-cache
       - apk add --update make curl git
       - mkdir -p $SRC && cp -R * $SRC && cd $SRC
-      - make drone-cache
+      - go get github.com/urfave/cli@v1.20.0
+      - go get github.com/aws/aws-sdk-go@v1.16.35
+      - go get github.com/pkg/errors@v0.8.1
+      - go build -a -ldflags '-w' .
       - wget -O - -q https://raw.githubusercontent.com/securego/gosec/master/install.sh | sh -s 1.2.0
       - ./bin/gosec ./...
 
