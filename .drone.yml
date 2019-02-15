@@ -62,7 +62,7 @@ pipeline:
     environment:
       CGO_ENABLED: '0'
     commands:
-      - wget -O - -q https://raw.githubusercontent.com/securego/gosec/master/install.sh | sh -s v1.2.0
+      - wget -O - -q https://raw.githubusercontent.com/securego/gosec/master/install.sh | sh -s 1.2.0
       - gosec ./...
 
   analyze-reportcard:
