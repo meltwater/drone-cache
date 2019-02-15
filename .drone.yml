@@ -53,6 +53,11 @@ pipeline:
     environment:
       CGO_ENABLED: '0'
     commands:
+      - export SRC=$GOPATH/src/github.com/meltwater/drone-cache
+      - apk add --update make curl git
+      - mkdir -p $SRC && cp -R * $SRC && cd $SRC
+      - make fetch-dependecies
+      - make drone-s3-cache
       - wget -O - -q https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh| sh -s v1.14.0
       - ./bin/golangci-lint -v run
 
