@@ -9,7 +9,6 @@ pipeline:
       bucket: drone-cache-bucket
       secrets: [aws_access_key_id, aws_secret_access_key]
       region: eu-west-1
-      path-style: true
       debug: true
       mount:
         - 'vendor'

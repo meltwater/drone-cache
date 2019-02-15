@@ -141,7 +141,7 @@ pipeline:
     image: meltwater/drone-s3-cache
     pull: true
     restore: true
-    cache-key: "{{ .Repo.Name }}_{{ .Commit.Branch }}_{{ .Build.Number }}"
+    cache_key: "{{ .Repo.Name }}_{{ .Commit.Branch }}_{{ .Build.Number }}"
     bucket: drone-cache-bucket
     region: eu-west-1
     secrets: [aws_access_key_id, aws_secret_access_key]
@@ -158,7 +158,7 @@ rebuild-deps-cache:
     image: meltwater/drone-s3-cache
     pull: true
     rebuild: true
-    cache-key: "{{ .Repo.Name }}_{{ .Commit.Branch }}_{{ .Build.Number }}"
+    cache_key: "{{ .Repo.Name }}_{{ .Commit.Branch }}_{{ .Build.Number }}"
     bucket: drone-cache-bucket
     region: eu-west-1
     secrets: [aws_access_key_id, aws_secret_access_key]
@@ -174,7 +174,7 @@ pipeline:
     image: meltwater/drone-s3-cache
     pull: true
     restore: true
-    cache-key: "{{ .Repo.Name }}_{{ .Commit.Branch }}_{{ .Build.Number }}"
+    cache_key: "{{ .Repo.Name }}_{{ .Commit.Branch }}_{{ .Build.Number }}"
     archive_format: "gzip"
     bucket: drone-cache-bucket
     region: eu-west-1
@@ -192,7 +192,7 @@ rebuild-deps-cache:
     image: meltwater/drone-s3-cache
     pull: true
     rebuild: true
-    cache-key: "{{ .Repo.Name }}_{{ .Commit.Branch }}_{{ .Build.Number }}"
+    cache_key: "{{ .Repo.Name }}_{{ .Commit.Branch }}_{{ .Build.Number }}"
     archive_format: "gzip"
     bucket: drone-cache-bucket
     region: eu-west-1
@@ -201,6 +201,38 @@ rebuild-deps-cache:
       - 'deps'
 ```
 
+#### Debug
+
+```yaml
+pipeline:
+  restore-cache:
+    image: meltwater/drone-s3-cache
+    pull: true
+    restore: true
+    debug: true
+    bucket: drone-cache-bucket
+    region: eu-west-1
+    secrets: [aws_access_key_id, aws_secret_access_key]
+    mount:
+      - 'deps'
+      - '_dialyzer'
+
+  build:
+    image: node:latest
+    commands:
+      - npm install
+
+rebuild-deps-cache:
+    image: meltwater/drone-s3-cache
+    pull: true
+    rebuild: true
+    debug: true
+    bucket: drone-cache-bucket
+    region: eu-west-1
+    secrets: [aws_access_key_id, aws_secret_access_key]
+    mount:
+      - 'deps'
+```
 
 ## Development
 
