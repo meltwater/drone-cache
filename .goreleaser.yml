@@ -39,7 +39,6 @@ changelog:
   sort: asc
   filters:
     exclude:
-    - .*
     - typo
     - '^docs:'
     - '^test:'
@@ -49,3 +48,20 @@ release:
     name: drone-cache
   prerelease: auto # in case there is an indicator for this in the tag e.g. v1.0.0-rc1
   disable: false
+dockers:
+  -
+    goos: linux
+    goarch: amd64
+    binaries:
+    - drone-cache
+    image_templates:
+    - "meltwater/drone-cache:latest"
+    - "meltwater/drone-cache:{{ .Tag }}"
+    - "meltwater/drone-cache:{{ .Tag }}-{{ .Env.GO_VERSION }}"
+    - "meltwater/drone-cache:v{{ .Major }}"
+    skip_push: false
+    dockerfile: Dockerfile
+    build_flag_templates:
+    - "--label=org.label-schema.schema-version=1.0"
+    - "--label=org.label-schema.version={{.Version}}"
+    - "--label=org.label-schema.name={{.ProjectName}}"
