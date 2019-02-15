@@ -28,8 +28,8 @@
 - [x] Add usage examples to README
 - [x] Add all possible environment variables to README
 - [x] Rename Repo
+- [x] TEST!
 
-- [ ] TEST!
 - [ ] MERGE !
 
 - [ ] Docker from scratch
