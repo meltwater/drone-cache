@@ -2,87 +2,78 @@ branches:
   - master
 
 pipeline:
-  clone:
-    image: plugins/git
-    tags: true
+  # clone:
+  #   image: plugins/git
+  #   tags: true
 
-  restore-cache:
-      image: meltwater/drone-cache
-      pull: true
-      restore: true
-      bucket: drone-cache-bucket
-      secrets: [aws_access_key_id, aws_secret_access_key]
-      region: eu-west-1
-      mount:
-        - 'vendor'
+  # restore-cache:
+  #     image: meltwater/drone-cache
+  #     pull: true
+  #     restore: true
+  #     bucket: drone-cache-bucket
+  #     secrets: [aws_access_key_id, aws_secret_access_key]
+  #     region: eu-west-1
+  #     mount:
+  #       - 'vendor'
 
-  restore-cache-with-key:
-      image: meltwater/drone-cache
-      pull: true
-      restore: true
-      cache_key: "{{ .Repo.Name }}_{{ .Commit.Branch }}_{{ .Build.Number }}"
-      bucket: drone-cache-bucket
-      secrets: [aws_access_key_id, aws_secret_access_key]
-      region: eu-west-1
-      mount:
-        - 'vendor'
+  # restore-cache-with-key:
+  #     image: meltwater/drone-cache
+  #     pull: true
+  #     restore: true
+  #     cache_key: "{{ .Repo.Name }}_{{ .Commit.Branch }}_{{ .Build.Number }}"
+  #     bucket: drone-cache-bucket
+  #     secrets: [aws_access_key_id, aws_secret_access_key]
+  #     region: eu-west-1
+  #     mount:
+  #       - 'vendor'
 
-  restore-cache-with-gzip:
-      image: meltwater/drone-cache
-      pull: true
-      restore: true
-      cache_key: "gzip"
-      archive_format: "gzip"
-      bucket: drone-cache-bucket
-      secrets: [aws_access_key_id, aws_secret_access_key]
-      region: eu-west-1
-      mount:
-        - 'vendor'
+  # restore-cache-with-gzip:
+  #     image: meltwater/drone-cache
+  #     pull: true
+  #     restore: true
+  #     cache_key: "gzip"
+  #     archive_format: "gzip"
+  #     bucket: drone-cache-bucket
+  #     secrets: [aws_access_key_id, aws_secret_access_key]
+  #     region: eu-west-1
+  #     mount:
+  #       - 'vendor'
 
-  build:
-    image: golang:1.11-alpine
-    pull: true
-    secrets: [aws_access_key_id, aws_secret_access_key]
-    commands:
-      - apk add --update make git
-      - make drone-cache
+  # build:
+  #   image: golang:1.11-alpine
+  #   pull: true
+  #   secrets: [aws_access_key_id, aws_secret_access_key]
+  #   commands:
+  #     - apk add --update make git
+  #     - make drone-cache
 
-  test:
-    image: golang:1.11-alpine
-    pull: true
-    environment:
-      CGO_ENABLED: '0'
-      TEST_ENDPOINT: filestorage:9000
-    commands:
-      - go test -v -mod=vendor ./... # NOTICE: -race: Needs CGO enabled
-
-  analyze-lint:
-    image: golang:1.11-alpine
-    pull: true
-    environment:
-      CGO_ENABLED: '0'
-    commands:
-      - wget -O - -q https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh| sh -s v1.14.0
-      - ./bin/golangci-lint -v run
-
-  # Disabled
-  # analyze-security:
+  # test:
   #   image: golang:1.11-alpine
   #   pull: true
   #   environment:
   #     CGO_ENABLED: '0'
-  #     GOOS: linux
-  #     GOARCH: amd64
+  #     TEST_ENDPOINT: filestorage:9000
   #   commands:
-  #     - export SRC=$GOPATH/src/github.com/meltwater/drone-cache
-  #     - apk add --update make curl git
-  #     - mkdir -p $SRC && cp -R * $SRC && cd $SRC
-  #     - curl https://glide.sh/get | sh
-  #     - cp ci/glide.* .
-  #     - glide install
-  #     - go build -a -ldflags '-w' .
-  #     - wget -O - -q https://raw.githubusercontent.com/securego/gosec/master/install.sh | sh -s 1.2.0
-  #     - ./bin/gosec ./...
+  #     - go test -v -mod=vendor ./... # NOTICE: -race: Needs CGO enabled
+
+  # analyze-lint:
+  #   image: golang:1.11-alpine
+  #   pull: true
+  #   environment:
+  #     CGO_ENABLED: '0'
+  #   commands:
+  #     - wget -O - -q https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh| sh -s v1.14.0
+  #     - ./bin/golangci-lint -v run
+
+  # # Disabled: Does not with go modules.
+  # # analyze-security:
+  # #   image: golang:1.11-alpine
+  # #   pull: true
+  # #   environment:
+  # #     CGO_ENABLED: '0'
+  # #   commands:
+  # #     - wget -O - -q https://raw.githubusercontent.com/securego/gosec/master/install.sh | sh -s 1.2.0
+  # #     - ./bin/gosec ./...
 
   analyze-reportcard:
     image: golang:1.11-alpine
@@ -91,97 +82,97 @@ pipeline:
       CGO_ENABLED: '0'
     commands:
       - apk add --update git
-      - go get github.com/gojp/goreportcard/cmd/goreportcard-cli
-      - go get github.com/alecthomas/gometalinter
+      - go get -u github.com/alecthomas/gometalinter
+      - go get -u github.com/gojp/goreportcard/cmd/goreportcard-cli
       - $GOPATH/bin/gometalinter --install --update
       - $GOPATH/bin/goreportcard-cli -v
 
-  rebuild-cache:
-      image: meltwater/drone-cache
-      pull: true
-      rebuild: true
-      bucket: drone-cache-bucket
-      secrets: [aws_access_key_id, aws_secret_access_key]
-      region: eu-west-1
-      mount:
-        - 'vendor'
+#   rebuild-cache:
+#       image: meltwater/drone-cache
+#       pull: true
+#       rebuild: true
+#       bucket: drone-cache-bucket
+#       secrets: [aws_access_key_id, aws_secret_access_key]
+#       region: eu-west-1
+#       mount:
+#         - 'vendor'
 
-  rebuild-cache-with-key:
-      image: meltwater/drone-cache
-      pull: true
-      rebuild: true
-      cache_key: "{{ .Repo.Name }}_{{ .Commit.Branch }}_{{ .Build.Number }}"
-      bucket: drone-cache-bucket
-      secrets: [aws_access_key_id, aws_secret_access_key]
-      region: eu-west-1
-      mount:
-        - 'vendor'
+#   rebuild-cache-with-key:
+#       image: meltwater/drone-cache
+#       pull: true
+#       rebuild: true
+#       cache_key: "{{ .Repo.Name }}_{{ .Commit.Branch }}_{{ .Build.Number }}"
+#       bucket: drone-cache-bucket
+#       secrets: [aws_access_key_id, aws_secret_access_key]
+#       region: eu-west-1
+#       mount:
+#         - 'vendor'
 
-  rebuild-cache-with-gzip:
-      image: meltwater/drone-cache
-      pull: true
-      rebuild: true
-      cache_key: "gzip"
-      archive_format: "gzip"
-      bucket: drone-cache-bucket
-      secrets: [aws_access_key_id, aws_secret_access_key]
-      region: eu-west-1
-      mount:
-        - 'vendor'
+#   rebuild-cache-with-gzip:
+#       image: meltwater/drone-cache
+#       pull: true
+#       rebuild: true
+#       cache_key: "gzip"
+#       archive_format: "gzip"
+#       bucket: drone-cache-bucket
+#       secrets: [aws_access_key_id, aws_secret_access_key]
+#       region: eu-west-1
+#       mount:
+#         - 'vendor'
 
-  docker-release-latest:
-    image: plugins/docker
-    pull: true
-    repo: meltwater/drone-cache
-    tags: latest
-    secrets: [docker_username, docker_password]
-    when:
-      branch: [master]
-      event: [push]
+#   docker-release-latest:
+#     image: plugins/docker
+#     pull: true
+#     repo: meltwater/drone-cache
+#     tags: latest
+#     secrets: [docker_username, docker_password]
+#     when:
+#       branch: [master]
+#       event: [push]
 
-  docker-release-tag:
-    image: plugins/docker
-    repo: meltwater/drone-cache
-    tags: '${DRONE_TAG}'
-    secrets: [docker_username, docker_password]
-    when:
-      event: tag
-      status: success
-      ref: refs/tags/*
+#   docker-release-tag:
+#     image: plugins/docker
+#     repo: meltwater/drone-cache
+#     tags: '${DRONE_TAG}'
+#     secrets: [docker_username, docker_password]
+#     when:
+#       event: tag
+#       status: success
+#       ref: refs/tags/*
 
-  github-release-tag:
-    image: golang:1.11 # golang:1.11-alpine
-    secrets: [github_token]
-    commands:
-      curl -sL https://git.io/goreleaser | bash
-    when:
-      event: tag
-      status: success
-      ref: refs/tags/*
+#   github-release-tag:
+#     image: golang:1.11 # golang:1.11-alpine
+#     secrets: [github_token]
+#     commands:
+#       curl -sL https://git.io/goreleaser | bash
+#     when:
+#       event: tag
+#       status: success
+#       ref: refs/tags/*
 
-  slack:
-    group: notifications
-    image: plugins/slack
-    pull: true
-    webhook: https://hooks.slack.com/services/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
-    icon_url: https://logo.clearbit.com/drone.io
-    username: "Drone: ${DRONE_REPO_NAME}"
-    channel: shakespeare-events
-    template: |
-      :drone-{{build.status}}: *<{{build.link}}|{{uppercasefirst repo.name}} Drone Build {{build.number}}>* completed in {{build.status}}. It took {{since build.started}}
-      :github: <https://github.com/{{repo.owner}}/{{repo.name}}/commit/{{build.commit}}|{{repo.owner}}/{{repo.name}}#{{truncate build.commit 8}}>
-      > {{build.message}} by <https://github.com/{{build.author}}|{{build.author}}>
-    when:
-      local: false
-      status: [success, failure]
+#   slack:
+#     group: notifications
+#     image: plugins/slack
+#     pull: true
+#     webhook: https://hooks.slack.com/services/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
+#     icon_url: https://logo.clearbit.com/drone.io
+#     username: "Drone: ${DRONE_REPO_NAME}"
+#     channel: shakespeare-events
+#     template: |
+#       :drone-{{build.status}}: *<{{build.link}}|{{uppercasefirst repo.name}} Drone Build {{build.number}}>* completed in {{build.status}}. It took {{since build.started}}
+#       :github: <https://github.com/{{repo.owner}}/{{repo.name}}/commit/{{build.commit}}|{{repo.owner}}/{{repo.name}}#{{truncate build.commit 8}}>
+#       > {{build.message}} by <https://github.com/{{build.author}}|{{build.author}}>
+#     when:
+#       local: false
+#       status: [success, failure]
 
-services:
-  filestorage:
-    image: minio/minio:RELEASE.2018-10-06T00-15-16Z
-    environment:
-      MINIO_ACCESS_KEY: AKIAIOSFODNN7EXAMPLE
-      MINIO_SECRET_KEY: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
-      MINIO_REGION: eu-west-1
-    ports:
-      - 9000:9000
-    command: server /data
+# services:
+#   filestorage:
+#     image: minio/minio:RELEASE.2018-10-06T00-15-16Z
+#     environment:
+#       MINIO_ACCESS_KEY: AKIAIOSFODNN7EXAMPLE
+#       MINIO_SECRET_KEY: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+#       MINIO_REGION: eu-west-1
+#     ports:
+#       - 9000:9000
+#     command: server /data
