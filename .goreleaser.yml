@@ -56,7 +56,7 @@ release:
   prerelease: auto # in case there is an indicator for this in the tag e.g. v1.0.0-rc1
   disable: false
 dockers:
-  # - &docker
+# - &docker
   - image_templates:
       - "meltwater/drone-cache:latest"
       - "meltwater/drone-cache:{{ .Tag }}"
