@@ -92,6 +92,8 @@ pipeline:
     commands:
       - apk add --update git
       - go get github.com/gojp/goreportcard/cmd/goreportcard-cli
+      - go get github.com/alecthomas/gometalinter
+      - $GOPATH/bin/gometalinter --install --update
       - $GOPATH/bin/goreportcard-cli -v
 
   rebuild-cache:
