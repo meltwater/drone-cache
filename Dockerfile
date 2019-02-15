@@ -18,6 +18,7 @@ RUN cp drone-cache /bin
 FROM alpine:3.9 as runner
 COPY --from=builder /bin/drone-cache /bin
 
+# TODO: Remove tar!
 RUN set -ex \
   && apk add --no-cache \
     ca-certificates \
