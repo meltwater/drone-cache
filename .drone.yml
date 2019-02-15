@@ -54,7 +54,7 @@ pipeline:
       CGO_ENABLED: '0'
     commands:
       - wget -O - -q https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh| sh -s v1.14.0
-      - golangci-lint run
+      - ./bin/golangci-lint run
 
   analyze-security:
     image: golang:1.11-alpine

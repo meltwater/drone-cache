@@ -35,10 +35,14 @@ pipeline:
       - 'deps'
       - '_dialyzer'
 
-  build:
-    image: node:latest
+  deps:
+    image: elixir:1.6.5
+    pull: true
     commands:
-      - npm install
+      - mix local.hex --force
+      - mix local.rebar --force
+      - mix deps.get
+      - mix dialyzer --halt-exit-status
 
 rebuild-deps-cache:
     image: meltwater/drone-cache
@@ -67,10 +71,14 @@ pipeline:
       - 'deps'
       - '_dialyzer'
 
-  build:
-    image: node:latest
+deps:
+    image: elixir:1.6.5
+    pull: true
     commands:
-      - npm install
+      - mix local.hex --force
+      - mix local.rebar --force
+      - mix deps.get
+      - mix dialyzer --halt-exit-status
 
 rebuild-deps-cache:
     image: meltwater/drone-cache
@@ -101,10 +109,14 @@ pipeline:
       - 'deps'
       - '_dialyzer'
 
-  build:
-    image: node:latest
+deps:
+    image: elixir:1.6.5
+    pull: true
     commands:
-      - npm install
+      - mix local.hex --force
+      - mix local.rebar --force
+      - mix deps.get
+      - mix dialyzer --halt-exit-status
 
 rebuild-deps-cache:
     image: meltwater/drone-cache
@@ -135,10 +147,14 @@ pipeline:
       - 'deps'
       - '_dialyzer'
 
-  build:
-    image: node:latest
+deps:
+    image: elixir:1.6.5
+    pull: true
     commands:
-      - npm install
+      - mix local.hex --force
+      - mix local.rebar --force
+      - mix deps.get
+      - mix dialyzer --halt-exit-status
 
 rebuild-deps-cache:
     image: meltwater/drone-cache
