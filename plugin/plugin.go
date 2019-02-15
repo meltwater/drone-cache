@@ -179,7 +179,10 @@ func (p Plugin) processRebuild(c cache.Cache) error {
 		key, err := p.cacheKey(mount)
 		if err != nil {
 			log.Printf("%v, falling back to default key\n", err)
-			key = hash(mount, branch)
+			key, err = hash(mount, branch)
+			if err != nil {
+				return errors.Wrap(err, "could not generate hash key for mounted")
+			}
 		}
 		path := filepath.Join(p.Repo.Name, key)
 
@@ -201,7 +204,10 @@ func (p Plugin) processRestore(c cache.Cache) error {
 		key, err := p.cacheKey(mount)
 		if err != nil {
 			log.Printf("%v, falling back to default key\n", err)
-			key = hash(mount, branch)
+			key, err = hash(mount, branch)
+			if err != nil {
+				return errors.Wrap(err, "could not generate hash key for mounted")
+			}
 		}
 		path := filepath.Join(p.Repo.Name, key)
 
@@ -223,7 +229,7 @@ func (p Plugin) cacheKey(mount string) (string, error) {
 	log.Println("using provided cache key template")
 	t, err := template.New("cacheKey").Parse(p.Config.CacheKey)
 	if err != nil {
-		return "", errors.Wrap(err, fmt.Sprintf("could not parse <%s> as cache key template, falling back to default\n", p.Config.CacheKey))
+		return "", errors.Wrap(err, fmt.Sprintf("could not parse <%s> as cache key template, falling back to default", p.Config.CacheKey))
 	}
 
 	data := struct {
@@ -239,7 +245,7 @@ func (p Plugin) cacheKey(mount string) (string, error) {
 	var b strings.Builder
 	err = t.Execute(&b, data)
 	if err != nil {
-		return "", errors.Wrap(err, fmt.Sprintf("could not build <%s> as cache key, falling back to default. %+v\n", p.Config.CacheKey, err))
+		return "", errors.Wrap(err, fmt.Sprintf("could not build <%s> as cache key, falling back to default. %+v", p.Config.CacheKey, err))
 	}
 
 	return filepath.Join(b.String(), mount), nil
@@ -248,13 +254,15 @@ func (p Plugin) cacheKey(mount string) (string, error) {
 // Helpers
 
 // hash generates a key based on filename paths and branch
-func hash(mount, branch string) string {
+func hash(mount, branch string) (string, error) {
 	parts := []string{mount, branch}
 
 	// calculate the hash using the branch
 	h := md5.New()
 	for _, part := range parts {
-		io.WriteString(h, part)
+		if _, err := io.WriteString(h, part); err != nil {
+			return "", errors.Wrap(err, fmt.Sprintf("could not write part <%s> as hash", part))
+		}
 	}
-	return fmt.Sprintf("%x", h.Sum(nil))
+	return fmt.Sprintf("%x", h.Sum(nil)), nil
 }

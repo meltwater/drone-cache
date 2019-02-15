@@ -6,14 +6,6 @@ pipeline:
     image: plugins/git
     tags: true
 
-  build:
-    image: golang:1.11-alpine
-    pull: true
-    secrets: [aws_access_key_id, aws_secret_access_key]
-    commands:
-      - apk add --update make git
-      - make drone-cache
-
   restore-cache:
       image: meltwater/drone-cache
       pull: true
@@ -46,6 +38,14 @@ pipeline:
       region: eu-west-1
       mount:
         - 'vendor'
+
+  build:
+    image: golang:1.11-alpine
+    pull: true
+    secrets: [aws_access_key_id, aws_secret_access_key]
+    commands:
+      - apk add --update make git
+      - make drone-cache
 
   analyze-lint:
     image: golang:1.11-alpine
