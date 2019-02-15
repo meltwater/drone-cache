@@ -25,5 +25,7 @@ RUN set -ex \
     tar \
   && rm -rf /var/cache/apk/*
 
-RUN env # TODO: Disable before merge
-ENTRYPOINT ["/bin/drone-cache"]
+COPY scripts/entrypoint.sh /entrypoint.sh
+RUN chmod 755 /entrypoint.sh
+ENTRYPOINT ["/entrypoint.sh"]
+CMD ["/bin/drone-cache"]

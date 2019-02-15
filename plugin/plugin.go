@@ -75,6 +75,7 @@ type (
 		ArchiveFormat string
 		Bucket        string
 		CacheKey      string
+		Debug         bool
 		// if not "", enable server-side encryption
 		// valid values are:
 		//     AES256
@@ -114,6 +115,10 @@ func (p *Plugin) Exec() error {
 	c := p.Config
 
 	// 1. Check paramaters
+	if c.Debug {
+		log.Println("DEBUG MODE enabled!")
+	}
+
 	if c.Rebuild && c.Restore {
 		return errors.New("rebuild and restore are mutually exclusive, please set only one of them")
 	}
@@ -132,14 +137,17 @@ func (p *Plugin) Exec() error {
 		cred = credentials.AnonymousCredentials
 		log.Println("AWS Key and/or Secret not provided (falling back to anonymous credentials)")
 	}
-
-	backend := backend.NewS3(c.Bucket, c.ACL, c.Encryption, (&aws.Config{
+	awsConf := &aws.Config{
 		Region:           aws.String(c.Region),
 		Endpoint:         &c.Endpoint,
 		DisableSSL:       aws.Bool(!strings.HasPrefix(c.Endpoint, "https://")),
 		S3ForcePathStyle: aws.Bool(c.PathStyle),
 		Credentials:      cred,
-	}).WithLogLevel(aws.LogDebugWithHTTPBody))
+	}
+	if c.Debug {
+		awsConf.WithLogLevel(aws.LogDebugWithHTTPBody)
+	}
+	backend := backend.NewS3(c.Bucket, c.ACL, c.Encryption, awsConf)
 
 	// 3. Initialize cache
 	cch := cache.New(backend, c.ArchiveFormat)
