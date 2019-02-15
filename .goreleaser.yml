@@ -11,10 +11,15 @@ builds:
     - darwin
     - linux
     - windows
-    - freebsd
   goarch:
-    - amd64
     - 386
+    - amd64
+    - arm
+    - arm64
+  goarm:
+    - 5
+    - 6
+    - 7
   ldflags: >
     -s
     -w
@@ -42,6 +47,8 @@ changelog:
     - typo
     - '^docs:'
     - '^test:'
+    - Merge pull request
+    - Merge branch
 release:
   github:
     owner: meltwater
@@ -49,19 +56,43 @@ release:
   prerelease: auto # in case there is an indicator for this in the tag e.g. v1.0.0-rc1
   disable: false
 dockers:
-  -
-    goos: linux
-    goarch: amd64
-    binaries:
-    - drone-cache
-    image_templates:
-    - "meltwater/drone-cache:latest"
-    - "meltwater/drone-cache:{{ .Tag }}"
-    - "meltwater/drone-cache:{{ .Tag }}-{{ .Env.GO_VERSION }}"
-    - "meltwater/drone-cache:v{{ .Major }}"
+  # - &docker
+  - image_templates:
+      - "meltwater/drone-cache:latest"
+      - "meltwater/drone-cache:{{ .Tag }}"
+      - "meltwater/drone-cache:{{ .Major }}.{{ .Minor }}"
+      - "meltwater/drone-cache:{{ .Major }}.{{ .Minor }}.{{ .Patch }}"
     skip_push: false
-    dockerfile: Dockerfile
+    binaries:
+      - drone-cache
+    dockerfile: Dockerfile.goreleaser
     build_flag_templates:
-    - "--label=org.label-schema.schema-version=1.0"
-    - "--label=org.label-schema.version={{.Version}}"
-    - "--label=org.label-schema.name={{.ProjectName}}"
+      - "--label=org.label-schema.schema-version=1.0"
+      - "--label=org.label-schema.version={{.Version}}"
+      - "--label=org.label-schema.name={{.ProjectName}}"
+      - "--label=repository=http://github.com/meltwater/drone-cache"
+      - "--label=homepage=http://github.com/meltwater"
+      - "--label=maintainer=Kemal Akkoyun <kakkoyun@gmail.com>"
+    extra_files:
+      - scripts/entrypoint.sh
+  # - <<: *docker
+  #   goos: linux
+  #   goarch: 386
+  # - <<: *docker
+  #   goos: linux
+  #   goarch: amd64
+  # - <<: *docker
+  #   goos: linux
+  #   goarch: arm
+  #   goarm: 5
+  # - <<: *docker
+  #   goos: linux
+  #   goarch: arm
+  #   goarm: 6
+  # - <<: *docker
+  #   goos: linux
+  #   goarch: arm
+  #   goarm: 7
+  # - <<: *docker
+  #   goos: linux
+  #   goarch: arm64

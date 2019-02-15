@@ -15,7 +15,7 @@ fetch-dependencies:
 .PHONY: fetch-dependencies
 
 compress: drone-cache
-	upx --brute drone-cache
+	upx drone-cache
 
 .PHONY: compress
 
