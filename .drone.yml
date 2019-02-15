@@ -2,6 +2,15 @@ branches:
   - master
 
 pipeline:
+  restore-cache:
+      image: meltwater/drone-cache
+      pull: true
+      restore: true
+      bucket: mw-drone-prod-ew1dro1
+      region: eu-west-1
+      mount:
+        - 'vendor'
+
   build:
     image: golang:1.11-alpine
     pull: true
@@ -25,6 +34,15 @@ pipeline:
       TEST_ENDPOINT: filestorage:9000
     commands:
       - go test -v -mod=vendor ./... # NOTICE: -race: Needs CGO enabled
+
+  rebuild-cache:
+      image: meltwater/drone-cache
+      pull: true
+      rebuild: true
+      bucket: mw-drone-prod-ew1dro1
+      region: eu-west-1
+      mount:
+        - 'vendor'
 
   docker-release-latest:
     image: plugins/docker
