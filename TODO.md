@@ -30,12 +30,12 @@
 - [x] Rename Repo
 
 - [ ] TEST!
+- [ ] MERGE !
 
 - [ ] Docker from scratch
 - [ ] Gorelease Docker multiple arc
 - [ ] Improve Makefile
 
-- [ ] MERGE !
 - [ ] Improve static analyzers
 
 ## Before v1.0.0
