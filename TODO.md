@@ -30,23 +30,24 @@
 - [x] Rename Repo
 
 - [ ] TEST!
-- [ ] MERGE !
 
 - [ ] Docker from scratch
 - [ ] Gorelease Docker multiple arc
-- [ ] Improve static analyzers
 - [ ] Improve Makefile
+
+- [ ] MERGE !
+- [ ] Improve static analyzers
 
 ## Before v1.0.0
 
 - [x] Badges
-    - [x] Drone Pluging badges
-    - [x] https://microbadger.com/images/meltwater/drone-cache
-    - [x] https://goreportcard.com/report/github.com/meltwater/drone-cache
+  - [x] Drone Pluging badges
+  - [x] https://microbadger.com/images/meltwater/drone-cache
+  - [x] https://goreportcard.com/report/github.com/meltwater/drone-cache
 - [ ] Add volume/file storage
-    - [ ] https://docs.drone.io/user-guide/pipeline/volumes/
-    - [ ] http://plugins.drone.io/drillster/drone-volume-cache/
-    - [ ] https://github.com/Drillster/drone-volume-cache/blob/master/cacher.sh
+  - [ ] https://docs.drone.io/user-guide/pipeline/volumes/
+  - [ ] http://plugins.drone.io/drillster/drone-volume-cache/
+  - [ ] https://github.com/Drillster/drone-volume-cache/blob/master/cacher.sh
 - [ ] Introduce mode: wrap_in_directory: true/false
 - [ ] Add unit tests
 

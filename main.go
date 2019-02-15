@@ -210,6 +210,11 @@ func main() {
 			Value:  "tar",
 			EnvVar: "PLUGIN_ARCHIVE_FORMAT",
 		},
+		cli.StringFlag{
+			Name:   "debug, d",
+			Usage:  "debug",
+			EnvVar: "PLUGIN_DEBUG, DEBUG",
+		},
 
 		// Volume specific Config args
 		// Comming soon...
@@ -302,6 +307,7 @@ func run(c *cli.Context) error {
 			ArchiveFormat: c.String("archive-format"),
 			Bucket:        c.String("bucket"),
 			CacheKey:      c.String("cache-key"),
+			Debug:         c.Bool("debug"),
 			Encryption:    c.String("encryption"),
 			Endpoint:      c.String("endpoint"),
 			Key:           c.String("access-key"),
