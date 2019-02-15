@@ -25,6 +25,6 @@ _testmain.go
 .env
 
 coverage.out
-drone-s3-cache
+drone-cache
 vendor
 target

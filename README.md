@@ -1,27 +1,85 @@
-# drone-s3-cache
+# drone-cache
 
-[![Go Doc](https://godoc.org/github.com/meltwater/drone-s3-cache?status.svg)](http://godoc.org/github.com/meltwater/drone-s3-cache)
-[![Drone](https://drone.meltwater.io/api/badges/meltwater/drone-s3-cache/status.svg)](https://drone.meltwater.io/meltwater/drone-s3-cache)
-[![Maintenance](https://img.shields.io/maintenance/yes/2019.svg)](https://github.com/meltwater/drone-s3-cache/commits/master)
+[![Maintenance](https://img.shields.io/maintenance/yes/2019.svg)](https://github.com/meltwater/drone-cache/commits/master)
+[![Drone](https://drone.meltwater.io/api/badges/meltwater/drone-cache/status.svg)](https://drone.meltwater.io/meltwater/drone-cache)
+[![Go Doc](https://godoc.org/github.com/meltwater/drone-cache?status.svg)](http://godoc.org/github.com/meltwater/drone-cache)
+[![Go Report Card](https://goreportcard.com/badge/github.com/meltwater/drone-cache)](https://goreportcard.com/report/github.com/meltwater/drone-cache)
+[![Docker](https://microbadger.com/images/meltwater/drone-cache)](https://microbadger.com/images/meltwater/drone-cache)
 
-Drone plugin for caching artifacts to a S3 bucket.
+Drone plugin for caching artifacts to a S3 bucket (or soon to a mounted volume).
 Use this plugin for caching build artifacts to speed up your build times.
 This plugin can create and restore caches of any folders.
 
 For the usage information and a listing of the available options please take a look at
-[usage](#usage).
+[usage](#usage) and [examples](#examples).
 
 ## Usage
 
-Execute from the working directory:
+### Using executable (with CLI args)
 
-Using executable:
+```console
+NAME:
+   Drone cache plugin - Drone cache plugin
 
-```bash
-$ ./drone-s3-cache help
+USAGE:
+   drone-cache [global options] command [command options] [arguments...]
+
+VERSION:
+   0.9.0
+
+COMMANDS:
+     help, h  Shows a list of commands or help for one command
+
+GLOBAL OPTIONS:
+   --repo.fullname value, --rf value         repository full name [$DRONE_REPO]
+   --repo.owner value, --ro value            repository owner [$DRONE_REPO_OWNER]
+   --repo.name value, --rn value             repository name [$DRONE_REPO_NAME]
+   --repo.link value, --rl value             repository link [$DRONE_REPO_LINK]
+   --repo.avatar value, --ra value           repository avatar [$DRONE_REPO_AVATAR]
+   --repo.branch value, --rb value           repository default branch [$DRONE_REPO_BRANCH]
+   --repo.private, --rp                      repository is private [$DRONE_REPO_PRIVATE]
+   --repo.trusted, --rt                      repository is trusted [$DRONE_REPO_TRUSTED]
+   --remote.url value, --remu value          git remote url [$DRONE_REMOTE_URL]
+   --commit.sha value, --cs value            git commit sha [$DRONE_COMMIT_SHA]
+   --commit.ref value, --cr value            git commit ref (default: "refs/heads/master") [$DRONE_COMMIT_REF]
+   --commit.branch value, --cb value         git commit branch (default: "master") [$DRONE_COMMIT_BRANCH]
+   --commit.message value, --cm value        git commit message [$DRONE_COMMIT_MESSAGE]
+   --commit.link value, --cl value           git commit link [$DRONE_COMMIT_LINK]
+   --commit.author.name value, --an value    git author name [$DRONE_COMMIT_AUTHOR]
+   --commit.author.email value, --ae value   git author email [$DRONE_COMMIT_AUTHOR_EMAIL]
+   --commit.author.avatar value, --aa value  git author avatar [$DRONE_COMMIT_AUTHOR_AVATAR]
+   --build.event value, --be value           build event (default: "push") [$DRONE_BUILD_EVENT]
+   --build.number value, --bn value          build number (default: 0) [$DRONE_BUILD_NUMBER]
+   --build.created value, --bc value         build created (default: 0) [$DRONE_BUILD_CREATED]
+   --build.started value, --bs value         build started (default: 0) [$DRONE_BUILD_STARTED]
+   --build.finished value, --bf value        build finished (default: 0) [$DRONE_BUILD_FINISHED]
+   --build.status value, --bstat value       build status (default: "success") [$DRONE_BUILD_STATUS]
+   --build.link value, --bl value            build link [$DRONE_BUILD_LINK]
+   --build.deploy value, --db value          build deployment target [$DRONE_DEPLOY_TO]
+   --yaml.verified, --yv                     build yaml is verified [$DRONE_YAML_VERIFIED]
+   --yaml.signed, --ys                       build yaml is signed [$DRONE_YAML_SIGNED]
+   --prev.build.number value, --pbn value    previous build number (default: 0) [$DRONE_PREV_BUILD_NUMBER]
+   --prev.build.status value, --pbst value   previous build status [$DRONE_PREV_BUILD_STATUS]
+   --prev.commit.sha value, --pcs value      previous build sha [$DRONE_PREV_COMMIT_SHA]
+   --mount value, -m value                   cache directories, an array of folders to cache [$PLUGIN_MOUNT]
+   --rebuild, --reb                          rebuild the cache directories [$PLUGIN_REBUILD]
+   --restore, --res                          restore the cache directories [$PLUGIN_RESTORE]
+   --cache-key value, --chk value            cache key to use for the cache directories [$PLUGIN_CACHE_KEY]
+   --archive-format value, --arcfmt value    archive format to use to store the cache directories. (tar, gzip) (default: "tar") [$PLUGIN_ARCHIVE_FORMAT]
+   --endpoint value, -e value                endpoint for the s3 connection [$PLUGIN_ENDPOINT, $S3_ENDPOINT]
+   --access-key value, --akey value          AWS access key [$PLUGIN_ACCESS_KEY, $AWS_ACCESS_KEY_ID, $CACHE_AWS_ACCESS_KEY_ID]
+   --secret-key value, --skey value          AWS secret key [$PLUGIN_SECRET_KEY, $AWS_SECRET_ACCESS_KEY, $CACHE_AWS_SECRET_ACCESS_KEY]
+   --bucket value, --bckt value              AWS bucket name [$PLUGIN_BUCKET, $S3_BUCKET]
+   --region value, --reg value               AWS bucket region. (us-east-1, eu-west-1, ...) [$PLUGIN_REGION, $S3_REGION]
+   --path-style, --ps                        use path style for bucket paths. (true for minio, false for aws) [$PLUGIN_PATH_STYLE]
+   --acl value                               upload files with acl (private, public-read, ...) (default: "private") [$PLUGIN_ACL]
+   --encryption value, --enc value           server-side encryption algorithm, defaults to none. (AES256, aws:kms) [$PLUGIN_ENCRYPTION]
+   --help, -h                                show help
+   --version, -v                             print the version
+
 ```
 
-with Environment variables, using Docker:
+### Using Docker (with Environment variables)
 
 ```bash
 $ docker run --rm \
@@ -34,88 +92,170 @@ $ docker run --rm \
       -e PLUGIN_BUCKET=<bucket> \
       -e AWS_ACCESS_KEY_ID=<token> \
       -e AWS_SECRET_ACCESS_KEY=<secret> \
-      meltwater/drone-s3-cache
+      meltwater/drone-cache
 ```
 
-## Config
+## Examples
 
-The following parameters are used to configure the plugin:
-
-- **endpoint** - custom endpoint URL (optional, to use a S3 compatible non-Amazon service)
-- **access_key** - amazon key (optional)
-- **secret_key** - amazon secret key (optional)
-- **bucket** - bucket name
-- **region** - bucket region (`us-east-1`, `eu-west-1`, etc)
-- **encryption** - if provided, use server-side encryption (`AES256`, `aws:kms`, etc)
-- **acl** - access to files that are uploaded (`private`, `public-read`, etc)
-- **path_style** - whether path style URLs should be used (true for minio, false for aws)
-- **mount** - one or an array of folders to cache
-- **rebuild** - boolean flag to trigger a rebuild
-- **restore** - boolean flag to trigger a restore
-
-The following secret values can be set to configure the plugin.
-
-- **AWS_ACCESS_KEY_ID** or **CACHE_AWS_ACCESS_KEY_ID** - corresponds to **access_key**
-- **AWS_SECRET_ACCESS_KEY** or **CACHE_AWS_SECRET_ACCESS_KEY** - corresponds to **secret_key**
-- **S3_BUCKET** - corresponds to **bucket**
-- **S3_REGION** - corresponds to **region**
-- **PLUGIN_ENDPOINT** - corresponds to **endpoint**
-
-### Example
+### Drone Config examples
 
 The following is a sample configuration in your .drone.yml file:
 
+#### Simple
+
 ```yaml
 pipeline:
-  s3_cache_restore:
-    bucket: my-drone-bucket
+  restore-cache:
     image: meltwater/drone-s3-cache
-    restore: true
+    pull: true
+   restore: true
+    bucket: drone-cache-bucket
+    region: eu-west-1
+    secrets: [aws_access_key_id, aws_secret_key]
     mount:
-      - node_modules
+      - 'deps'
+      - '_dialyzer'
 
   build:
     image: node:latest
     commands:
       - npm install
 
-  s3_cache_rebuild:
-    bucket: my-drone-bucket
+rebuild-deps-cache:
     image: meltwater/drone-s3-cache
+    pull: true
     rebuild: true
+    bucket: drone-cache-bucket
+    region: eu-west-1
+    secrets: [aws_access_key_id, aws_secret_key]
     mount:
-      - node_modules
+      - 'deps'
 ```
+
+#### With custom cache key prefix template
+
+```yaml
+pipeline:
+  restore-cache:
+    image: meltwater/drone-s3-cache
+    pull: true
+    restore: true
+    cache-key: "{{ .Repo.Name }}_{{ .Commit.Branch }}_{{ .Build.Number }}"
+    bucket: drone-cache-bucket
+    region: eu-west-1
+    secrets: [aws_access_key_id, aws_secret_key]
+    mount:
+      - 'deps'
+      - '_dialyzer'
+
+  build:
+    image: node:latest
+    commands:
+      - npm install
+
+rebuild-deps-cache:
+    image: meltwater/drone-s3-cache
+    pull: true
+    rebuild: true
+    cache-key: "{{ .Repo.Name }}_{{ .Commit.Branch }}_{{ .Build.Number }}"
+    bucket: drone-cache-bucket
+    region: eu-west-1
+    secrets: [aws_access_key_id, aws_secret_key]
+    mount:
+      - 'deps'
+```
+
+#### With gzip compression
+
+```yaml
+pipeline:
+  restore-cache:
+    image: meltwater/drone-s3-cache
+    pull: true
+    restore: true
+    cache-key: "{{ .Repo.Name }}_{{ .Commit.Branch }}_{{ .Build.Number }}"
+    archive_format: "gzip"
+    bucket: drone-cache-bucket
+    region: eu-west-1
+    secrets: [aws_access_key_id, aws_secret_key]
+    mount:
+      - 'deps'
+      - '_dialyzer'
+
+  build:
+    image: node:latest
+    commands:
+      - npm install
+
+rebuild-deps-cache:
+    image: meltwater/drone-s3-cache
+    pull: true
+    rebuild: true
+    cache-key: "{{ .Repo.Name }}_{{ .Commit.Branch }}_{{ .Build.Number }}"
+    archive_format: "gzip"
+    bucket: drone-cache-bucket
+    region: eu-west-1
+    secrets: [aws_access_key_id, aws_secret_key]
+    mount:
+      - 'deps'
+```
+
 
 ## Development
 
 ### Local setup
 
-```bash
+```console
 $ ./scripts/setup_dev_environment.sh
+> Done.
 ```
 
-### Build
+### Tests
+
+```console
+$ ./test
+> ...
+```
+
+OR
+
+```console
+$ docker-compose up -d
+> ...
+$ go test ./..
+> ...
+```
+
+### Build Binary
 
 Build the binary with the following commands:
 
-```bash
-$ go build
-$ go test
+```console
+$ make build
+> ...
+$ go build .
+> ...
 ```
 
-### Docker
+### Build Docker
 
 Build the docker image with the following commands:
 
-```bash
+```console
 $ make docker-build
+> ...
 ```
 
-Please note incorrectly building the image for the correct x64 linux and with
-GCO disabled will result in an error when running the Docker image:
+## Contributing
 
-```bash
-docker: Error response from daemon: Container command
-'/bin/drone-s3-cache' not found or does not exist..
-```
+Pull requests are welcome.
+
+## Authors
+
+* [@dim](https://github.com/dim)
+* [@kakkoyun](https://github.com/kakkoyun)
+* [@salimane](https://github.com/salimane)
+
+## Copyright
+
+See [LICENSE](LICENSE) document

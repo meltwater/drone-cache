@@ -209,7 +209,7 @@ func newTestPlugin(rebuild bool, restore bool, mount []string, cacheKey string) 
 	return Plugin{
 		Repo: Repo{
 			Branch: "master",
-			Name:   "drone-s3-cache",
+			Name:   "drone-cache",
 		},
 		Commit: Commit{
 			Branch: "master",
