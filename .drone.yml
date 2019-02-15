@@ -37,15 +37,15 @@ pipeline:
     commands:
       - go test -v -mod=vendor ./... # NOTICE: -race: Needs CGO enabled
 
-  # rebuild-cache:
-  #     image: meltwater/drone-cache
-  #     pull: true
-  #     rebuild: true
-  #     bucket: drone-cache-bucket
-  #     secrets: [aws_access_key_id, aws_secret_access_key]
-  #     region: eu-west-1
-  #     mount:
-  #       - 'vendor'
+  rebuild-cache:
+      image: meltwater/drone-cache
+      pull: true
+      rebuild: true
+      bucket: drone-cache-bucket
+      secrets: [aws_access_key_id, aws_secret_access_key]
+      region: eu-west-1
+      mount:
+        - 'vendor'
 
   docker-release-latest:
     image: plugins/docker
