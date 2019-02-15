@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # Pre-run commands
-if [ ${DEBUG} == "true" ]; then
+if [[ ${DEBUG} == "true" ]]; then
     env
 fi
 
