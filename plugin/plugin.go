@@ -133,13 +133,13 @@ func (p *Plugin) Exec() error {
 		log.Println("AWS Key and/or Secret not provided (falling back to anonymous credentials)")
 	}
 
-	backend := backend.NewS3(c.Bucket, c.ACL, c.Encryption, &aws.Config{
+	backend := backend.NewS3(c.Bucket, c.ACL, c.Encryption, (&aws.Config{
 		Region:           aws.String(c.Region),
 		Endpoint:         &c.Endpoint,
 		DisableSSL:       aws.Bool(!strings.HasPrefix(c.Endpoint, "https://")),
 		S3ForcePathStyle: aws.Bool(c.PathStyle),
 		Credentials:      cred,
-	})
+	}).WithLogLevel(aws.LogDebugWithHTTPBody))
 
 	// 3. Initialize cache
 	cch := cache.New(backend, c.ArchiveFormat)

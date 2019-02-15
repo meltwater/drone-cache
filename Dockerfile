@@ -11,7 +11,7 @@ RUN make fetch-dependencies
 COPY . $BUILD_DIR
 
 RUN make drone-cache
-RUN make compress
+# RUN make compress # TODO: Enable before merge
 RUN cp drone-cache /bin
 
 # final stage
@@ -24,4 +24,5 @@ RUN set -ex \
     tar \
   && rm -rf /var/cache/apk/*
 
+RUN env # TODO: Disable before merge
 ENTRYPOINT ["/bin/drone-cache"]
