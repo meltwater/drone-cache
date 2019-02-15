@@ -6,6 +6,14 @@ pipeline:
     image: plugins/git
     tags: true
 
+  build:
+    image: golang:1.11-alpine
+    pull: true
+    secrets: [aws_access_key_id, aws_secret_access_key]
+    commands:
+      - apk add --update make git
+      - make drone-cache
+
   restore-cache:
       image: meltwater/drone-cache
       pull: true
@@ -39,14 +47,6 @@ pipeline:
       mount:
         - 'vendor'
 
-  build:
-    image: golang:1.11-alpine
-    pull: true
-    secrets: [aws_access_key_id, aws_secret_access_key]
-    commands:
-      - apk add --update make git
-      - make drone-cache
-
   analyze-lint:
     image: golang:1.11-alpine
     pull: true
@@ -54,7 +54,7 @@ pipeline:
       CGO_ENABLED: '0'
     commands:
       - wget -O - -q https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh| sh -s v1.14.0
-      - ./bin/golangci-lint run
+      - ./bin/golangci-lint -v run
 
   analyze-security:
     image: golang:1.11-alpine
