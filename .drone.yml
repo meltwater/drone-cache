@@ -27,6 +27,7 @@ pipeline:
       image: meltwater/drone-cache
       pull: true
       restore: true
+      cache_key: "gzip"
       archive_format: "gzip"
       bucket: drone-cache-bucket
       secrets: [aws_access_key_id, aws_secret_access_key]
@@ -84,6 +85,7 @@ pipeline:
       image: meltwater/drone-cache
       pull: true
       rebuild: true
+      cache_key: "gzip"
       archive_format: "gzip"
       bucket: drone-cache-bucket
       secrets: [aws_access_key_id, aws_secret_access_key]
