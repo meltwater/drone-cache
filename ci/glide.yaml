@@ -1,0 +1,10 @@
+package: github.com/meltwater/drone-s3-cache
+import:
+- package: github.com/aws/aws-sdk-go
+  subpackages:
+  - aws
+  - aws/credentials
+  - aws/session
+  - service/s3
+- package: github.com/pkg/errors
+- package: github.com/urfave/cli
