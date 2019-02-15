@@ -15,7 +15,7 @@ RUN make fetch-dependencies
 COPY . $BUILD_DIR
 
 RUN make drone-cache
-# RUN make compress
+RUN make compress
 RUN cp drone-cache /bin
 
 # final stage
