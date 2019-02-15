@@ -135,7 +135,7 @@ func (p *Plugin) Exec() error {
 		cred = credentials.NewStaticCredentials(c.Key, c.Secret, "")
 	} else {
 		cred = credentials.AnonymousCredentials
-		log.Println("AWS Key and/or Secret not provided (falling back to anonymous credentials)")
+		log.Println("aws key and/or Secret not provided (falling back to anonymous credentials)")
 	}
 	awsConf := &aws.Config{
 		Region:           aws.String(c.Region),
