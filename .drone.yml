@@ -2,6 +2,10 @@ branches:
   - master
 
 pipeline:
+  clone:
+    image: plugins/git
+    tags: true
+
   restore-cache:
       image: meltwater/drone-cache
       pull: true
@@ -137,7 +141,7 @@ pipeline:
       > {{build.message}} by <https://github.com/{{build.author}}|{{build.author}}>
     when:
       local: false
-      status: [changed, failure] # success
+      status: [success, failure]
 
 services:
   filestorage:
