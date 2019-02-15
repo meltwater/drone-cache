@@ -109,7 +109,7 @@ pipeline:
   restore-cache:
     image: meltwater/drone-s3-cache
     pull: true
-   restore: true
+    restore: true
     bucket: drone-cache-bucket
     region: eu-west-1
     secrets: [aws_access_key_id, aws_secret_key]
