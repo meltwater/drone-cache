@@ -42,6 +42,7 @@ func (c Cache) Upload(src, dst string) error {
 	log.Printf("archiving directory <%s>", src)
 
 	// 2. create a temporary file for the archive
+	ensureDir("/tmp")
 	dir, err := ioutil.TempDir("", "")
 	if err != nil {
 		return errors.Wrap(err, "could not create tmp folder for archive")
@@ -163,15 +164,6 @@ func archiveReader(r io.Reader, archiveFmt string) *tar.Reader {
 }
 
 func extractFilesFromArchive(tr *tar.Reader, dst string) error {
-	ensureDir := func(dirName string) error {
-		if _, err := os.Stat(dirName); err != nil {
-			if err := os.MkdirAll(dirName, os.FileMode(0755)); err != nil {
-				return errors.Wrap(err, fmt.Sprintf("could not create directory <%s>", dirName))
-			}
-		}
-		return nil
-	}
-
 	for {
 		h, err := tr.Next()
 		switch {
@@ -206,4 +198,13 @@ func extractFilesFromArchive(tr *tar.Reader, dst string) error {
 		}
 		f.Close()
 	}
+}
+
+func ensureDir(dirName string) error {
+	if _, err := os.Stat(dirName); err != nil {
+		if err := os.MkdirAll(dirName, os.FileMode(0755)); err != nil {
+			return errors.Wrap(err, fmt.Sprintf("could not create directory <%s>", dirName))
+		}
+	}
+	return nil
 }
