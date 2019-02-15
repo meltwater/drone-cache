@@ -15,8 +15,8 @@ import (
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/pkg/errors"
 
-	"github.com/meltwater/drone-s3-cache/cache"
-	"github.com/meltwater/drone-s3-cache/cache/backend"
+	"github.com/meltwater/drone-cache/cache"
+	"github.com/meltwater/drone-cache/cache/backend"
 )
 
 type (
@@ -221,7 +221,7 @@ func (p Plugin) cacheKey(mount string) (string, error) {
 		return "", errors.Wrap(err, fmt.Sprintf("could not build <%s> as cache key, falling back to default. %+v\n", p.Config.CacheKey, err))
 	}
 
-	return fmt.Sprintf("%s/%s", b.String(), mount), nil
+	return filepath.Join(b.String(), mount), nil
 }
 
 // Helpers

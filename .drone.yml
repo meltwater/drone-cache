@@ -11,7 +11,7 @@ pipeline:
     pull: true
     commands:
       - apk add --update make git
-      - make drone-s3-cache
+      - make drone-cache
 
   analyze:
     image: golang:1.11-alpine
@@ -33,7 +33,7 @@ pipeline:
   docker-release-latest:
     image: plugins/docker
     pull: true
-    repo: meltwater/drone-s3-cache
+    repo: meltwater/drone-cache
     tags: latest
     secrets: [docker_username, docker_password]
     when:
@@ -42,7 +42,7 @@ pipeline:
 
   docker-release-tag:
     image: plugins/docker
-    repo: meltwater/drone-s3-cache
+    repo: meltwater/drone-cache
     tags: '${DRONE_TAG}'
     secrets: [docker_username, docker_password]
     when:

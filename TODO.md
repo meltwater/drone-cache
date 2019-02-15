@@ -18,21 +18,19 @@
 - [x] Add more useful log messages and debug logs, clear useless log messages
 - [x] Refactor tests
 - [x] Clean up TODOs
-
 - [x] Remove unused flags, simplify
 - [x] Make flags mutually exclusive, throw an error
 - [x] Add more build information
 - [x] Add short names for Flags (you can set alternate (or short) names for flags by providing a comma-delimited list for the Name.)
 - [x] Add Goreleaser
-
 - [x] Add CircleCI like go template cache keys
 - [x] Tar/Gzip
+- [x] Add usage examples to README
+- [x] Add all possible environment variables to README
+- [x] Rename Repo
 
-- [ ] Add usage examples to README
-- [ ] Add all possible environment variables to README
-- [ ] Rename Repo
-
-- [] MERGE !
+- [ ] TEST!
+- [ ] MERGE !
 
 - [ ] Improve static analyzers
 - [ ] Improve Makefile
@@ -40,16 +38,16 @@
 
 ## Before v1.0.0
 
-- [ ] Introduce mode: wrap_in_directory: true
+- [x] Badges
+    - [x] Drone Pluging badges
+    - [x] https://microbadger.com/images/meltwater/drone-cache
+    - [x] https://goreportcard.com/report/github.com/meltwater/drone-cache
 - [ ] Add volume/file storage
     - [ ] https://docs.drone.io/user-guide/pipeline/volumes/
     - [ ] http://plugins.drone.io/drillster/drone-volume-cache/
     - [ ] https://github.com/Drillster/drone-volume-cache/blob/master/cacher.sh
+- [ ] Introduce mode: wrap_in_directory: true
 - [ ] Add unit tests
-- [ ] Badges
-    - [ ] Drone Pluging badges
-    - [ ] https://microbadger.com/images/meltwater/drone-s3-cache
-    - [ ] [![Go Report Card](https://goreportcard.com/badge/github.com/meltwater/drone-cache)](https://goreportcard.com/report/github.com/meltwater/drone-cache)
 
 ## Road to Open Source
 

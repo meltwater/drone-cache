@@ -10,13 +10,13 @@ RUN make fetch-dependencies
 
 COPY . $BUILD_DIR
 
-RUN make drone-s3-cache
+RUN make drone-cache
 RUN make compress
-RUN cp drone-s3-cache /bin
+RUN cp drone-cache /bin
 
 # final stage
 FROM alpine:3.9 as runner
-COPY --from=builder /bin/drone-s3-cache /bin
+COPY --from=builder /bin/drone-cache /bin
 
 RUN set -ex \
   && apk add --no-cache \
@@ -24,4 +24,4 @@ RUN set -ex \
     tar \
   && rm -rf /var/cache/apk/*
 
-ENTRYPOINT ["/bin/drone-s3-cache"]
+ENTRYPOINT ["/bin/drone-cache"]

@@ -8,7 +8,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/pkg/errors"
 
-	"github.com/meltwater/drone-s3-cache/cache"
+	"github.com/meltwater/drone-cache/cache"
 )
 
 // s3Backend is an S3 implementation of the Backend

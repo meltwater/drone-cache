@@ -6,7 +6,7 @@ import (
 
 	"github.com/urfave/cli"
 
-	"github.com/meltwater/drone-s3-cache/plugin"
+	"github.com/meltwater/drone-cache/plugin"
 )
 
 func main() {
@@ -186,7 +186,7 @@ func main() {
 
 		cli.StringSliceFlag{
 			Name:   "mount, m",
-			Usage:  "cache directories",
+			Usage:  "cache directories, an array of folders to cache",
 			EnvVar: "PLUGIN_MOUNT",
 		},
 		cli.BoolFlag{
@@ -206,13 +206,13 @@ func main() {
 		},
 		cli.StringFlag{
 			Name:   "archive-format, arcfmt",
-			Usage:  "archive format to use to store the cache directories, available formats: tar (default), gzip.",
+			Usage:  "archive format to use to store the cache directories. (tar, gzip)",
+			Value:  "tar",
 			EnvVar: "PLUGIN_ARCHIVE_FORMAT",
 		},
 
 		// Volume specific Config args
-
-		// TODO: !!
+		// Comming soon...
 
 		// S3 specific Config args
 		cli.StringFlag{
@@ -222,40 +222,38 @@ func main() {
 		},
 		cli.StringFlag{
 			Name:   "access-key, akey",
-			Usage:  "aws access key",
+			Usage:  "AWS access key",
 			EnvVar: "PLUGIN_ACCESS_KEY,AWS_ACCESS_KEY_ID,CACHE_AWS_ACCESS_KEY_ID",
 		},
 		cli.StringFlag{
 			Name:   "secret-key, skey",
-			Usage:  "aws secret key",
+			Usage:  "AWS secret key",
 			EnvVar: "PLUGIN_SECRET_KEY,AWS_SECRET_ACCESS_KEY,CACHE_AWS_SECRET_ACCESS_KEY",
 		},
 		cli.StringFlag{
 			Name:   "bucket, bckt",
-			Usage:  "aws bucket",
-			Value:  "mw-drone-prod-ew1dro1",
+			Usage:  "AWS bucket name",
 			EnvVar: "PLUGIN_BUCKET,S3_BUCKET",
 		},
 		cli.StringFlag{
 			Name:   "region, reg",
-			Usage:  "aws region",
-			Value:  "us-east-1",
+			Usage:  "AWS bucket region. (us-east-1, eu-west-1, ...)",
 			EnvVar: "PLUGIN_REGION,S3_REGION",
 		},
 		cli.BoolFlag{
 			Name:   "path-style, ps",
-			Usage:  "use path style for bucket paths",
+			Usage:  "use path style for bucket paths. (true for minio, false for aws)",
 			EnvVar: "PLUGIN_PATH_STYLE",
 		},
 		cli.StringFlag{
 			Name:   "acl",
-			Usage:  "upload files with acl",
+			Usage:  "upload files with acl (private, public-read, ...)",
 			Value:  "private",
 			EnvVar: "PLUGIN_ACL",
 		},
 		cli.StringFlag{
 			Name:   "encryption, enc",
-			Usage:  "server-side encryption algorithm, defaults to none",
+			Usage:  "server-side encryption algorithm, defaults to none. (AES256, aws:kms)",
 			EnvVar: "PLUGIN_ENCRYPTION",
 		},
 	}
