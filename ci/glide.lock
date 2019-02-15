@@ -1,8 +1,8 @@
-hash: 6829fccd7e300e204855ec3808f7aa683bda77988939e40548ef49328801c1ca
-updated: 2019-02-15T18:02:22.389759+01:00
+hash: 182a6d95e65d8518753723634a3d0d781409ba3cc565d0ab8d99b556ac377ee0
+updated: 2019-02-15T18:08:35.210887+01:00
 imports:
 - name: github.com/aws/aws-sdk-go
-  version: f25c58028ccaa4be2726c172d970ba1cc0f26c99
+  version: 4e2e7c3c80cfb77d22990cadb2c17096d2614938
   subpackages:
   - aws
   - aws/credentials
@@ -11,5 +11,5 @@ imports:
 - name: github.com/pkg/errors
   version: ffb6e22f01932bf7ac35e0bad9be11f01d1c8685
 - name: github.com/urfave/cli
-  version: 2526b57c56f30b50466c96c4133b1a4ad0f0191f
+  version: cfb38830724cc34fedffe9a2a29fb54fa9169cd1
 testImports: []
