@@ -2,8 +2,8 @@ branches:
   - master
 
 clone:
-    image: plugins/git
-    tags: true
+  image: plugins/git
+  tags: true
 
 pipeline:
   build:
