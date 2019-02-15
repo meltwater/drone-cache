@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # Pre-run commands
-if [[ $(echo $DEBUG) == "true" || $(echo $PLUGIN_DEBUG) == "true" ]]; then
+if [ "${DEBUG-}" = "true" ] || [ "${PLUGIN_DEBUG-}" = "true" ]; then
     env
 fi
 
