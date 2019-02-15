@@ -63,7 +63,7 @@ pipeline:
       CGO_ENABLED: '0'
     commands:
       - wget -O - -q https://raw.githubusercontent.com/securego/gosec/master/install.sh | sh -s 1.2.0
-      - gosec ./...
+      - ./bin/gosec ./...
 
   analyze-reportcard:
     image: golang:1.11-alpine
@@ -72,8 +72,7 @@ pipeline:
       CGO_ENABLED: '0'
     commands:
       - go get github.com/gojp/goreportcard/cmd/goreportcard-cli
-      - cd $GOPATH/src/github.com/gojp/goreportcard
-      - goreportcard-cli -v
+      - $GOPATH/src/github.com/gojp/goreportcard/goreportcard-cli -v
 
   test:
     image: golang:1.11-alpine
