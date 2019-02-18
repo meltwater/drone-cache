@@ -76,7 +76,7 @@ pipeline:
       - export PROJECT_PATH=$(go env GOPATH)/src/github.com/meltwater/drone-cache
       - mkdir -p $PROJECT_PATH
       - cp -R $(pwd)/* $PROJECT_PATH
-      - ./bin/gosec -quiet -severity medium $PROJECT_PATH
+      - ./bin/gosec $PROJECT_PATH
 
   rebuild-cache:
       image: meltwater/drone-cache

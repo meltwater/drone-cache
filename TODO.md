@@ -40,6 +40,7 @@
 
 ## v0.10.0
 
+- [x] Fix `gosec`
 - [ ] Add helper functions for cache keys (https://circleci.com/docs/2.0/caching/#using-keys-and-templates)
 - [ ] https://golang.org/pkg/text/template/#example_Template
   - [ ] checksum (https://golang.org/pkg/crypto/md5/#New)
@@ -59,7 +60,6 @@
   - [ ] https://github.com/drone-plugins/drone-s3
   - [ ] New Drone Version
 - [ ] Improve Makefile
-- [ ] Fix `gosec`
 - [ ] Add unit tests
 
 ## Road to Open Source
