@@ -72,6 +72,7 @@ pipeline:
       CGO_ENABLED: '0'
     commands:
       - wget -O - -q https://raw.githubusercontent.com/securego/gosec/master/install.sh | sh -s 1.2.0
+      - export GOPATH=$(pwd)
       - ./bin/gosec -quiet -severity medium ./...
 
   rebuild-cache:
