@@ -65,28 +65,14 @@ pipeline:
       - wget -O - -q https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh| sh -s v1.14.0
       - ./bin/golangci-lint -v run
 
-  # Disabled: Does not with go modules.
-  # analyze-security:
-  #   image: golang:1.11-alpine
-  #   pull: true
-  #   environment:
-  #     CGO_ENABLED: '0'
-  #   commands:
-  #     - wget -O - -q https://raw.githubusercontent.com/securego/gosec/master/install.sh | sh -s 1.2.0
-  #     - ./bin/gosec ./...
-
-  # Disabled: Does not with this version of go.
-  # analyze-reportcard:
-  #   image: golang:1.11-alpine
-  #   pull: true
-  #   environment:
-  #     CGO_ENABLED: '0'
-  #   commands:
-  #     - apk add --update git
-  #     # - go get -u github.com/alecthomas/gometalinter
-  #     # - go get -u github.com/gojp/goreportcard/cmd/goreportcard-cli
-  #     # - $GOPATH/bin/gometalinter --install --update
-  #     - $GOPATH/bin/goreportcard-cli -v
+  analyze-security:
+    image: golang:1.11-alpine
+    pull: true
+    environment:
+      CGO_ENABLED: '0'
+    commands:
+      - wget -O - -q https://raw.githubusercontent.com/securego/gosec/master/install.sh | sh -s 1.2.0
+      - ./bin/gosec $GOPATH/src/github.com/meltwater/drone-cache/...
 
   rebuild-cache:
       image: meltwater/drone-cache
