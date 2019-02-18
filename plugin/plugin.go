@@ -2,13 +2,10 @@
 package plugin
 
 import (
-	"crypto/md5"
 	"fmt"
-	"io"
 	"log"
 	"path/filepath"
 	"strings"
-	"text/template"
 	"time"
 
 	"github.com/aws/aws-sdk-go/aws"
@@ -17,50 +14,11 @@ import (
 
 	"github.com/meltwater/drone-cache/cache"
 	"github.com/meltwater/drone-cache/cache/backend"
+	"github.com/meltwater/drone-cache/metadata"
+	"github.com/meltwater/drone-cache/plugin/cachekey"
 )
 
 type (
-	// Repo stores information about repository that is built
-	Repo struct {
-		Avatar  string
-		Branch  string
-		Link    string
-		Name    string
-		Owner   string
-		Private bool
-		Trusted bool
-	}
-
-	// Build stores information about current build
-	Build struct {
-		Created  int64
-		Deploy   string
-		Event    string
-		Finished int64
-		Link     string
-		Number   int
-		Started  int64
-		Status   string
-	}
-
-	// Commit stores information about current commit
-	Commit struct {
-		Author  Author
-		Branch  string
-		Link    string
-		Message string
-		Ref     string
-		Remote  string
-		Sha     string
-	}
-
-	// Author stores information about current commit's author
-	Author struct {
-		Avatar string
-		Email  string
-		Name   string
-	}
-
 	// Config plugin-specific parameters and secrets
 	Config struct {
 		// Indicates the files ACL, which should be one
@@ -103,10 +61,10 @@ type (
 
 	// Plugin stores metadata about current plugin
 	Plugin struct {
-		Build  Build
-		Commit Commit
+		Build  metadata.Build
+		Commit metadata.Commit
 		Config Config
-		Repo   Repo
+		Repo   metadata.Repo
 	}
 )
 
@@ -123,7 +81,7 @@ func (p *Plugin) Exec() error {
 		return errors.New("rebuild and restore are mutually exclusive, please set only one of them")
 	}
 
-	_, err := template.New("cacheKey").Parse(p.Config.CacheKey)
+	_, err := cachekey.ParseTemplate(p.Config.CacheKey)
 	if err != nil {
 		return errors.Wrap(err, fmt.Sprintf("could not parse <%s> as cache key template, falling back to default", p.Config.CacheKey))
 	}
@@ -176,13 +134,9 @@ func (p Plugin) processRebuild(c cache.Cache) error {
 	branch := p.Commit.Branch
 
 	for _, mount := range p.Config.Mount {
-		key, err := p.cacheKey(mount)
+		key, err := p.cacheKey(mount, branch)
 		if err != nil {
-			log.Printf("%v, falling back to default key\n", err)
-			key, err = hash(mount, branch)
-			if err != nil {
-				return errors.Wrap(err, "could not generate hash key for mounted")
-			}
+			return errors.Wrap(err, "could not generate cache key")
 		}
 		path := filepath.Join(p.Repo.Name, key)
 
@@ -201,13 +155,9 @@ func (p Plugin) processRestore(c cache.Cache) error {
 	branch := p.Commit.Branch
 
 	for _, mount := range p.Config.Mount {
-		key, err := p.cacheKey(mount)
+		key, err := p.cacheKey(mount, branch)
 		if err != nil {
-			log.Printf("%v, falling back to default key\n", err)
-			key, err = hash(mount, branch)
-			if err != nil {
-				return errors.Wrap(err, "could not generate hash key for mounted")
-			}
+			return errors.Wrap(err, "could not generate cache key")
 		}
 		path := filepath.Join(p.Repo.Name, key)
 
@@ -221,48 +171,19 @@ func (p Plugin) processRestore(c cache.Cache) error {
 }
 
 // cacheKey generates key from given template as parameter or fallbacks hash
-func (p Plugin) cacheKey(mount string) (string, error) {
-	if p.Config.CacheKey == "" {
-		return "", errors.New("cache key template is empty")
-	}
-
-	log.Println("using provided cache key template")
-	t, err := template.New("cacheKey").Parse(p.Config.CacheKey)
-	if err != nil {
-		return "", errors.Wrap(err, fmt.Sprintf("could not parse <%s> as cache key template, falling back to default", p.Config.CacheKey))
-	}
-
-	data := struct {
-		Build  Build
-		Commit Commit
-		Repo   Repo
-	}{
+func (p Plugin) cacheKey(mount, branch string) (string, error) {
+	key, err := cachekey.Generate(p.Config.CacheKey, mount, metadata.Metadata{
 		Build:  p.Build,
 		Commit: p.Commit,
 		Repo:   p.Repo,
-	}
-
-	var b strings.Builder
-	err = t.Execute(&b, data)
+	})
 	if err != nil {
-		return "", errors.Wrap(err, fmt.Sprintf("could not build <%s> as cache key, falling back to default. %+v", p.Config.CacheKey, err))
-	}
-
-	return filepath.Join(b.String(), mount), nil
-}
-
-// Helpers
-
-// hash generates a key based on filename paths and branch
-func hash(mount, branch string) (string, error) {
-	parts := []string{mount, branch}
-
-	// calculate the hash using the branch
-	h := md5.New()
-	for _, part := range parts {
-		if _, err := io.WriteString(h, part); err != nil {
-			return "", errors.Wrap(err, fmt.Sprintf("could not write part <%s> as hash", part))
+		log.Printf("%v, falling back to default key\n", err)
+		key, err = cachekey.Hash(mount, branch)
+		if err != nil {
+			return "", errors.Wrap(err, "could not generate hash key for mounted")
 		}
 	}
-	return fmt.Sprintf("%x", h.Sum(nil)), nil
+
+	return key, nil
 }

@@ -43,9 +43,9 @@
 - [x] Fix `gosec`
 - [ ] Add helper functions for cache keys (https://circleci.com/docs/2.0/caching/#using-keys-and-templates)
 - [ ] https://golang.org/pkg/text/template/#example_Template
-  - [ ] checksum (https://golang.org/pkg/crypto/md5/#New)
-  - [ ] epoch (https://gobyexample.com/epoch)
-  - [ ] arch (https://golang.org/pkg/runtime/#pkg-constants)
+  - [x] checksum (https://golang.org/pkg/crypto/md5/#New)
+  - [x] epoch (https://gobyexample.com/epoch)
+  - [x] arch (https://golang.org/pkg/runtime/#pkg-constants)
   - [ ] .Environment (https://gobyexample.com/environment-variables)
 
 ## Before v1.0.0
