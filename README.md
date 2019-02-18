@@ -410,7 +410,7 @@ Pull requests are welcome.
 
 ## Authors
 
-* [@dim](https://github.com/dim)
+* [@dim](https://github.com/dim) Thanks for original work!
 * [@kakkoyun](https://github.com/kakkoyun)
 * [@salimane](https://github.com/salimane)
 
