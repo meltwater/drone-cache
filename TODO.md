@@ -37,6 +37,14 @@
 - [ ] Improve Makefile
 - [ ] Fix `gosec`
 
+- [ ] Add helper functions for cache keys (https://circleci.com/docs/2.0/caching/#using-keys-and-templates)
+  - [ ] checksum
+  - [ ] epoch
+  - [ ] arch
+  - [ ] .Environment
+
+- [ ] Absolute paths for `mount`
+
 ## Before v1.0.0
 
 - [x] Badges
