@@ -70,9 +70,10 @@ pipeline:
     pull: true
     environment:
       CGO_ENABLED: '0'
+      GO111MODULE: 'off'
     commands:
-      - wget -O - -q https://raw.githubusercontent.com/securego/gosec/master/install.sh | sh -s 1.2.0
       - export GOPATH=$(pwd)
+      - wget -O - -q https://raw.githubusercontent.com/securego/gosec/master/install.sh | sh -s 1.2.0
       - ./bin/gosec -quiet -severity medium ./...
 
   rebuild-cache:

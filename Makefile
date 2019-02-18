@@ -10,7 +10,7 @@ clean:
 .PHONY: default all clean
 
 fetch-dependencies:
-	GO111MODULE=on GOFLAGS=-mod=vendor go mod vendor -v
+	go mod vendor -v
 
 .PHONY: fetch-dependencies
 
