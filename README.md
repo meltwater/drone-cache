@@ -16,7 +16,7 @@ For the usage information and a listing of the available options please take a l
 
 ## Examples
 
-### Drone Config examples
+### Drone Configuration examples
 
 The following is a sample configuration in your .drone.yml file:
 
@@ -56,6 +56,8 @@ rebuild-deps-cache:
 ```
 
 #### With custom cache key prefix template
+
+See [cache key templates](#cache-key-templates) section for further information and to learn about syntax.
 
 ```yaml
 pipeline:
@@ -248,6 +250,55 @@ $ docker run --rm \
       -e AWS_ACCESS_KEY_ID=<token> \
       -e AWS_SECRET_ACCESS_KEY=<secret> \
       meltwater/drone-cache
+```
+
+## Cache Key Templates
+
+`"{{ .Repo.Name }}-{{ .Commit.Branch }}-yadayadayada"`
+
+Cache key template syntax is very basic. You just need to provide a string. In that string you can use variables by prefixing them with a `.` in `{{ }}` construct, from provided metadata object.
+
+Following metadata object is available and pre-populated with current build information for you to use in cache key templates.
+
+For further information about this syntax please see [official docs](https://golang.org/pkg/text/template/) from Go standard library.
+
+```go
+{
+  Repo {
+    Avatar  string
+    Branch  string
+    Link    string
+    Name    string
+    Owner   string
+    Private bool
+    Trusted bool
+  }
+
+  Build {
+    Created  int
+    Deploy   string
+    Event    string
+    Finished int
+    Link     string
+    Number   int
+    Started  int
+    Status   string
+  }
+
+  Commit {
+    Author {
+      Avatar string
+      Email  string
+      Name   string
+    }
+    Branch  string
+    Link    string
+    Message string
+    Ref     string
+    Remote  string
+    Sha     string
+  }
+}
 ```
 
 ## Development
