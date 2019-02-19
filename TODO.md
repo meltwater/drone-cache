@@ -50,6 +50,7 @@
 
 ## Before v1.0.0
 
+- [ ] Fix tmp directory create permissions for scratch/unprivileged user in container
 - [ ] **Add volume/file storage**
   - [ ] https://docs.drone.io/user-guide/pipeline/volumes/
   - [ ] http://plugins.drone.io/drillster/drone-volume-cache/

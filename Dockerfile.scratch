@@ -29,5 +29,4 @@ USER appuser
 
 ENTRYPOINT ["/bin/drone-cache"]
 
-# NOTICE: scract has issues
 # TODO: Fix /tmp directory creation issues!
