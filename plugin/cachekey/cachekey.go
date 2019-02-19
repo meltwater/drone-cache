@@ -20,14 +20,22 @@ import (
 
 var funcMap = template.FuncMap{
 	"checksum": func(path string) string {
-		f, err := os.Open(path)
+		absPath, err := filepath.Abs(filepath.Clean(path))
 		if err != nil {
+			log.Println("cache key template/checksum could not find file")
+			return ""
+		}
+
+		f, err := os.Open(absPath)
+		if err != nil {
+			log.Println("cache key template/checksum could not open file")
 			return ""
 		}
 		defer f.Close()
 
 		str, err := readerHasher(f)
 		if err != nil {
+			log.Println("cache key template/checksum could not generate hash")
 			return ""
 		}
 		return str
@@ -43,7 +51,6 @@ func Generate(tmpl, mount string, data metadata.Metadata) (string, error) {
 		return "", errors.New("cache key template is empty")
 	}
 
-	log.Println("using provided cache key template")
 	t, err := ParseTemplate(tmpl)
 	if err != nil {
 		return "", errors.Wrap(err, fmt.Sprintf("could not parse <%s> as cache key template, falling back to default", tmpl))

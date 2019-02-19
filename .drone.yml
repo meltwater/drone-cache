@@ -20,7 +20,7 @@ pipeline:
       image: meltwater/drone-cache
       pull: true
       restore: true
-      cache_key: "{{ .Repo.Name }}_{{ .Commit.Branch }}_{{ .Build.Number }}"
+      cache_key: '{{ .Repo.Name }}_{{ checksum "go.mod" }}_{{ checksum "go.sum" }}_{{ arch }}_{{ os }}'
       bucket: drone-cache-bucket
       secrets: [aws_access_key_id, aws_secret_access_key]
       region: eu-west-1
@@ -54,7 +54,7 @@ pipeline:
       CGO_ENABLED: '0'
       TEST_ENDPOINT: filestorage:9000
     commands:
-      - go test -v -mod=vendor ./... # NOTICE: -race: Needs CGO enabled
+      - go test -v -mod=vendor -cover ./... # NOTICE: -race: Needs CGO enabled
 
   analyze-lint:
     image: golang:1.11-alpine
@@ -92,7 +92,7 @@ pipeline:
       image: meltwater/drone-cache
       pull: true
       rebuild: true
-      cache_key: "{{ .Repo.Name }}_{{ .Commit.Branch }}_{{ .Build.Number }}"
+      cache_key: '{{ .Repo.Name }}_{{ checksum "go.mod" }}_{{ checksum "go.sum" }}_{{ arch }}_{{ os }}'
       bucket: drone-cache-bucket
       secrets: [aws_access_key_id, aws_secret_access_key]
       region: eu-west-1
@@ -135,7 +135,9 @@ pipeline:
     image: golang:1.11 # golang:1.11-alpine
     secrets: [github_token]
     commands:
-      curl -sL https://git.io/goreleaser | bash
+      - git status
+      - curl -sL https://git.io/goreleaser | bash
+      - git status
     when:
       event: tag
       status: success

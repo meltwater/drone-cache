@@ -172,6 +172,7 @@ func (p Plugin) processRestore(c cache.Cache) error {
 
 // cacheKey generates key from given template as parameter or fallbacks hash
 func (p Plugin) cacheKey(mount, branch string) (string, error) {
+	log.Println("using provided cache key template")
 	key, err := cachekey.Generate(p.Config.CacheKey, mount, metadata.Metadata{
 		Build:  p.Build,
 		Commit: p.Commit,
