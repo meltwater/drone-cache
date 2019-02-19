@@ -1,7 +1,7 @@
 package cachekey
 
 import (
-	"crypto/md5"
+	"crypto/md5" // #nosec
 	"fmt"
 	"io"
 	"log"
@@ -72,9 +72,9 @@ func ParseTemplate(tmpl string) (*template.Template, error) {
 
 // Hash generates a key based on given strings (ie. filename paths and branch)
 func Hash(parts ...string) (string, error) {
-	var readers []io.Reader
-	for _, p := range parts {
-		readers = append(readers, strings.NewReader(p))
+	readers := make([]io.Reader, len(parts))
+	for i, p := range parts {
+		readers[i] = strings.NewReader(p)
 	}
 	return readerHasher(readers...)
 }
@@ -83,7 +83,7 @@ func Hash(parts ...string) (string, error) {
 
 // readerHasher generic md5 hash generater from io.Readers
 func readerHasher(readers ...io.Reader) (string, error) {
-	h := md5.New()
+	h := md5.New() // #nosec
 	for _, r := range readers {
 		if _, err := io.Copy(h, r); err != nil {
 			return "", errors.Wrap(err, "could not write reader as hash")

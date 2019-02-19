@@ -218,7 +218,7 @@ func main() {
 		},
 
 		// Volume specific Config args
-		// Comming soon...
+		// Coming soon...
 
 		// S3 specific Config args
 		cli.StringFlag{

@@ -63,7 +63,7 @@ func (c Cache) Upload(src, dst string) error {
 	defer closer()
 
 	// 3. walk through source and add each file
-	err = filepath.Walk(src, writeFileToArchive(tw, src))
+	err = filepath.Walk(src, writeFileToArchive(tw))
 	if err != nil {
 		return errors.Wrap(err, "could not add all files to archive")
 	}
@@ -119,7 +119,7 @@ func archiveWriter(w io.Writer, archiveFmt string) (*tar.Writer, func()) {
 	}
 }
 
-func writeFileToArchive(tw *tar.Writer, src string) func(path string, fi os.FileInfo, err error) error {
+func writeFileToArchive(tw *tar.Writer) func(path string, fi os.FileInfo, err error) error {
 	return func(path string, fi os.FileInfo, perr error) error {
 		if !fi.Mode().IsRegular() { // skip on symbolic links or directories
 			return nil
