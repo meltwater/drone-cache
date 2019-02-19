@@ -72,7 +72,7 @@ func ParseTemplate(tmpl string) (*template.Template, error) {
 
 // Hash generates a key based on given strings (ie. filename paths and branch)
 func Hash(parts ...string) (string, error) {
-	readers := make([]io.Reader, len(parts), len(parts))
+	readers := make([]io.Reader, len(parts))
 	for i, p := range parts {
 		readers[i] = strings.NewReader(p)
 	}
