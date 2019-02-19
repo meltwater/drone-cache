@@ -218,9 +218,15 @@ func main() {
 		},
 
 		// Volume specific Config args
-		// Coming soon...
+
+		cli.StringFlag{
+			Name:   "cache-root, cr",
+			Usage:  "root directory for the mounted volume cache",
+			EnvVar: "PLUGIN_CACHE_ROOT",
+		},
 
 		// S3 specific Config args
+
 		cli.StringFlag{
 			Name:   "endpoint, e",
 			Usage:  "endpoint for the s3 connection",
@@ -271,36 +277,38 @@ func main() {
 
 func run(c *cli.Context) error {
 	plugin := plugin.Plugin{
-		Repo: metadata.Repo{
-			Owner:   c.String("repo.owner"),
-			Name:    c.String("repo.name"),
-			Link:    c.String("repo.link"),
-			Avatar:  c.String("repo.avatar"),
-			Branch:  c.String("repo.branch"),
-			Private: c.Bool("repo.private"),
-			Trusted: c.Bool("repo.trusted"),
-		},
-		Build: metadata.Build{
-			Number:   c.Int("build.number"),
-			Event:    c.String("build.event"),
-			Status:   c.String("build.status"),
-			Deploy:   c.String("build.deploy"),
-			Created:  int64(c.Int("build.created")),
-			Started:  int64(c.Int("build.started")),
-			Finished: int64(c.Int("build.finished")),
-			Link:     c.String("build.link"),
-		},
-		Commit: metadata.Commit{
-			Remote:  c.String("remote.url"),
-			Sha:     c.String("commit.sha"),
-			Ref:     c.String("commit.sha"),
-			Link:    c.String("commit.link"),
-			Branch:  c.String("commit.branch"),
-			Message: c.String("commit.message"),
-			Author: metadata.Author{
-				Name:   c.String("commit.author.name"),
-				Email:  c.String("commit.author.email"),
-				Avatar: c.String("commit.author.avatar"),
+		Metadata: metadata.Metadata{
+			Repo: metadata.Repo{
+				Owner:   c.String("repo.owner"),
+				Name:    c.String("repo.name"),
+				Link:    c.String("repo.link"),
+				Avatar:  c.String("repo.avatar"),
+				Branch:  c.String("repo.branch"),
+				Private: c.Bool("repo.private"),
+				Trusted: c.Bool("repo.trusted"),
+			},
+			Build: metadata.Build{
+				Number:   c.Int("build.number"),
+				Event:    c.String("build.event"),
+				Status:   c.String("build.status"),
+				Deploy:   c.String("build.deploy"),
+				Created:  int64(c.Int("build.created")),
+				Started:  int64(c.Int("build.started")),
+				Finished: int64(c.Int("build.finished")),
+				Link:     c.String("build.link"),
+			},
+			Commit: metadata.Commit{
+				Remote:  c.String("remote.url"),
+				Sha:     c.String("commit.sha"),
+				Ref:     c.String("commit.sha"),
+				Link:    c.String("commit.link"),
+				Branch:  c.String("commit.branch"),
+				Message: c.String("commit.message"),
+				Author: metadata.Author{
+					Name:   c.String("commit.author.name"),
+					Email:  c.String("commit.author.email"),
+					Avatar: c.String("commit.author.avatar"),
+				},
 			},
 		},
 		Config: plugin.Config{
@@ -308,6 +316,7 @@ func run(c *cli.Context) error {
 			ArchiveFormat: c.String("archive-format"),
 			Bucket:        c.String("bucket"),
 			CacheKey:      c.String("cache-key"),
+			CacheRoot:     c.String("cache-root"),
 			Debug:         c.Bool("debug"),
 			Encryption:    c.String("encryption"),
 			Endpoint:      c.String("endpoint"),

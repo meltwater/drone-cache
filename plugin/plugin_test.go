@@ -299,12 +299,14 @@ func TestRestoreWithGzip(t *testing.T) {
 
 func newTestPlugin(rebuild, restore bool, mount []string, cacheKey, archiveFmt string) Plugin {
 	return Plugin{
-		Repo: metadata.Repo{
-			Branch: "master",
-			Name:   "drone-cache",
-		},
-		Commit: metadata.Commit{
-			Branch: "master",
+		Metadata: metadata.Metadata{
+			Repo: metadata.Repo{
+				Branch: "master",
+				Name:   "drone-cache",
+			},
+			Commit: metadata.Commit{
+				Branch: "master",
+			},
 		},
 		Config: Config{
 			ACL:           "private",

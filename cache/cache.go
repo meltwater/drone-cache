@@ -31,8 +31,8 @@ func New(b Backend, archiveFmt string) Cache {
 	return Cache{b: b, archiveFmt: archiveFmt}
 }
 
-// Upload pushes the archived file to the cache
-func (c Cache) Upload(src, dst string) error {
+// Push pushes the archived file to the cache
+func (c Cache) Push(src, dst string) error {
 	// 1. check if source is reachable
 	src, err := filepath.Abs(filepath.Clean(src))
 	if err != nil {
@@ -73,10 +73,10 @@ func (c Cache) Upload(src, dst string) error {
 
 	// 5. upload archive file to server
 	log.Printf("uploading archived directory <%s> to <%s>", src, dst)
-	return c.uploadArchive(dst, archivePath)
+	return c.pushArchive(dst, archivePath)
 }
 
-func (c Cache) uploadArchive(dst, archivePath string) error {
+func (c Cache) pushArchive(dst, archivePath string) error {
 	f, err := os.Open(archivePath)
 	if err != nil {
 		return errors.Wrap(err, "could not open archived file to send")
@@ -86,8 +86,8 @@ func (c Cache) uploadArchive(dst, archivePath string) error {
 	return errors.Wrap(c.b.Put(dst, f), "could not upload file")
 }
 
-// Download fetches the archived file from the cache and restores to the host machine's file system
-func (c Cache) Download(src, dst string) error {
+// Pull fetches the archived file from the cache and restores to the host machine's file system
+func (c Cache) Pull(src, dst string) error {
 	log.Printf("dowloading archived directory <%s>", src)
 	// 1. download archive
 	rc, err := c.b.Get(src)
