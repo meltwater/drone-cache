@@ -33,16 +33,24 @@
 - [X] Docker from scratch
 - [x] Gorelease Docker multiple arc
 - [X] Improve static analyzers
-
-- [ ] Improve Makefile
-- [ ] Fix `gosec`
-
-## Before v1.0.0
-
 - [x] Badges
   - [x] Drone Pluging badges
   - [x] https://microbadger.com/images/meltwater/drone-cache
   - [x] https://goreportcard.com/report/github.com/meltwater/drone-cache
+
+## v0.10.0
+
+- [x] Fix `gosec`
+- [x] Add helper functions for cache keys (https://circleci.com/docs/2.0/caching/#using-keys-and-templates)
+  - [x] https://golang.org/pkg/text/template/#example_Template
+  - [x] checksum (https://golang.org/pkg/crypto/md5/#New)
+  - [x] epoch (https://gobyexample.com/epoch)
+  - [x] arch (https://golang.org/pkg/runtime/#pkg-constants)
+  - ~[ ] .Environment (https://gobyexample.com/environment-variables)~
+
+## Before v1.0.0
+
+- [ ] Fix tmp directory create permissions for scratch/unprivileged user in container
 - [ ] **Add volume/file storage**
   - [ ] https://docs.drone.io/user-guide/pipeline/volumes/
   - [ ] http://plugins.drone.io/drillster/drone-volume-cache/
@@ -52,6 +60,7 @@
   - [ ] https://github.com/drone/drone-go
   - [ ] https://github.com/drone-plugins/drone-s3
   - [ ] New Drone Version
+- [ ] Improve Makefile
 - [ ] Add unit tests
 
 ## Road to Open Source

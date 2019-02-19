@@ -6,6 +6,7 @@ import (
 
 	"github.com/urfave/cli"
 
+	"github.com/meltwater/drone-cache/metadata"
 	"github.com/meltwater/drone-cache/plugin"
 )
 
@@ -270,7 +271,7 @@ func main() {
 
 func run(c *cli.Context) error {
 	plugin := plugin.Plugin{
-		Repo: plugin.Repo{
+		Repo: metadata.Repo{
 			Owner:   c.String("repo.owner"),
 			Name:    c.String("repo.name"),
 			Link:    c.String("repo.link"),
@@ -279,7 +280,7 @@ func run(c *cli.Context) error {
 			Private: c.Bool("repo.private"),
 			Trusted: c.Bool("repo.trusted"),
 		},
-		Build: plugin.Build{
+		Build: metadata.Build{
 			Number:   c.Int("build.number"),
 			Event:    c.String("build.event"),
 			Status:   c.String("build.status"),
@@ -289,14 +290,14 @@ func run(c *cli.Context) error {
 			Finished: int64(c.Int("build.finished")),
 			Link:     c.String("build.link"),
 		},
-		Commit: plugin.Commit{
+		Commit: metadata.Commit{
 			Remote:  c.String("remote.url"),
 			Sha:     c.String("commit.sha"),
 			Ref:     c.String("commit.sha"),
 			Link:    c.String("commit.link"),
 			Branch:  c.String("commit.branch"),
 			Message: c.String("commit.message"),
-			Author: plugin.Author{
+			Author: metadata.Author{
 				Name:   c.String("commit.author.name"),
 				Email:  c.String("commit.author.email"),
 				Avatar: c.String("commit.author.avatar"),

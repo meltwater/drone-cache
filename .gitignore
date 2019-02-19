@@ -28,3 +28,4 @@ coverage.out
 drone-cache
 vendor
 target
+bin

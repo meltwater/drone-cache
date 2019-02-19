@@ -13,8 +13,8 @@ RUN make fetch-dependencies
 
 COPY . $BUILD_DIR
 
-RUN make drone-cache
-RUN make compress
+# RUN make drone-cache
+RUN make build-compressed
 RUN cp drone-cache /bin
 
 # final stage
@@ -28,3 +28,5 @@ COPY --from=builder /bin/drone-cache /bin/
 USER appuser
 
 ENTRYPOINT ["/bin/drone-cache"]
+
+# TODO: Fix /tmp directory creation issues!

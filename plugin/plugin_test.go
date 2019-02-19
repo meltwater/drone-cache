@@ -6,6 +6,8 @@ import (
 	"testing"
 
 	"github.com/minio/minio-go"
+
+	"github.com/meltwater/drone-cache/metadata"
 )
 
 const (
@@ -297,11 +299,11 @@ func TestRestoreWithGzip(t *testing.T) {
 
 func newTestPlugin(rebuild, restore bool, mount []string, cacheKey, archiveFmt string) Plugin {
 	return Plugin{
-		Repo: Repo{
+		Repo: metadata.Repo{
 			Branch: "master",
 			Name:   "drone-cache",
 		},
-		Commit: Commit{
+		Commit: metadata.Commit{
 			Branch: "master",
 		},
 		Config: Config{

@@ -20,7 +20,7 @@ pipeline:
       image: meltwater/drone-cache
       pull: true
       restore: true
-      cache_key: "{{ .Repo.Name }}_{{ .Commit.Branch }}_{{ .Build.Number }}"
+      cache_key: '{{ .Repo.Name }}_{{ checksum "go.mod" }}_{{ checksum "go.sum" }}_{{ arch }}_{{ os }}'
       bucket: drone-cache-bucket
       secrets: [aws_access_key_id, aws_secret_access_key]
       region: eu-west-1
@@ -54,7 +54,7 @@ pipeline:
       CGO_ENABLED: '0'
       TEST_ENDPOINT: filestorage:9000
     commands:
-      - go test -v -mod=vendor ./... # NOTICE: -race: Needs CGO enabled
+      - go test -v -mod=vendor -cover ./... # NOTICE: -race: Needs CGO enabled
 
   analyze-lint:
     image: golang:1.11-alpine
@@ -65,28 +65,18 @@ pipeline:
       - wget -O - -q https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh| sh -s v1.14.0
       - ./bin/golangci-lint -v run
 
-  # Disabled: Does not with go modules.
-  # analyze-security:
-  #   image: golang:1.11-alpine
-  #   pull: true
-  #   environment:
-  #     CGO_ENABLED: '0'
-  #   commands:
-  #     - wget -O - -q https://raw.githubusercontent.com/securego/gosec/master/install.sh | sh -s 1.2.0
-  #     - ./bin/gosec ./...
-
-  # Disabled: Does not with this version of go.
-  # analyze-reportcard:
-  #   image: golang:1.11-alpine
-  #   pull: true
-  #   environment:
-  #     CGO_ENABLED: '0'
-  #   commands:
-  #     - apk add --update git
-  #     # - go get -u github.com/alecthomas/gometalinter
-  #     # - go get -u github.com/gojp/goreportcard/cmd/goreportcard-cli
-  #     # - $GOPATH/bin/gometalinter --install --update
-  #     - $GOPATH/bin/goreportcard-cli -v
+  analyze-security:
+    image: golang:1.11-alpine
+    pull: true
+    environment:
+      CGO_ENABLED: '0'
+      GO111MODULE: 'off'
+    commands:
+      - wget -O - -q https://raw.githubusercontent.com/securego/gosec/master/install.sh | sh -s 1.2.0
+      - export PROJECT_PATH=$(go env GOPATH)/src/github.com/meltwater/drone-cache
+      - mkdir -p $PROJECT_PATH
+      - cp -R $(pwd)/* $PROJECT_PATH
+      - ./bin/gosec $PROJECT_PATH
 
   rebuild-cache:
       image: meltwater/drone-cache
@@ -102,7 +92,7 @@ pipeline:
       image: meltwater/drone-cache
       pull: true
       rebuild: true
-      cache_key: "{{ .Repo.Name }}_{{ .Commit.Branch }}_{{ .Build.Number }}"
+      cache_key: '{{ .Repo.Name }}_{{ checksum "go.mod" }}_{{ checksum "go.sum" }}_{{ arch }}_{{ os }}'
       bucket: drone-cache-bucket
       secrets: [aws_access_key_id, aws_secret_access_key]
       region: eu-west-1
@@ -145,7 +135,9 @@ pipeline:
     image: golang:1.11 # golang:1.11-alpine
     secrets: [github_token]
     commands:
-      curl -sL https://git.io/goreleaser | bash
+      - git status
+      - curl -sL https://git.io/goreleaser | bash
+      - git status
     when:
       event: tag
       status: success
