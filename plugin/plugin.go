@@ -33,19 +33,10 @@ type (
 		ArchiveFormat string
 		Bucket        string
 		CacheKey      string
-		Debug         bool
-		// if not "", enable server-side encryption
-		// valid values are:
-		//     AES256
-		//     aws:kms
-		Encryption string
-		Endpoint   string
-		Key        string
-		Mount      []string
-		// Use path style instead of domain style.
-		// Should be true for minio and false for AWS
-		PathStyle bool
-		Rebuild   bool
+		Encryption    string // if not "", enables server-side encryption. valid values are: AES256, aws:kms
+		Endpoint      string
+		Key           string
+
 		// us-east-1
 		// us-west-1
 		// us-west-2
@@ -54,9 +45,15 @@ type (
 		// ap-southeast-2
 		// ap-northeast-1
 		// sa-east-1
-		Region  string
-		Restore bool
-		Secret  string
+		Region string
+		Secret string
+
+		Debug     bool
+		PathStyle bool // Use path style instead of domain style. Should be true for minio and false for AWS
+		Rebuild   bool
+		Restore   bool
+
+		Mount []string
 	}
 
 	// Plugin stores metadata about current plugin
@@ -72,7 +69,7 @@ type (
 func (p *Plugin) Exec() error {
 	c := p.Config
 
-	// 1. Check paramaters
+	// 1. Check parameters
 	if c.Debug {
 		log.Println("DEBUG MODE enabled!")
 	}
@@ -83,7 +80,10 @@ func (p *Plugin) Exec() error {
 
 	_, err := cachekey.ParseTemplate(p.Config.CacheKey)
 	if err != nil {
-		return errors.Wrap(err, fmt.Sprintf("could not parse <%s> as cache key template, falling back to default", p.Config.CacheKey))
+		return errors.Wrap(
+			err,
+			fmt.Sprintf("could not parse <%s> as cache key template, falling back to default", p.Config.CacheKey),
+		)
 	}
 
 	// 2. Initialize backend
