@@ -10,14 +10,14 @@ clean:
 .PHONY: default all clean
 
 fetch-dependencies:
-	go mod vendor -v
+	@go mod vendor -v
 
 .PHONY: fetch-dependencies
 
-compress: drone-cache
-	upx drone-cache
+build-compressed: drone-cache
+	@upx drone-cache
 
-.PHONY: compress
+.PHONY: build-compressed
 
 docker-build: Dockerfile
 	docker build -t meltwater/drone-cache:latest .
@@ -28,4 +28,7 @@ docker-build-scratch: Dockerfile.scratch
 docker-push: docker-build
 	docker push meltwater/drone-cache:latest
 
-.PHONY: docker-build docker-push
+docker-push-scratch: docker-build-scratch
+	docker push meltwater/drone-cache:latest
+
+.PHONY: docker-build docker-build-scratch docker-push

@@ -1,6 +1,9 @@
 # build stage
 FROM golang:1.11-alpine AS builder
-RUN apk add --update make git upx
+RUN apk add --update make git upx ca-certificates \
+  && update-ca-certificates
+
+RUN adduser -D -g '' appuser
 
 ENV BUILD_DIR /build
 
@@ -10,21 +13,21 @@ RUN make fetch-dependencies
 
 COPY . $BUILD_DIR
 
-RUN make drone-cache
-RUN make compress
+# RUN make drone-cache
+RUN make build-compressed
 RUN cp drone-cache /bin
 
 # final stage
 FROM alpine:3.9 as runner
+
+COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
+COPY --from=builder /etc/passwd /etc/passwd
 COPY --from=builder /bin/drone-cache /bin
 
-RUN set -ex \
-  && apk add --no-cache \
-    ca-certificates \
-  && rm -rf /var/cache/apk/*
+COPY scripts/entrypoint.sh /bin/entrypoint.sh
+RUN chmod +x /bin/entrypoint.sh
 
-COPY scripts/entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
+USER appuser
 
-ENTRYPOINT ["/entrypoint.sh"]
+ENTRYPOINT ["/bin/entrypoint.sh"]
 CMD ["/bin/drone-cache"]
