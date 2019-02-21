@@ -72,7 +72,7 @@
 
 ## Road to Open Source
 
-- ~[] Add Copyright~
+- [x] Add Copyright
 - [x] Add credits for original author [@dim](https://github.com/dim)
 - [x] Update LICENCE
 - [ ] Open Source :tada:
