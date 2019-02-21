@@ -76,3 +76,7 @@
 - [ ] Add credits for original author [@dim](https://github.com/dim)
 - [ ] Update LICENCE
 - [ ] Open Source :tada:
+
+## Future work
+
+- [ ] TTL/Retention policy
