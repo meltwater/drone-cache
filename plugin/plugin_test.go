@@ -5,6 +5,8 @@ import (
 	"os"
 	"testing"
 
+	"github.com/meltwater/drone-cache/cache/backend"
+
 	"github.com/minio/minio-go"
 
 	"github.com/meltwater/drone-cache/metadata"
@@ -309,19 +311,23 @@ func newTestPlugin(rebuild, restore bool, mount []string, cacheKey, archiveFmt s
 			},
 		},
 		Config: Config{
-			ACL:           "private",
 			ArchiveFormat: archiveFmt,
-			Bucket:        bucket,
+			Backend:       "s3",
 			CacheKey:      cacheKey,
-			Encryption:    "",
-			Endpoint:      endpoint,
-			Key:           accessKey,
 			Mount:         mount,
-			PathStyle:     true, // Should be true for minio and false for AWS.
 			Rebuild:       rebuild,
-			Region:        region,
 			Restore:       restore,
-			Secret:        secretAccessKey,
+
+			S3: backend.S3Config{
+				ACL:        "private",
+				Bucket:     bucket,
+				Encryption: "",
+				Endpoint:   endpoint,
+				Key:        accessKey,
+				PathStyle:  true, // Should be true for minio and false for AWS.
+				Region:     region,
+				Secret:     secretAccessKey,
+			},
 		},
 	}
 }

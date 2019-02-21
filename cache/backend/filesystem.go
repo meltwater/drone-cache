@@ -16,8 +16,8 @@ type filesystem struct {
 	cacheRoot string
 }
 
-// NewS3 returns a new S3 remote Backend implemented
-func NewFileSystem(cacheRoot string) cache.Backend {
+// newFileSystem returns a new file system Backend implementation
+func newFileSystem(cacheRoot string) cache.Backend {
 	return &filesystem{cacheRoot: cacheRoot}
 }
 
@@ -39,6 +39,7 @@ func (c *filesystem) Put(p string, src io.ReadSeeker) error {
 	}
 
 	// TODO: What happens when it exists?
+	// - should override existing one
 	dst, err := os.Create(absPath)
 	if err != nil {
 		return errors.Wrap(err, fmt.Sprintf("could not create cache file <%s>", absPath))

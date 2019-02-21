@@ -5,12 +5,8 @@ import (
 	"fmt"
 	"log"
 	"path/filepath"
-	"strings"
 	"time"
-	"os"
 
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/pkg/errors"
 
 	"github.com/meltwater/drone-cache/cache"
@@ -22,46 +18,24 @@ import (
 type (
 	// Config plugin-specific parameters and secrets
 	Config struct {
-		// Indicates the files ACL, which should be one
-		// of the following:
-		//     private
-		//     public-read
-		//     public-read-write
-		//     authenticated-read
-		//     bucket-owner-read
-		//     bucket-owner-full-control
-		ACL           string
 		ArchiveFormat string
-		Bucket        string
+		Backend       string
 		CacheKey      string
-		CacheRoot     string
-		Encryption    string // if not "", enables server-side encryption. valid values are: AES256, aws:kms
-		Endpoint      string
-		Key           string
 
-		// us-east-1
-		// us-west-1
-		// us-west-2
-		// eu-west-1
-		// ap-southeast-1
-		// ap-southeast-2
-		// ap-northeast-1
-		// sa-east-1
-		Region string
-		Secret string
-
-		Debug     bool
-		PathStyle bool // Use path style instead of domain style. Should be true for minio and false for AWS
-		Rebuild   bool
-		Restore   bool
+		Debug   bool
+		Rebuild bool
+		Restore bool
 
 		Mount []string
+
+		S3         backend.S3Config
+		FileSystem backend.FileSystemConfig
 	}
 
 	// Plugin stores metadata about current plugin
 	Plugin struct {
-		Metadata  metadata.Metadata
-		Config Config
+		Metadata metadata.Metadata
+		Config   Config
 	}
 )
 
@@ -88,6 +62,9 @@ func (p *Plugin) Exec() error {
 
 	// 2. Initialize backend
 	backend, err := initializeBackend(c)
+	if err != nil {
+		return errors.Wrap(err, fmt.Sprintf("could not initialize <%s> as backend", c.Backend))
+	}
 
 	// 3. Initialize cache
 	cch := cache.New(backend, c.ArchiveFormat)
@@ -108,6 +85,20 @@ func (p *Plugin) Exec() error {
 	}
 
 	return nil
+}
+
+// initializeBackend initializes backend using given configuration
+func initializeBackend(c Config) (cache.Backend, error) {
+	switch c.Backend {
+	case "s3":
+		log.Println("IMPORTANT: using aws s3 as backend")
+		return backend.InitializeS3Backend(c.S3, c.Debug)
+	case "filesystem":
+		log.Println("IMPORTANT: using filesystem as backend")
+		return backend.InitializeFileSystemBackend(c.FileSystem, c.Debug)
+	default:
+		return nil, errors.New("unknown backend")
+	}
 }
 
 // processRebuild the remote cache from the local environment
@@ -152,6 +143,8 @@ func processRestore(c cache.Cache, cacheKeyTmpl string, mountedDirs []string, m 
 	return nil
 }
 
+// Helpers
+
 // cacheKey generates key from given template as parameter or fallbacks hash
 func cacheKey(p metadata.Metadata, cacheKeyTmpl, mount, branch string) (string, error) {
 	log.Println("using provided cache key template")
@@ -170,44 +163,4 @@ func cacheKey(p metadata.Metadata, cacheKeyTmpl, mount, branch string) (string, 
 	}
 
 	return key, nil
-}
-
-// initializeBackend initializes backend using given configuration
-func initializeBackend(c Config) (cache.Backend, error) {
-	if c.CacheRoot != "" {
-		log.Println("IMPORTANT: using filesystem as backend")
-
-		// TODO: What happens if it's not mounted?
-		if _, err := os.Stat(c.CacheRoot); err != nil {
-			return nil, errors.Wrap(
-				err,
-				fmt.Sprintf("could not use <%s> as cache root, make sure volume is mounted", c.CacheRoot),
-			)
-		}
-
-		return backend.NewFileSystem(c.CacheRoot), nil
-	}
-
-	log.Println("IMPORTANT: using aws s3 as backend")
-	var cred *credentials.Credentials
-	if c.Key != "" && c.Secret != "" {
-		// allowing to use the instance role or provide a key and secret
-		cred = credentials.NewStaticCredentials(c.Key, c.Secret, "")
-	} else {
-		cred = credentials.AnonymousCredentials
-		log.Println("aws key and/or Secret not provided (falling back to anonymous credentials)")
-	}
-	awsConf := &aws.Config{
-		Region:           aws.String(c.Region),
-		Endpoint:         &c.Endpoint,
-		DisableSSL:       aws.Bool(!strings.HasPrefix(c.Endpoint, "https://")),
-		S3ForcePathStyle: aws.Bool(c.PathStyle),
-		Credentials:      cred,
-	}
-
-	if c.Debug {
-		awsConf.WithLogLevel(aws.LogDebugWithHTTPBody)
-	}
-
-	return backend.NewS3(c.Bucket, c.ACL, c.Encryption, awsConf), nil
 }

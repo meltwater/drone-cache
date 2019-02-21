@@ -6,6 +6,7 @@ import (
 
 	"github.com/urfave/cli"
 
+	"github.com/meltwater/drone-cache/cache/backend"
 	"github.com/meltwater/drone-cache/metadata"
 	"github.com/meltwater/drone-cache/plugin"
 )
@@ -185,6 +186,13 @@ func main() {
 
 		// Config args
 
+		cli.StringFlag{
+			Name:   "backend, b",
+			Usage:  "cache backend to use in plugin (s3, filesystem)",
+			Value:  "s3",
+			EnvVar: "PLUGIN_BACKEND",
+		},
+
 		cli.StringSliceFlag{
 			Name:   "mount, m",
 			Usage:  "cache directories, an array of folders to cache",
@@ -207,7 +215,7 @@ func main() {
 		},
 		cli.StringFlag{
 			Name:   "archive-format, arcfmt",
-			Usage:  "archive format to use to store the cache directories. (tar, gzip)",
+			Usage:  "archive format to use to store the cache directories (tar, gzip)",
 			Value:  "tar",
 			EnvVar: "PLUGIN_ARCHIVE_FORMAT",
 		},
@@ -220,9 +228,10 @@ func main() {
 		// Volume specific Config args
 
 		cli.StringFlag{
-			Name:   "cache-root, cr",
-			Usage:  "root directory for the mounted volume cache",
-			EnvVar: "PLUGIN_CACHE_ROOT",
+			Name:   "filesystem-cache-root, fcr",
+			Usage:  "local filesystem root directory for the filesystem cache",
+			Value:  "/tmp/cache",
+			EnvVar: "PLUGIN_FILESYSTEM_CACHE_ROOT, FILESYSTEM_CACHE_ROOT",
 		},
 
 		// S3 specific Config args
@@ -312,21 +321,27 @@ func run(c *cli.Context) error {
 			},
 		},
 		Config: plugin.Config{
-			ACL:           c.String("acl"),
 			ArchiveFormat: c.String("archive-format"),
-			Bucket:        c.String("bucket"),
+			Backend:       c.String("backend"),
 			CacheKey:      c.String("cache-key"),
-			CacheRoot:     c.String("cache-root"),
 			Debug:         c.Bool("debug"),
-			Encryption:    c.String("encryption"),
-			Endpoint:      c.String("endpoint"),
-			Key:           c.String("access-key"),
 			Mount:         c.StringSlice("mount"),
-			PathStyle:     c.Bool("path-style"),
 			Rebuild:       c.Bool("rebuild"),
-			Region:        c.String("region"),
 			Restore:       c.Bool("restore"),
-			Secret:        c.String("secret-key"),
+
+			FileSystem: backend.FileSystemConfig{
+				CacheRoot: c.String("filesystem-cache-root"),
+			},
+			S3: backend.S3Config{
+				ACL:        c.String("acl"),
+				Bucket:     c.String("bucket"),
+				Encryption: c.String("encryption"),
+				Endpoint:   c.String("endpoint"),
+				Key:        c.String("access-key"),
+				PathStyle:  c.Bool("path-style"),
+				Region:     c.String("region"),
+				Secret:     c.String("secret-key"),
+			},
 		},
 	}
 

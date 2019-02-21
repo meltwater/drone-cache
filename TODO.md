@@ -30,9 +30,9 @@
 - [x] Rename Repo
 - [x] TEST!
 - [x] MERGE !
-- [X] Docker from scratch
+- [x] Docker from scratch
 - [x] Gorelease Docker multiple arc
-- [X] Improve static analyzers
+- [x] Improve static analyzers
 - [x] Badges
   - [x] Drone Pluging badges
   - [x] https://microbadger.com/images/meltwater/drone-cache
@@ -59,11 +59,15 @@
   - [x] https://github.com/drone-plugins/drone-s3
   - [x] https://github.com/drone-plugins/drone-cache
   - [x] New Drone Version compatibility
+- [ ] Improve documentation
+  - [ ] Examples
+  - [ ] Drone 1.0 examples
 
 ## Before v1.0.0
 
 - [ ] Fix tmp directory create permissions for scratch/unprivileged user in container
 - [ ] Improve Makefile
+- [ ] Clean up TODOs
 - [ ] Add unit tests
 
 ## Road to Open Source
