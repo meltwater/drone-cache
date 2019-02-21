@@ -75,6 +75,7 @@
 - [x] Add Copyright
 - [x] Add credits for original author [@dim](https://github.com/dim)
 - [x] Update LICENCE
+- [ ] Add public CI/CD
 - [ ] Open Source :tada:
 
 ## Future work
