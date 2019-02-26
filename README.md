@@ -7,7 +7,7 @@
 [![](https://images.microbadger.com/badges/image/meltwater/drone-cache.svg)](https://microbadger.com/images/meltwater/drone-cache "Get your own image badge on microbadger.com")
 [![](https://images.microbadger.com/badges/version/meltwater/drone-cache.svg)](https://microbadger.com/images/meltwater/drone-cache "Get your own version badge on microbadger.com")
 
-Drone plugin for caching artifacts to a S3 bucket (or soon to a mounted volume).
+Drone plugin for caching artifacts to a S3 bucket or to a mounted volume.
 Use this plugin for caching build artifacts to speed up your build times.
 This plugin can create and restore caches of any folders.
 
