@@ -72,6 +72,8 @@ pipeline:
     mount:
       - 'deps'
       - '_dialyzer'
+    volumes:
+        - '/drone/tmp/cache:/tmp/cache'
 
   deps:
     image: elixir:1.6.5
@@ -92,6 +94,8 @@ rebuild-deps-cache:
     secrets: [aws_access_key_id, aws_secret_access_key]
     mount:
       - 'deps'
+    volumes:
+        - '/drone/tmp/cache:/tmp/cache'
 ```
 
 #### With custom cache key prefix template
@@ -295,13 +299,26 @@ $ docker run --rm \
 
 ## Cache Key Templates
 
-`"{{ .Repo.Name }}-{{ .Commit.Branch }}-yadayadayada"`
+Cache key template syntax is very basic. You just need to provide a string. In that string you can use variables by prefixing them with a `.` in `{{ }}` construct, from provided metadata object (see below).
 
-Cache key template syntax is very basic. You just need to provide a string. In that string you can use variables by prefixing them with a `.` in `{{ }}` construct, from provided metadata object.
+Also following helper functions provided for your use:
 
-Following metadata object is available and pre-populated with current build information for you to use in cache key templates.
+* `checksum`: Provides md5 hash of a file for given path
+* `epoch`: Provides Unix epoch
+* `arch`: Provides Architecture of running system
+* `os`: Provides Operation system of running system
 
 For further information about this syntax please see [official docs](https://golang.org/pkg/text/template/) from Go standard library.
+
+### Template Examples
+
+`"{{ .Repo.Name }}-{{ .Commit.Branch }}-{{ checksum "go.mod" }}-yadayadayada"`
+
+`"{{ .Repo.Name }}_{{ checksum "go.mod" }}_{{ checksum "go.sum" }}_{{ arch }}_{{ os }}"`
+
+### Metadata
+
+Following metadata object is available and pre-populated with current build information for you to use in cache key templates.
 
 ```go
 {
