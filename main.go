@@ -345,9 +345,9 @@ func run(c *cli.Context) error {
 		},
 	}
 
-	err, ok := plg.Exec().(plugin.Error)
-	if ok {
-		// If it is a recognized just log it, convenience error for testing
+	err := plg.Exec()
+	if _, ok := err.(plugin.Error); ok {
+		// If it is a recognized error log it, convenience error for testing
 		log.Println(err)
 		return nil
 	}
