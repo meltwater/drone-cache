@@ -6,6 +6,16 @@ pipeline:
     image: plugins/git
     tags: true
 
+  docker-release-dev:
+    image: plugins/docker
+    pull: true
+    repo: meltwater/drone-cache
+    tags: dev
+    secrets: [docker_username, docker_password]
+    when:
+      branch: [master]
+      event: [push]
+
   restore-cache:
       image: meltwater/drone-cache:dev
       pull: true
@@ -68,6 +78,8 @@ pipeline:
       TEST_ENDPOINT: filestorage:9000
     commands:
       - go test -v -mod=vendor -cover ./... # NOTICE: -race: Needs CGO enabled
+    volumes:
+      - '/drone/tmp/testcache:/testcache/cache'
 
   analyze:
     image: golang:1.11-alpine
