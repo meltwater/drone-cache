@@ -38,7 +38,7 @@
   - [x] https://microbadger.com/images/meltwater/drone-cache
   - [x] https://goreportcard.com/report/github.com/meltwater/drone-cache
 
-## v0.10.0
+## v1.0.0-rc1
 
 - [x] Fix `gosec`
 - [x] Add helper functions for cache keys (https://circleci.com/docs/2.0/caching/#using-keys-and-templates)
@@ -47,10 +47,7 @@
   - [x] epoch (https://gobyexample.com/epoch)
   - [x] arch (https://golang.org/pkg/runtime/#pkg-constants)
   - ~[ ] .Environment (https://gobyexample.com/environment-variables)~
-
-## v0.11.0
-
-- [ ] **Add volume/file storage**
+- [X] **Add volume/file storage**
   - [x] https://docs.drone.io/user-guide/pipeline/volumes/
   - [x] http://plugins.drone.io/drillster/drone-volume-cache/
   - [x] https://github.com/Drillster/drone-volume-cache/blob/master/cacher.sh
@@ -59,16 +56,13 @@
   - [x] https://github.com/drone-plugins/drone-s3
   - [x] https://github.com/drone-plugins/drone-cache
   - [x] New Drone Version compatibility
+
+## Before v1.0.0
+
 - [ ] Improve documentation
   - [x] Examples
   - [ ] Drone 1.0 examples
 
-## Before v1.0.0
-
-- [ ] Fix tmp directory create permissions for scratch/unprivileged user in container
-- [ ] Improve Makefile
-- [ ] Clean up TODOs
-- [ ] Add unit tests
 
 ## Road to Open Source
 
@@ -81,3 +75,7 @@
 ## Future work
 
 - [ ] TTL/Retention policy
+- [ ] Fix tmp directory create permissions for scratch/unprivileged user in container
+- [ ] Improve Makefile
+- [ ] Clean up TODOs
+- [ ] Add unit tests
