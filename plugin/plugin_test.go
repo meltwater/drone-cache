@@ -5,6 +5,8 @@ import (
 	"os"
 	"testing"
 
+	"github.com/meltwater/drone-cache/cache/backend"
+
 	"github.com/minio/minio-go"
 
 	"github.com/meltwater/drone-cache/metadata"
@@ -45,7 +47,7 @@ func TestRebuild(t *testing.T) {
 	file.Sync()
 	file.Close()
 
-	plugin := newTestPlugin(true, false, []string{"./tmp/1"}, "", "")
+	plugin := newTestPlugin("s3", true, false, []string{"./tmp/1"}, "", "")
 
 	if err := plugin.Exec(); err != nil {
 		t.Errorf("plugin exec failed, error: %v\n", err)
@@ -72,7 +74,7 @@ func TestRebuildWithCacheKey(t *testing.T) {
 	file.Sync()
 	file.Close()
 
-	plugin := newTestPlugin(true, false, []string{"./tmp/1"}, "{{ .Repo.Name }}_{{ .Commit.Branch }}_{{ .Build.Number }}", "")
+	plugin := newTestPlugin("s3", true, false, []string{"./tmp/1"}, "{{ .Repo.Name }}_{{ .Commit.Branch }}_{{ .Build.Number }}", "")
 
 	if err := plugin.Exec(); err != nil {
 		t.Errorf("plugin exec failed, error: %v\n", err)
@@ -99,7 +101,34 @@ func TestRebuildWithGzip(t *testing.T) {
 	file.Sync()
 	file.Close()
 
-	plugin := newTestPlugin(true, false, []string{"./tmp/1"}, "", "gzip")
+	plugin := newTestPlugin("s3", true, false, []string{"./tmp/1"}, "", "gzip")
+
+	if err := plugin.Exec(); err != nil {
+		t.Errorf("plugin exec failed, error: %v\n", err)
+	}
+}
+
+func TestRebuildWithFilesystem(t *testing.T) {
+	setup(t)
+	defer cleanUp(t)
+
+	if mkErr1 := os.MkdirAll("./tmp/1", 0755); mkErr1 != nil {
+		t.Fatal(mkErr1)
+	}
+
+	file, fErr := os.Create("./tmp/1/file_to_cache.txt")
+	if fErr != nil {
+		t.Fatal(fErr)
+	}
+
+	_, wErr := file.WriteString("some content\n")
+	if wErr != nil {
+		t.Fatal(wErr)
+	}
+	file.Sync()
+	file.Close()
+
+	plugin := newTestPlugin("filesystem", true, false, []string{"./tmp/1"}, "", "gzip")
 
 	if err := plugin.Exec(); err != nil {
 		t.Errorf("plugin exec failed, error: %v\n", err)
@@ -144,7 +173,7 @@ func TestRestore(t *testing.T) {
 	file1.Sync()
 	file1.Close()
 
-	plugin := newTestPlugin(true, false, []string{"./tmp/1"}, "", "")
+	plugin := newTestPlugin("s3", true, false, []string{"./tmp/1"}, "", "")
 
 	if err := plugin.Exec(); err != nil {
 		t.Errorf("plugin (rebuild mode) exec failed, error: %v\n", err)
@@ -207,7 +236,7 @@ func TestRestoreWithCacheKey(t *testing.T) {
 	file1.Sync()
 	file1.Close()
 
-	plugin := newTestPlugin(true, false, []string{"./tmp/1"}, "{{ .Repo.Name }}_{{ .Commit.Branch }}_{{ .Build.Number }}", "")
+	plugin := newTestPlugin("s3", true, false, []string{"./tmp/1"}, "{{ .Repo.Name }}_{{ .Commit.Branch }}_{{ .Build.Number }}", "")
 
 	if err := plugin.Exec(); err != nil {
 		t.Errorf("plugin (rebuild mode) exec failed, error: %v\n", err)
@@ -270,7 +299,70 @@ func TestRestoreWithGzip(t *testing.T) {
 	file1.Sync()
 	file1.Close()
 
-	plugin := newTestPlugin(true, false, []string{"./tmp/1"}, "", "gzip")
+	plugin := newTestPlugin("s3", true, false, []string{"./tmp/1"}, "", "gzip")
+
+	if err := plugin.Exec(); err != nil {
+		t.Errorf("plugin (rebuild mode) exec failed, error: %v\n", err)
+	}
+
+	if err := os.RemoveAll("./tmp"); err != nil {
+		t.Fatal(err)
+	}
+
+	plugin.Config.Rebuild = false
+	plugin.Config.Restore = true
+	if err := plugin.Exec(); err != nil {
+		t.Errorf("plugin (restore mode) exec failed, error: %v\n", err)
+	}
+
+	if _, err := os.Stat("./tmp/1/file_to_cache.txt"); os.IsNotExist(err) {
+		t.Fatal(err)
+	}
+
+	if _, err := os.Stat("./tmp/1/file1_to_cache.txt"); os.IsNotExist(err) {
+		t.Fatal(err)
+	}
+}
+
+func TestRestoreWithFilesystem(t *testing.T) {
+	setup(t)
+	defer cleanUp(t)
+
+	if err := os.MkdirAll("./tmp/1", 0755); err != nil {
+		t.Fatal(err)
+	}
+
+	file, cErr := os.Create("./tmp/1/file_to_cache.txt")
+	if cErr != nil {
+		t.Fatal(cErr)
+	}
+
+	_, wErr := file.WriteString("some content\n")
+	if wErr != nil {
+		t.Fatal(wErr)
+	}
+
+	file.Sync()
+	file.Close()
+
+	if mkErr1 := os.MkdirAll("./tmp/1", 0755); mkErr1 != nil {
+		t.Fatal(mkErr1)
+	}
+
+	file1, fErr1 := os.Create("./tmp/1/file1_to_cache.txt")
+	if fErr1 != nil {
+		t.Fatal(fErr1)
+	}
+
+	_, wErr1 := file1.WriteString("some content\n")
+	if wErr1 != nil {
+		t.Fatal(wErr1)
+	}
+
+	file1.Sync()
+	file1.Close()
+
+	plugin := newTestPlugin("filesystem", true, false, []string{"./tmp/1"}, "", "gzip")
 
 	if err := plugin.Exec(); err != nil {
 		t.Errorf("plugin (rebuild mode) exec failed, error: %v\n", err)
@@ -297,29 +389,39 @@ func TestRestoreWithGzip(t *testing.T) {
 
 // Helpers
 
-func newTestPlugin(rebuild, restore bool, mount []string, cacheKey, archiveFmt string) Plugin {
+func newTestPlugin(bck string, rebuild, restore bool, mount []string, cacheKey, archiveFmt string) Plugin {
 	return Plugin{
-		Repo: metadata.Repo{
-			Branch: "master",
-			Name:   "drone-cache",
-		},
-		Commit: metadata.Commit{
-			Branch: "master",
+		Metadata: metadata.Metadata{
+			Repo: metadata.Repo{
+				Branch: "master",
+				Name:   "drone-cache",
+			},
+			Commit: metadata.Commit{
+				Branch: "master",
+			},
 		},
 		Config: Config{
-			ACL:           "private",
 			ArchiveFormat: archiveFmt,
-			Bucket:        bucket,
+			Backend:       bck,
 			CacheKey:      cacheKey,
-			Encryption:    "",
-			Endpoint:      endpoint,
-			Key:           accessKey,
 			Mount:         mount,
-			PathStyle:     true, // Should be true for minio and false for AWS.
 			Rebuild:       rebuild,
-			Region:        region,
 			Restore:       restore,
-			Secret:        secretAccessKey,
+
+			FileSystem: backend.FileSystemConfig{
+				CacheRoot: "../testcache/cache",
+			},
+
+			S3: backend.S3Config{
+				ACL:        "private",
+				Bucket:     bucket,
+				Encryption: "",
+				Endpoint:   endpoint,
+				Key:        accessKey,
+				PathStyle:  true, // Should be true for minio and false for AWS.
+				Region:     region,
+				Secret:     secretAccessKey,
+			},
 		},
 	}
 }

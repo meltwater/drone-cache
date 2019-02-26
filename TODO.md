@@ -30,9 +30,9 @@
 - [x] Rename Repo
 - [x] TEST!
 - [x] MERGE !
-- [X] Docker from scratch
+- [x] Docker from scratch
 - [x] Gorelease Docker multiple arc
-- [X] Improve static analyzers
+- [x] Improve static analyzers
 - [x] Badges
   - [x] Drone Pluging badges
   - [x] https://microbadger.com/images/meltwater/drone-cache
@@ -48,19 +48,26 @@
   - [x] arch (https://golang.org/pkg/runtime/#pkg-constants)
   - ~[ ] .Environment (https://gobyexample.com/environment-variables)~
 
+## v0.11.0
+
+- [ ] **Add volume/file storage**
+  - [x] https://docs.drone.io/user-guide/pipeline/volumes/
+  - [x] http://plugins.drone.io/drillster/drone-volume-cache/
+  - [x] https://github.com/Drillster/drone-volume-cache/blob/master/cacher.sh
+- [x] Checkout
+  - [x] https://github.com/drone/drone-go
+  - [x] https://github.com/drone-plugins/drone-s3
+  - [x] https://github.com/drone-plugins/drone-cache
+  - [x] New Drone Version compatibility
+- [ ] Improve documentation
+  - [ ] Examples
+  - [ ] Drone 1.0 examples
+
 ## Before v1.0.0
 
 - [ ] Fix tmp directory create permissions for scratch/unprivileged user in container
-- [ ] **Add volume/file storage**
-  - [ ] https://docs.drone.io/user-guide/pipeline/volumes/
-  - [ ] http://plugins.drone.io/drillster/drone-volume-cache/
-  - [ ] https://github.com/Drillster/drone-volume-cache/blob/master/cacher.sh
-- [ ] Introduce mode: wrap_in_directory: true/false
-- [ ] Checkout
-  - [ ] https://github.com/drone/drone-go
-  - [ ] https://github.com/drone-plugins/drone-s3
-  - [ ] New Drone Version
 - [ ] Improve Makefile
+- [ ] Clean up TODOs
 - [ ] Add unit tests
 
 ## Road to Open Source
@@ -69,3 +76,7 @@
 - [ ] Add credits for original author [@dim](https://github.com/dim)
 - [ ] Update LICENCE
 - [ ] Open Source :tada:
+
+## Future work
+
+- [ ] TTL/Retention policy

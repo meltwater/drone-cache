@@ -5,11 +5,8 @@ import (
 	"fmt"
 	"log"
 	"path/filepath"
-	"strings"
 	"time"
 
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/pkg/errors"
 
 	"github.com/meltwater/drone-cache/cache"
@@ -21,49 +18,31 @@ import (
 type (
 	// Config plugin-specific parameters and secrets
 	Config struct {
-		// Indicates the files ACL, which should be one
-		// of the following:
-		//     private
-		//     public-read
-		//     public-read-write
-		//     authenticated-read
-		//     bucket-owner-read
-		//     bucket-owner-full-control
-		ACL           string
 		ArchiveFormat string
-		Bucket        string
+		Backend       string
 		CacheKey      string
-		Encryption    string // if not "", enables server-side encryption. valid values are: AES256, aws:kms
-		Endpoint      string
-		Key           string
 
-		// us-east-1
-		// us-west-1
-		// us-west-2
-		// eu-west-1
-		// ap-southeast-1
-		// ap-southeast-2
-		// ap-northeast-1
-		// sa-east-1
-		Region string
-		Secret string
-
-		Debug     bool
-		PathStyle bool // Use path style instead of domain style. Should be true for minio and false for AWS
-		Rebuild   bool
-		Restore   bool
+		Debug   bool
+		Rebuild bool
+		Restore bool
 
 		Mount []string
+
+		S3         backend.S3Config
+		FileSystem backend.FileSystemConfig
 	}
 
 	// Plugin stores metadata about current plugin
 	Plugin struct {
-		Build  metadata.Build
-		Commit metadata.Commit
-		Config Config
-		Repo   metadata.Repo
+		Metadata metadata.Metadata
+		Config   Config
 	}
+
+	// Error recognized error from plugin
+	Error string
 )
+
+func (e Error) Error() string { return string(e) }
 
 // Exec entry point of Plugin, where the magic happens
 func (p *Plugin) Exec() error {
@@ -78,70 +57,67 @@ func (p *Plugin) Exec() error {
 		return errors.New("rebuild and restore are mutually exclusive, please set only one of them")
 	}
 
-	_, err := cachekey.ParseTemplate(p.Config.CacheKey)
+	_, err := cachekey.ParseTemplate(c.CacheKey)
 	if err != nil {
 		return errors.Wrap(
 			err,
-			fmt.Sprintf("could not parse <%s> as cache key template, falling back to default", p.Config.CacheKey),
+			fmt.Sprintf("could not parse <%s> as cache key template, falling back to default", c.CacheKey),
 		)
 	}
 
 	// 2. Initialize backend
-	var cred *credentials.Credentials
-	if c.Key != "" && c.Secret != "" {
-		// allowing to use the instance role or provide a key and secret
-		cred = credentials.NewStaticCredentials(c.Key, c.Secret, "")
-	} else {
-		cred = credentials.AnonymousCredentials
-		log.Println("aws key and/or Secret not provided (falling back to anonymous credentials)")
+	backend, err := initializeBackend(c)
+	if err != nil {
+		return errors.Wrap(err, fmt.Sprintf("could not initialize <%s> as backend", c.Backend))
 	}
-	awsConf := &aws.Config{
-		Region:           aws.String(c.Region),
-		Endpoint:         &c.Endpoint,
-		DisableSSL:       aws.Bool(!strings.HasPrefix(c.Endpoint, "https://")),
-		S3ForcePathStyle: aws.Bool(c.PathStyle),
-		Credentials:      cred,
-	}
-	if c.Debug {
-		awsConf.WithLogLevel(aws.LogDebugWithHTTPBody)
-	}
-	backend := backend.NewS3(c.Bucket, c.ACL, c.Encryption, awsConf)
 
 	// 3. Initialize cache
 	cch := cache.New(backend, c.ArchiveFormat)
 
 	// 4. Select mode
 	if c.Rebuild {
-		if err := p.processRebuild(cch); err != nil {
-			log.Printf("WARNING: could not build cache. process rebuild failed, %v\n", err)
-			return nil
+		if err := processRebuild(cch, p.Config.CacheKey, p.Config.Mount, p.Metadata); err != nil {
+			return Error(fmt.Sprintf("WARNING: could not build cache. process rebuild failed, %v\n", err))
 		}
 	}
 
 	if c.Restore {
-		if err := p.processRestore(cch); err != nil {
-			log.Printf("WARNING: could not restore cache. process restore failed, %v\n", err)
-			return nil
+		if err := processRestore(cch, p.Config.CacheKey, p.Config.Mount, p.Metadata); err != nil {
+			return Error(fmt.Sprintf("WARNING: could not restore cache. process restore failed, %v\n", err))
 		}
 	}
 
 	return nil
 }
 
-// processRebuild the remote cache from the local environment
-func (p Plugin) processRebuild(c cache.Cache) error {
-	now := time.Now()
-	branch := p.Commit.Branch
+// initializeBackend initializes backend using given configuration
+func initializeBackend(c Config) (cache.Backend, error) {
+	switch c.Backend {
+	case "s3":
+		log.Println("IMPORTANT: using aws s3 as backend")
+		return backend.InitializeS3Backend(c.S3, c.Debug)
+	case "filesystem":
+		log.Println("IMPORTANT: using filesystem as backend")
+		return backend.InitializeFileSystemBackend(c.FileSystem, c.Debug)
+	default:
+		return nil, errors.New("unknown backend")
+	}
+}
 
-	for _, mount := range p.Config.Mount {
-		key, err := p.cacheKey(mount, branch)
+// processRebuild the remote cache from the local environment
+func processRebuild(c cache.Cache, cacheKeyTmpl string, mountedDirs []string, m metadata.Metadata) error {
+	now := time.Now()
+	branch := m.Commit.Branch
+
+	for _, mount := range mountedDirs {
+		key, err := cacheKey(m, cacheKeyTmpl, mount, branch)
 		if err != nil {
 			return errors.Wrap(err, "could not generate cache key")
 		}
-		path := filepath.Join(p.Repo.Name, key)
+		path := filepath.Join(m.Repo.Name, key)
 
 		log.Printf("rebuilding cache for directory <%s> to remote cache <%s>\n", mount, path)
-		if err := c.Upload(mount, path); err != nil {
+		if err := c.Push(mount, path); err != nil {
 			return errors.Wrap(err, "could not upload")
 		}
 	}
@@ -150,19 +126,19 @@ func (p Plugin) processRebuild(c cache.Cache) error {
 }
 
 // processRestore the local environment from the remote cache
-func (p Plugin) processRestore(c cache.Cache) error {
+func processRestore(c cache.Cache, cacheKeyTmpl string, mountedDirs []string, m metadata.Metadata) error {
 	now := time.Now()
-	branch := p.Commit.Branch
+	branch := m.Commit.Branch
 
-	for _, mount := range p.Config.Mount {
-		key, err := p.cacheKey(mount, branch)
+	for _, mount := range mountedDirs {
+		key, err := cacheKey(m, cacheKeyTmpl, mount, branch)
 		if err != nil {
 			return errors.Wrap(err, "could not generate cache key")
 		}
-		path := filepath.Join(p.Repo.Name, key)
+		path := filepath.Join(m.Repo.Name, key)
 
 		log.Printf("restoring directory <%s> from remote cache <%s>\n", mount, path)
-		if err := c.Download(path, mount); err != nil {
+		if err := c.Pull(path, mount); err != nil {
 			return errors.Wrap(err, "could not download")
 		}
 	}
@@ -170,14 +146,17 @@ func (p Plugin) processRestore(c cache.Cache) error {
 	return nil
 }
 
+// Helpers
+
 // cacheKey generates key from given template as parameter or fallbacks hash
-func (p Plugin) cacheKey(mount, branch string) (string, error) {
+func cacheKey(p metadata.Metadata, cacheKeyTmpl, mount, branch string) (string, error) {
 	log.Println("using provided cache key template")
-	key, err := cachekey.Generate(p.Config.CacheKey, mount, metadata.Metadata{
+	key, err := cachekey.Generate(cacheKeyTmpl, mount, metadata.Metadata{
 		Build:  p.Build,
 		Commit: p.Commit,
 		Repo:   p.Repo,
 	})
+
 	if err != nil {
 		log.Printf("%v, falling back to default key\n", err)
 		key, err = cachekey.Hash(mount, branch)

@@ -19,8 +19,8 @@ type s3Backend struct {
 	client     *s3.S3
 }
 
-// NewS3 returns a new S3 remote Backend implemented
-func NewS3(bucket, acl, encryption string, conf *aws.Config) cache.Backend {
+// newS3 returns a new S3 remote Backend implemented
+func newS3(bucket, acl, encryption string, conf *aws.Config) cache.Backend {
 	client := s3.New(session.Must(session.NewSessionWithOptions(session.Options{})), conf)
 	return &s3Backend{
 		bucket:     bucket,
