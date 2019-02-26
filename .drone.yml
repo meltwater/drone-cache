@@ -6,13 +6,6 @@ pipeline:
     image: plugins/git
     tags: true
 
-  docker-release-dev:
-    image: plugins/docker
-    pull: true
-    repo: meltwater/drone-cache
-    tags: dev
-    secrets: [docker_username, docker_password]
-
   restore-cache:
       image: meltwater/drone-cache:dev
       pull: true
