@@ -6,6 +6,7 @@ IFS=$'\n\t'
 
 echo 'Setting up test environemnt...'
 (set -x; docker-compose up -d)
+(set -x; mkdir -p ./testcache/cache)
 
 echo 'Testing...'
 # make sure https://github.com/rakyll/gotest installed

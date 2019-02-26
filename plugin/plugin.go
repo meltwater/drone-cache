@@ -37,7 +37,12 @@ type (
 		Metadata metadata.Metadata
 		Config   Config
 	}
+
+	// Error recognized error from plugin
+	Error string
 )
+
+func (e Error) Error() string { return string(e) }
 
 // Exec entry point of Plugin, where the magic happens
 func (p *Plugin) Exec() error {
@@ -72,15 +77,13 @@ func (p *Plugin) Exec() error {
 	// 4. Select mode
 	if c.Rebuild {
 		if err := processRebuild(cch, p.Config.CacheKey, p.Config.Mount, p.Metadata); err != nil {
-			log.Printf("WARNING: could not build cache. process rebuild failed, %v\n", err)
-			return nil
+			return Error(fmt.Sprintf("WARNING: could not build cache. process rebuild failed, %v\n", err))
 		}
 	}
 
 	if c.Restore {
 		if err := processRestore(cch, p.Config.CacheKey, p.Config.Mount, p.Metadata); err != nil {
-			log.Printf("WARNING: could not restore cache. process restore failed, %v\n", err)
-			return nil
+			return Error(fmt.Sprintf("WARNING: could not restore cache. process restore failed, %v\n", err))
 		}
 	}
 

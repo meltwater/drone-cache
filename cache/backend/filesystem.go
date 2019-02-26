@@ -25,7 +25,7 @@ func newFileSystem(cacheRoot string) cache.Backend {
 func (c *filesystem) Get(p string) (io.ReadCloser, error) {
 	absPath, err := filepath.Abs(filepath.Clean(filepath.Join(c.cacheRoot, p)))
 	if err != nil {
-		return nil, errors.Wrap(err, "couldn't get the object")
+		return nil, errors.Wrap(err, "could not get the object")
 	}
 
 	return os.Open(absPath)
@@ -35,11 +35,14 @@ func (c *filesystem) Get(p string) (io.ReadCloser, error) {
 func (c *filesystem) Put(p string, src io.ReadSeeker) error {
 	absPath, err := filepath.Abs(filepath.Clean(filepath.Join(c.cacheRoot, p)))
 	if err != nil {
-		return errors.Wrap(err, "couldn't put the object")
+		return errors.Wrap(err, "could not build path")
 	}
 
-	// TODO: What happens when it exists?
-	// - should override existing one
+	dir := filepath.Dir(absPath)
+	if err := os.MkdirAll(dir, os.FileMode(0755)); err != nil {
+		return errors.Wrap(err, fmt.Sprintf("could not create directory <%s>", dir))
+	}
+
 	dst, err := os.Create(absPath)
 	if err != nil {
 		return errors.Wrap(err, fmt.Sprintf("could not create cache file <%s>", absPath))

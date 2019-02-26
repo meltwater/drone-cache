@@ -285,7 +285,7 @@ func main() {
 }
 
 func run(c *cli.Context) error {
-	plugin := plugin.Plugin{
+	plg := plugin.Plugin{
 		Metadata: metadata.Metadata{
 			Repo: metadata.Repo{
 				Owner:   c.String("repo.owner"),
@@ -345,5 +345,11 @@ func run(c *cli.Context) error {
 		},
 	}
 
-	return plugin.Exec()
+	err, ok := plg.Exec().(plugin.Error)
+	if ok {
+		// If it is a recognized just log it, convenience error for testing
+		log.Println(err)
+		return nil
+	}
+	return err
 }

@@ -7,7 +7,7 @@ pipeline:
     tags: true
 
   restore-cache:
-      image: meltwater/drone-cache
+      image: meltwater/drone-cache:dev
       pull: true
       restore: true
       bucket: drone-cache-bucket
@@ -17,7 +17,7 @@ pipeline:
         - 'vendor'
 
   restore-cache-with-key:
-      image: meltwater/drone-cache
+      image: meltwater/drone-cache:dev
       pull: true
       restore: true
       cache_key: '{{ .Repo.Name }}_{{ checksum "go.mod" }}_{{ checksum "go.sum" }}_{{ arch }}_{{ os }}'
@@ -28,7 +28,7 @@ pipeline:
         - 'vendor'
 
   restore-cache-with-gzip:
-      image: meltwater/drone-cache
+      image: meltwater/drone-cache:dev
       pull: true
       restore: true
       cache_key: "gzip"
@@ -38,6 +38,19 @@ pipeline:
       region: eu-west-1
       mount:
         - 'vendor'
+
+  restore-cache-with-filesystem:
+      image: meltwater/drone-cache:dev
+      pull: true
+      backend: "filesystem"
+      restore: true
+      cache_key: "volume"
+      archive_format: "gzip"
+      # filesystem_cache_root: "/tmp/cache"
+      mount:
+        - 'vendor'
+      volumes:
+        - '/drone/tmp/cache:/tmp/cache'
 
   build:
     image: golang:1.11-alpine
@@ -56,7 +69,7 @@ pipeline:
     commands:
       - go test -v -mod=vendor -cover ./... # NOTICE: -race: Needs CGO enabled
 
-  analyze-all:
+  analyze:
     image: golang:1.11-alpine
     pull: true
     environment:
@@ -66,7 +79,7 @@ pipeline:
       - ./bin/golangci-lint run -v --enable-all -D gochecknoglobals
 
   rebuild-cache:
-      image: meltwater/drone-cache
+      image: meltwater/drone-cache:dev
       pull: true
       rebuild: true
       bucket: drone-cache-bucket
@@ -76,7 +89,7 @@ pipeline:
         - 'vendor'
 
   rebuild-cache-with-key:
-      image: meltwater/drone-cache
+      image: meltwater/drone-cache:dev
       pull: true
       rebuild: true
       cache_key: '{{ .Repo.Name }}_{{ checksum "go.mod" }}_{{ checksum "go.sum" }}_{{ arch }}_{{ os }}'
@@ -87,7 +100,7 @@ pipeline:
         - 'vendor'
 
   rebuild-cache-with-gzip:
-      image: meltwater/drone-cache
+      image: meltwater/drone-cache:dev
       pull: true
       rebuild: true
       cache_key: "gzip"
@@ -97,6 +110,19 @@ pipeline:
       region: eu-west-1
       mount:
         - 'vendor'
+
+  rebuild-cache-with-filesystem:
+      image: meltwater/drone-cache:dev
+      pull: true
+      backend: "filesystem"
+      rebuild: true
+      cache_key: "volume"
+      archive_format: "gzip"
+      # filesystem_cache_root: "/tmp/cache"
+      mount:
+        - 'vendor'
+      volumes:
+        - '/drone/tmp/cache:/tmp/cache'
 
   docker-release-latest:
     image: plugins/docker

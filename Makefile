@@ -22,11 +22,17 @@ build-compressed: drone-cache
 docker-build: Dockerfile
 	docker build -t meltwater/drone-cache:latest .
 
+docker-build-dev: Dockerfile
+	docker build -t meltwater/drone-cache:dev .
+
 docker-build-scratch: Dockerfile.scratch
 	docker build -f Dockerfile.scratch -t meltwater/drone-cache:latest .
 
 docker-push: docker-build
 	docker push meltwater/drone-cache:latest
+
+docker-push-dev: docker-build-dev
+	docker push meltwater/drone-cache:dev
 
 docker-push-scratch: docker-build-scratch
 	docker push meltwater/drone-cache:latest

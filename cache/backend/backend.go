@@ -71,14 +71,11 @@ func InitializeS3Backend(c S3Config, debug bool) (cache.Backend, error) {
 }
 
 func InitializeFileSystemBackend(c FileSystemConfig, debug bool) (cache.Backend, error) {
-	// TODO Check if volumes present?
 	if strings.TrimRight(path.Clean(c.CacheRoot), "/") == "" {
 		return nil, nil
 	}
 
-	// TODO: Test!
 	if _, err := os.Stat(c.CacheRoot); err != nil {
-		// TODO What happens if it's not mounted? and dir is not there
 		return nil, errors.Wrap(
 			err,
 			fmt.Sprintf("could not use <%s> as cache root, make sure volume is mounted", c.CacheRoot),
