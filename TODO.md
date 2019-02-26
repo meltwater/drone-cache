@@ -60,7 +60,7 @@
   - [x] https://github.com/drone-plugins/drone-cache
   - [x] New Drone Version compatibility
 - [ ] Improve documentation
-  - [ ] Examples
+  - [x] Examples
   - [ ] Drone 1.0 examples
 
 ## Before v1.0.0
