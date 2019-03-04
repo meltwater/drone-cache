@@ -64,6 +64,7 @@ func InitializeS3Backend(c S3Config, debug bool) (cache.Backend, error) {
 	}
 
 	if debug {
+		log.Printf("s3 backend config: %+v", c)
 		awsConf.WithLogLevel(aws.LogDebugWithHTTPBody)
 	}
 
@@ -72,14 +73,16 @@ func InitializeS3Backend(c S3Config, debug bool) (cache.Backend, error) {
 
 func InitializeFileSystemBackend(c FileSystemConfig, debug bool) (cache.Backend, error) {
 	if strings.TrimRight(path.Clean(c.CacheRoot), "/") == "" {
-		return nil, nil
+		return nil, fmt.Errorf("could not use <%s> as cache root, empty or root path given", c.CacheRoot)
 	}
 
 	if _, err := os.Stat(c.CacheRoot); err != nil {
-		return nil, errors.Wrap(
-			err,
-			fmt.Sprintf("could not use <%s> as cache root, make sure volume is mounted", c.CacheRoot),
-		)
+		msg := fmt.Sprintf("could not use <%s> as cache root, make sure volume is mounted", c.CacheRoot)
+		return nil, errors.Wrap(err, msg)
+	}
+
+	if debug {
+		log.Printf("filesystem backend config: %+v", c)
 	}
 
 	return newFileSystem(c.CacheRoot), nil
