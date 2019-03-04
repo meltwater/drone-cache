@@ -1,5 +1,5 @@
 
-# drone-cache [![Maintenance](https://img.shields.io/maintenance/yes/2019.svg)](https://github.com/meltwater/drone-cache/commits/master) [![Drone](https://drone.meltwater.io/api/badges/meltwater/drone-cache/status.svg)](https://drone.meltwater.io/meltwater/drone-cache) [![Go Doc](https://godoc.org/github.com/meltwater/drone-cache?status.svg)](http://godoc.org/github.com/meltwater/drone-cache) [![Go Report Card](https://goreportcard.com/badge/github.com/meltwater/drone-cache)](https://goreportcard.com/report/github.com/meltwater/drone-cache) [![](https://images.microbadger.com/badges/image/meltwater/drone-cache.svg)](https://microbadger.com/images/meltwater/drone-cache "Get your own image badge on microbadger.com") [![](https://images.microbadger.com/badges/version/meltwater/drone-cache.svg)](https://microbadger.com/images/meltwater/drone-cache "Get your own version badge on microbadger.com")
+# drone-cache [![semver](https://img.shields.io/badge/semver-1.0.0-blue.svg?cacheSeconds=2592000)](https://github.com/meltwater/drone-cache/releases) [![Maintenance](https://img.shields.io/maintenance/yes/2019.svg)](https://github.com/meltwater/drone-cache/commits/master) [![Drone](https://drone.meltwater.io/api/badges/meltwater/drone-cache/status.svg)](https://drone.meltwater.io/meltwater/drone-cache) [![Go Doc](https://godoc.org/github.com/meltwater/drone-cache?status.svg)](http://godoc.org/github.com/meltwater/drone-cache) [![Go Report Card](https://goreportcard.com/badge/github.com/meltwater/drone-cache)](https://goreportcard.com/report/github.com/meltwater/drone-cache) [![](https://images.microbadger.com/badges/image/meltwater/drone-cache.svg)](https://microbadger.com/images/meltwater/drone-cache) [![](https://images.microbadger.com/badges/version/meltwater/drone-cache.svg)](https://microbadger.com/images/meltwater/drone-cache)
 
 <p align="center"><img src="images/drone_gopher.png" width="400"></p>
 
@@ -7,12 +7,14 @@ Drone plugin for caching artifacts to a S3 bucket or to a mounted volume.
 Use this plugin for caching build artifacts to speed up your build times.
 This plugin can create and restore caches of any folders.
 
-For the usage information and a listing of the available options please take a look at
-[usage](#usage) and [examples](#examples).
+For the usage information and a list of the available options please take a look at
+[usage](#usage) and checkout [examples](#examples). If you want to learn more about custom cache keys, see [cache key templates](docs/cache_key_templates.md).
 
 ## Examples
 
 ### Drone Configuration examples
+
+> `!!!` The example Yaml configurations in this file are using the legacy 0.8 syntax. If you are using Drone 1.0 or Drone Cloud please ensure you use the appropriate 1.0 syntax. [Learn more here](https://docs.drone.io/config/pipeline/migrating/#plugins).
 
 The following is a sample configuration in your .drone.yml file:
 
@@ -94,120 +96,7 @@ rebuild-deps-cache:
         - '/drone/tmp/cache:/tmp/cache'
 ```
 
-#### With custom cache key prefix template
-
-See [cache key templates](#cache-key-templates) section for further information and to learn about syntax.
-
-```yaml
-pipeline:
-  restore-cache:
-    image: meltwater/drone-cache
-    pull: true
-    restore: true
-    cache_key: "{{ .Repo.Name }}_{{ .Commit.Branch }}_{{ .Build.Number }}"
-    bucket: drone-cache-bucket
-    region: eu-west-1
-    secrets: [aws_access_key_id, aws_secret_access_key]
-    mount:
-      - 'deps'
-      - '_dialyzer'
-
-deps:
-    image: elixir:1.6.5
-    pull: true
-    commands:
-      - mix local.hex --force
-      - mix local.rebar --force
-      - mix deps.get
-      - mix dialyzer --halt-exit-status
-
-rebuild-deps-cache:
-    image: meltwater/drone-cache
-    pull: true
-    rebuild: true
-    cache_key: "{{ .Repo.Name }}_{{ .Commit.Branch }}_{{ .Build.Number }}"
-    bucket: drone-cache-bucket
-    region: eu-west-1
-    secrets: [aws_access_key_id, aws_secret_access_key]
-    mount:
-      - 'deps'
-```
-
-#### With gzip compression
-
-```yaml
-pipeline:
-  restore-cache:
-    image: meltwater/drone-cache
-    pull: true
-    restore: true
-    cache_key: "{{ .Repo.Name }}_{{ .Commit.Branch }}_{{ .Build.Number }}"
-    archive_format: "gzip"
-    bucket: drone-cache-bucket
-    region: eu-west-1
-    secrets: [aws_access_key_id, aws_secret_access_key]
-    mount:
-      - 'deps'
-      - '_dialyzer'
-
-deps:
-    image: elixir:1.6.5
-    pull: true
-    commands:
-      - mix local.hex --force
-      - mix local.rebar --force
-      - mix deps.get
-      - mix dialyzer --halt-exit-status
-
-rebuild-deps-cache:
-    image: meltwater/drone-cache
-    pull: true
-    rebuild: true
-    cache_key: "{{ .Repo.Name }}_{{ .Commit.Branch }}_{{ .Build.Number }}"
-    archive_format: "gzip"
-    bucket: drone-cache-bucket
-    region: eu-west-1
-    secrets: [aws_access_key_id, aws_secret_access_key]
-    mount:
-      - 'deps'
-```
-
-#### Debug
-
-```yaml
-pipeline:
-  restore-cache:
-    image: meltwater/drone-cache
-    pull: true
-    restore: true
-    debug: true
-    bucket: drone-cache-bucket
-    region: eu-west-1
-    secrets: [aws_access_key_id, aws_secret_access_key]
-    mount:
-      - 'deps'
-      - '_dialyzer'
-
-deps:
-    image: elixir:1.6.5
-    pull: true
-    commands:
-      - mix local.hex --force
-      - mix local.rebar --force
-      - mix deps.get
-      - mix dialyzer --halt-exit-status
-
-rebuild-deps-cache:
-    image: meltwater/drone-cache
-    pull: true
-    rebuild: true
-    debug: true
-    bucket: drone-cache-bucket
-    region: eu-west-1
-    secrets: [aws_access_key_id, aws_secret_access_key]
-    mount:
-      - 'deps'
-```
+## For more examples see [docs/examples](docs/examples.md)
 
 ## Usage
 
@@ -293,68 +182,6 @@ $ docker run --rm \
       meltwater/drone-cache
 ```
 
-## Cache Key Templates
-
-Cache key template syntax is very basic. You just need to provide a string. In that string you can use variables by prefixing them with a `.` in `{{ }}` construct, from provided metadata object (see below).
-
-Also following helper functions provided for your use:
-
-* `checksum`: Provides md5 hash of a file for given path
-* `epoch`: Provides Unix epoch
-* `arch`: Provides Architecture of running system
-* `os`: Provides Operation system of running system
-
-For further information about this syntax please see [official docs](https://golang.org/pkg/text/template/) from Go standard library.
-
-### Template Examples
-
-`"{{ .Repo.Name }}-{{ .Commit.Branch }}-{{ checksum "go.mod" }}-yadayadayada"`
-
-`"{{ .Repo.Name }}_{{ checksum "go.mod" }}_{{ checksum "go.sum" }}_{{ arch }}_{{ os }}"`
-
-### Metadata
-
-Following metadata object is available and pre-populated with current build information for you to use in cache key templates.
-
-```go
-{
-  Repo {
-    Avatar  string "repository avatar [$DRONE_REPO_AVATAR]"
-    Branch  string "repository default branch [$DRONE_REPO_BRANCH]"
-    Link    string "repository link [$DRONE_REPO_LINK]"
-    Name    string "repository name [$DRONE_REPO_NAME]"
-    Owner   string "repository owner [$DRONE_REPO_OWNER]"
-    Private bool   "repository is private [$DRONE_REPO_PRIVATE]"
-    Trusted bool   "repository is trusted [$DRONE_REPO_TRUSTED]"
-  }
-
-  Build {
-    Created  int    "build created (default: 0) [$DRONE_BUILD_CREATED]"
-    Deploy   string "build deployment target [$DRONE_DEPLOY_TO]"
-    Event    string "build event (default: 'push') [$DRONE_BUILD_EVENT]"
-    Finished int    "build finished (default: 0) [$DRONE_BUILD_FINISHED]"
-    Link     string "build link [$DRONE_BUILD_LINK]"
-    Number   int    "build number (default: 0) [$DRONE_BUILD_NUMBER]"
-    Started  int    "build started (default: 0) [$DRONE_BUILD_STARTED]"
-    Status   string "build status (default: 'success') [$DRONE_BUILD_STATUS]"
-  }
-
-  Commit {
-    Author {
-      Avatar string "git author avatar [$DRONE_COMMIT_AUTHOR_AVATAR]"
-      Email  string "git author email [$DRONE_COMMIT_AUTHOR_EMAIL]"
-      Name   string "git author name [$DRONE_COMMIT_AUTHOR]"
-    }
-    Branch  string "git commit branch (default: 'master') [$DRONE_COMMIT_BRANCH]"
-    Link    string "git commit link [$DRONE_COMMIT_LINK]"
-    Message string "git commit message [$DRONE_COMMIT_MESSAGE]"
-    Ref     string "git commit ref (default: 'refs/heads/master') [$DRONE_COMMIT_REF]"
-    Remote  string "git remote url [$DRONE_REMOTE_URL]"
-    Sha     string "git commit sha [$DRONE_COMMIT_SHA]"
-  }
-}
-```
-
 ## Development
 
 ### Local setup
@@ -402,17 +229,22 @@ $ make docker-build
 
 ## Contributing
 
-Pull requests are welcome.
+Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct, and the process for submitting pull requests to us.
 
-## Authors
+## Versioning
+
+We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/meltwater/drone-cache/tags).
+
+## Authors and Acknowledgement
 
 * [@dim](https://github.com/dim) Thanks for original work!
 * [@kakkoyun](https://github.com/kakkoyun)
 * [@salimane](https://github.com/salimane)
-* **Special thanks to [@AdamGlazerMW](https://github.com/AdamGlazerMW) for amazing artwork!**
+
+> **Special thanks to [@AdamGlazerMW](https://github.com/AdamGlazerMW) for amazing artwork!**
 
 Check out for [all contributors](https://github.com/meltwater/drone-cache/graphs/contributors).
 
-## Copyright
+## License and Copyright
 
-See [LICENSE](LICENSE) document
+This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details
