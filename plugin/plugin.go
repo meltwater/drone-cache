@@ -51,6 +51,8 @@ func (p *Plugin) Exec() error {
 	// 1. Check parameters
 	if c.Debug {
 		log.Println("DEBUG MODE enabled!")
+		log.Printf("Plugin initialized with config: %+v", p.Config)
+		log.Printf("Plugin initialized with metadata: %+v", p.Metadata)
 	}
 
 	if c.Rebuild && c.Restore {
@@ -59,10 +61,8 @@ func (p *Plugin) Exec() error {
 
 	_, err := cachekey.ParseTemplate(c.CacheKey)
 	if err != nil {
-		return errors.Wrap(
-			err,
-			fmt.Sprintf("could not parse <%s> as cache key template, falling back to default", c.CacheKey),
-		)
+		msg := fmt.Sprintf("could not parse <%s> as cache key template, falling back to default", c.CacheKey)
+		return errors.Wrap(err, msg)
 	}
 
 	// 2. Initialize backend
@@ -116,7 +116,7 @@ func processRebuild(c cache.Cache, cacheKeyTmpl string, mountedDirs []string, m 
 		}
 		path := filepath.Join(m.Repo.Name, key)
 
-		log.Printf("rebuilding cache for directory <%s> to remote cache <%s>\n", mount, path)
+		log.Printf("rebuilding cache for directory <%s> to remote cache <%s>", mount, path)
 		if err := c.Push(mount, path); err != nil {
 			return errors.Wrap(err, "could not upload")
 		}
@@ -137,7 +137,7 @@ func processRestore(c cache.Cache, cacheKeyTmpl string, mountedDirs []string, m 
 		}
 		path := filepath.Join(m.Repo.Name, key)
 
-		log.Printf("restoring directory <%s> from remote cache <%s>\n", mount, path)
+		log.Printf("restoring directory <%s> from remote cache <%s>", mount, path)
 		if err := c.Pull(path, mount); err != nil {
 			return errors.Wrap(err, "could not download")
 		}
@@ -158,7 +158,7 @@ func cacheKey(p metadata.Metadata, cacheKeyTmpl, mount, branch string) (string, 
 	})
 
 	if err != nil {
-		log.Printf("%v, falling back to default key\n", err)
+		log.Printf("%v, falling back to default key", err)
 		key, err = cachekey.Hash(mount, branch)
 		if err != nil {
 			return "", errors.Wrap(err, "could not generate hash key for mounted")
