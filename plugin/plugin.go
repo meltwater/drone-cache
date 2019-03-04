@@ -77,13 +77,13 @@ func (p *Plugin) Exec() error {
 	// 4. Select mode
 	if c.Rebuild {
 		if err := processRebuild(cch, p.Config.CacheKey, p.Config.Mount, p.Metadata); err != nil {
-			return Error(fmt.Sprintf("WARNING: could not build cache. process rebuild failed, %v\n", err))
+			return Error(fmt.Sprintf("[WARNING] could not build cache, process rebuild failed, %v\n", err))
 		}
 	}
 
 	if c.Restore {
 		if err := processRestore(cch, p.Config.CacheKey, p.Config.Mount, p.Metadata); err != nil {
-			return Error(fmt.Sprintf("WARNING: could not restore cache. process restore failed, %v\n", err))
+			return Error(fmt.Sprintf("[WARNING] could not restore cache, process restore failed, %v\n", err))
 		}
 	}
 
@@ -94,10 +94,10 @@ func (p *Plugin) Exec() error {
 func initializeBackend(c Config) (cache.Backend, error) {
 	switch c.Backend {
 	case "s3":
-		log.Println("IMPORTANT: using aws s3 as backend")
+		log.Println("[IMPORTANT] using aws s3 as backend")
 		return backend.InitializeS3Backend(c.S3, c.Debug)
 	case "filesystem":
-		log.Println("IMPORTANT: using filesystem as backend")
+		log.Println("[IMPORTANT] using filesystem as backend")
 		return backend.InitializeFileSystemBackend(c.FileSystem, c.Debug)
 	default:
 		return nil, errors.New("unknown backend")
