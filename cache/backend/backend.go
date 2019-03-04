@@ -47,24 +47,21 @@ type FileSystemConfig struct {
 }
 
 func InitializeS3Backend(c S3Config, debug bool) (cache.Backend, error) {
-	var cred *credentials.Credentials
-	if c.Key != "" && c.Secret != "" {
-		// allowing to use the instance role or provide a key and secret
-		cred = credentials.NewStaticCredentials(c.Key, c.Secret, "")
-	} else {
-		cred = credentials.AnonymousCredentials
-		log.Println("aws key and/or Secret not provided (falling back to anonymous credentials)")
-	}
 	awsConf := &aws.Config{
 		Region:           aws.String(c.Region),
 		Endpoint:         &c.Endpoint,
 		DisableSSL:       aws.Bool(!strings.HasPrefix(c.Endpoint, "https://")),
 		S3ForcePathStyle: aws.Bool(c.PathStyle),
-		Credentials:      cred,
+	}
+
+	if c.Key != "" && c.Secret != "" {
+		awsConf.Credentials = credentials.NewStaticCredentials(c.Key, c.Secret, "")
+	} else {
+		log.Println("aws key and/or Secret not provided (falling back to anonymous credentials)")
 	}
 
 	if debug {
-		log.Printf("s3 backend config: %+v", c)
+		log.Printf("[DEBUG] s3 backend config: %+v", c)
 		awsConf.WithLogLevel(aws.LogDebugWithHTTPBody)
 	}
 
@@ -82,7 +79,7 @@ func InitializeFileSystemBackend(c FileSystemConfig, debug bool) (cache.Backend,
 	}
 
 	if debug {
-		log.Printf("filesystem backend config: %+v", c)
+		log.Printf("[DEBUG] filesystem backend config: %+v", c)
 	}
 
 	return newFileSystem(c.CacheRoot), nil

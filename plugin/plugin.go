@@ -51,8 +51,8 @@ func (p *Plugin) Exec() error {
 	// 1. Check parameters
 	if c.Debug {
 		log.Println("DEBUG MODE enabled!")
-		log.Printf("Plugin initialized with config: %+v", p.Config)
-		log.Printf("Plugin initialized with metadata: %+v", p.Metadata)
+		log.Printf("[DEBUG] Plugin initialized with config: %+v", p.Config)
+		log.Printf("[DEBUG] Plugin initialized with metadata: %+v", p.Metadata)
 	}
 
 	if c.Rebuild && c.Restore {
