@@ -70,8 +70,9 @@
 - [x] Add credits for original author [@dim](https://github.com/dim)
 - [x] Update LICENCE
 - [x] Project artwork
-- [ ] Add public CI/CD
+- [ ] Improve README
 - [ ] Open Source :tada:
+- [ ] Add public CI/CD (https://cloud.drone.io/)
 
 ## Future work
 
