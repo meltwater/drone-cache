@@ -57,6 +57,7 @@ pipeline:
     pull: true
     secrets: [aws_access_key_id, aws_secret_access_key]
     commands:
+      - ls -al /drone
       - apk add --update make git
       - make drone-cache
 

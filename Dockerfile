@@ -19,7 +19,7 @@ RUN cp drone-cache /bin
 
 # final stage
 FROM alpine:3.9 as runner
-RUN apk add --update su-exec
+RUN apk add --no-cache su-exec
 
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 COPY --from=builder /etc/passwd /etc/passwd
@@ -27,6 +27,8 @@ COPY --from=builder /bin/drone-cache /bin
 
 COPY scripts/entrypoint.sh /bin/entrypoint.sh
 RUN chmod +x /bin/entrypoint.sh
+
+# RUN mkdir -m 755 /drone
 
 ENTRYPOINT ["/bin/entrypoint.sh"]
 CMD ["/bin/drone-cache"]
