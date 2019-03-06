@@ -6,4 +6,4 @@ if [ "${DEBUG-}" = "true" ] || [ "${PLUGIN_DEBUG-}" = "true" ]; then
 fi
 
 # Hand off to the CMD
-exec "$@"
+exec su-exec appuser "$@"
