@@ -25,7 +25,7 @@ func TestGenerate(t *testing.T) {
 	}{
 		{`{{ .Repo.Name }}`, "RepoName"},
 		{`{{ checksum "checksum_file_test.txt"}}`, "04a29c732ecbce101c1be44c948a50c6"},
-		{`{{ checksum "../../DRONE_ENVIRONMENT_VARS.md"}}`, "f8b5b7f96f3ffaa828e4890aab290e59"},
+		{`{{ checksum "../../docs/drone_env_vars.md"}}`, "f8b5b7f96f3ffaa828e4890aab290e59"},
 		{`{{ epoch }}`, "1550563151"},
 		{`{{ arch }}`, "amd64"},
 		{`{{ os }}`, "darwin"},
