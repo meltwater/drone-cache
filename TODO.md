@@ -29,7 +29,7 @@
 - [x] Add all possible environment variables to README
 - [x] Rename Repo
 - [x] TEST!
-- [x] MERGE !
+- [x] MERGE!
 - [x] Docker from scratch
 - [x] Gorelease Docker multiple arc
 - [x] Improve static analyzers
@@ -62,13 +62,9 @@
 - [ ] Improve documentation
   - [x] Examples
   - [ ] Drone 1.0 examples
-
-- [ ] Inspiration reference
+- [x] Inspiration reference
     - https://github.com/bsm/drone-s3-cache
-- [ ] Fix tmp directory create permissions for scratch/unprivileged user in container
-    - [ ] https://github.com/tianon/gosu
-    - [ ] https://github.com/ncopa/su-exec (in Alpine main package repository)
-
+    - https://github.com/Drillster/drone-volume-cache
 
 ## Road to Open Source
 
@@ -84,5 +80,4 @@
 
 - [ ] TTL/Retention policy
 - [ ] Improve Makefile
-- [ ] Clean up TODOs
 - [ ] Add unit tests

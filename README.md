@@ -4,20 +4,17 @@
 
 <p align="center"><img src="images/drone_gopher.png" width="400"></p>
 
-Drone plugin for caching artifacts to a S3 bucket or to a mounted volume.
-Use this plugin for caching build artifacts to speed up your build times.
-This plugin can create and restore caches of any folders.
+A Drone plugin for caching current workspace files between builds to reduce your build times. You can provide your own cache key templates, specify archive format and you can use an S3 bucket or a mounted volume as storage for your cached files.
 
-For the usage information and a list of the available options please take a look at
-[usage](#usage) and checkout [examples](#examples). If you want to learn more about custom cache keys, see [cache key templates](docs/cache_key_templates.md).
+For the detailed usage information and a list of the available options please take a look at [usage](#usage) and checkout [examples](#examples). If you want to learn more about custom cache keys, see [cache key templates](docs/cache_key_templates.md).
 
 ## Examples
 
 ### Drone Configuration examples
 
-> `!!!` The example Yaml configurations in this file are using the legacy 0.8 syntax. If you are using Drone 1.0 or Drone Cloud please ensure you use the appropriate 1.0 syntax. [Learn more here](https://docs.drone.io/config/pipeline/migrating/#plugins).
+> The example Yaml configurations in this file are using the legacy 0.8 syntax. If you are using Drone 1.0 or Drone Cloud please ensure you use the appropriate 1.0 syntax. [Learn more here](https://docs.drone.io/config/pipeline/migrating/#plugins).
 
-The following is a sample configuration in your .drone.yml file:
+The following is a sample configuration in your `.drone.yml` file:
 
 #### Simple
 
@@ -97,7 +94,7 @@ rebuild-deps-cache:
         - '/drone/tmp/cache:/tmp/cache'
 ```
 
-## For more examples see [docs/examples](docs/examples.md)
+### For more examples see [docs/examples](docs/examples.md)
 
 ## Usage
 
@@ -185,27 +182,23 @@ $ docker run --rm \
 
 ## Development
 
-### Local setup
+### Local set-up
 
 ```console
 $ ./scripts/setup_dev_environment.sh
-> Done.
 ```
 
 ### Tests
 
 ```console
 $ ./test
-> ...
 ```
 
 OR
 
 ```console
 $ docker-compose up -d
-> ...
 $ go test ./..
-> ...
 ```
 
 ### Build Binary
@@ -213,10 +206,7 @@ $ go test ./..
 Build the binary with the following commands:
 
 ```console
-$ make build
-> ...
 $ go build .
-> ...
 ```
 
 ### Build Docker
@@ -225,7 +215,6 @@ Build the docker image with the following commands:
 
 ```console
 $ make docker-build
-> ...
 ```
 
 ## Contributing
@@ -244,6 +233,11 @@ We use [SemVer](http://semver.org/) for versioning. For the versions available, 
 * [@AdamGlazerMW](https://github.com/AdamGlazerMW)
 
 > **Special thanks to Adam for amazing artwork!**
+
+### Inspiration
+
+* https://github.com/bsm/drone-s3-cache (original work)
+* https://github.com/Drillster/drone-volume-cache
 
 Check out for [all contributors](https://github.com/meltwater/drone-cache/graphs/contributors).
 
