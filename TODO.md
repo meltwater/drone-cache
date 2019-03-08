@@ -29,7 +29,7 @@
 - [x] Add all possible environment variables to README
 - [x] Rename Repo
 - [x] TEST!
-- [x] MERGE !
+- [x] MERGE!
 - [x] Docker from scratch
 - [x] Gorelease Docker multiple arc
 - [x] Improve static analyzers
@@ -62,7 +62,9 @@
 - [ ] Improve documentation
   - [x] Examples
   - [ ] Drone 1.0 examples
-
+- [x] Inspiration reference
+    - https://github.com/bsm/drone-s3-cache
+    - https://github.com/Drillster/drone-volume-cache
 
 ## Road to Open Source
 
@@ -77,7 +79,5 @@
 ## Future work
 
 - [ ] TTL/Retention policy
-- [ ] Fix tmp directory create permissions for scratch/unprivileged user in container
 - [ ] Improve Makefile
-- [ ] Clean up TODOs
 - [ ] Add unit tests
