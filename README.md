@@ -241,8 +241,9 @@ We use [SemVer](http://semver.org/) for versioning. For the versions available, 
 * [@dim](https://github.com/dim) Thanks for original work!
 * [@kakkoyun](https://github.com/kakkoyun)
 * [@salimane](https://github.com/salimane)
+* [@AdamGlazerMW](https://github.com/AdamGlazerMW)
 
-> **Special thanks to [@AdamGlazerMW](https://github.com/AdamGlazerMW) for amazing artwork!**
+> **Special thanks to Adam for amazing artwork!**
 
 Check out for [all contributors](https://github.com/meltwater/drone-cache/graphs/contributors).
 

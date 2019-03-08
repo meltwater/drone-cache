@@ -63,6 +63,12 @@
   - [x] Examples
   - [ ] Drone 1.0 examples
 
+- [ ] Inspiration reference
+    - https://github.com/bsm/drone-s3-cache
+- [ ] Fix tmp directory create permissions for scratch/unprivileged user in container
+    - [ ] https://github.com/tianon/gosu
+    - [ ] https://github.com/ncopa/su-exec (in Alpine main package repository)
+
 
 ## Road to Open Source
 
@@ -77,7 +83,6 @@
 ## Future work
 
 - [ ] TTL/Retention policy
-- [ ] Fix tmp directory create permissions for scratch/unprivileged user in container
 - [ ] Improve Makefile
 - [ ] Clean up TODOs
 - [ ] Add unit tests
