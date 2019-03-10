@@ -18,7 +18,7 @@ The best example would be to use this with your package managers such as Mix, Bu
 
 <p align="center"><img src="images/diagram.png" width="400"></p>
 
-With restored dependencies from a cache, commands like `mix install` will only need to download new dependencies, rather than re-download every package on each and every build.
+With restored dependencies from a cache, commands like `mix deps.get` will only need to download new dependencies, rather than re-download every package on each and every build.
 
 ## Examples
 
