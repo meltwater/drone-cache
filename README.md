@@ -8,6 +8,18 @@ A Drone plugin for caching current workspace files between builds to reduce your
 
 For the detailed usage information and a list of the available options please take a look at [usage](#usage) and checkout [examples](#examples). If you want to learn more about custom cache keys, see [cache key templates](docs/cache_key_templates.md).
 
+## How it works
+
+`drone-cache` stores mounted directories and files under a key at the specified backend (by default S3).
+
+Use this plugin to cache data that makes your builds faster. In the case of a cache miss or zero cache restore it will fail silently in won't break your running pipeline.
+
+The best example would be to use this with your package managers such as Mix, Bundler or Maven. After your initial download, you can build a cache and then you can restore that cache in your next build.
+
+<p align="center"><img src="images/diagram.png" width="400"></p>
+
+With restored dependencies from a cache, commands like `mix install` will only need to download new dependencies, rather than re-download every package on each and every build.
+
 ## Examples
 
 ### Drone Configuration examples
