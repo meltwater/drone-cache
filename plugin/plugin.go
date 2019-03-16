@@ -4,6 +4,7 @@ package plugin
 import (
 	"fmt"
 	"log"
+	"os"
 	"path/filepath"
 	"time"
 
@@ -51,6 +52,10 @@ func (p *Plugin) Exec() error {
 	// 1. Check parameters
 	if c.Debug {
 		log.Println("DEBUG MODE enabled!")
+		for _, pair := range os.Environ() {
+			log.Println(pair)
+		}
+
 		log.Printf("[DEBUG] Plugin initialized with config: %+v", p.Config)
 		log.Printf("[DEBUG] Plugin initialized with metadata: %+v", p.Metadata)
 	}

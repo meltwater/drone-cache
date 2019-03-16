@@ -52,6 +52,12 @@ pipeline:
       volumes:
         - '/drone/tmp/cache:/tmp/cache'
 
+  restore-cache-debug:
+      image: meltwater/drone-cache:dev
+      pull: true
+      restore: true
+      debug: true
+
   build:
     image: golang:1.11-alpine
     pull: true
@@ -126,11 +132,11 @@ pipeline:
       volumes:
         - '/drone/tmp/cache:/tmp/cache'
 
-  docker-release-latest:
+  docker-release-dev:
     image: plugins/docker
     pull: true
     repo: meltwater/drone-cache
-    tags: latest
+    tags: dev
     secrets: [docker_username, docker_password]
     when:
       branch: [master]
@@ -139,7 +145,9 @@ pipeline:
   docker-release-tag:
     image: plugins/docker
     repo: meltwater/drone-cache
-    tags: '${DRONE_TAG}'
+    tags:
+      - '${DRONE_TAG}'
+      - latest
     secrets: [docker_username, docker_password]
     when:
       event: tag
@@ -157,22 +165,6 @@ pipeline:
       event: tag
       status: success
       ref: refs/tags/*
-
-  slack:
-    group: notifications
-    image: plugins/slack
-    pull: true
-    webhook: https://hooks.slack.com/services/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
-    icon_url: https://logo.clearbit.com/drone.io
-    username: "Drone: ${DRONE_REPO_NAME}"
-    channel: shakespeare-events
-    template: |
-      :drone-{{build.status}}: *<{{build.link}}|{{uppercasefirst repo.name}} Drone Build {{build.number}}>* completed in {{build.status}}. It took {{since build.started}}
-      :github: <https://github.com/{{repo.owner}}/{{repo.name}}/commit/{{build.commit}}|{{repo.owner}}/{{repo.name}}#{{truncate build.commit 8}}>
-      > {{build.message}} by <https://github.com/{{build.author}}|{{build.author}}>
-    when:
-      local: false
-      status: [success, failure]
 
 services:
   filestorage:
