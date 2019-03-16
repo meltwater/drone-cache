@@ -55,7 +55,6 @@ pipeline:
   restore-cache-debug:
       image: meltwater/drone-cache:dev
       pull: true
-      backend: "filesystem"
       restore: true
       debug: true
 
