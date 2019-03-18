@@ -132,16 +132,6 @@ pipeline:
       volumes:
         - '/drone/tmp/cache:/tmp/cache'
 
-  docker-release-dev:
-    image: plugins/docker
-    pull: true
-    repo: meltwater/drone-cache
-    tags: dev
-    secrets: [docker_username, docker_password]
-    when:
-      branch: [master]
-      event: [push]
-
   docker-release-tag:
     image: plugins/docker
     repo: meltwater/drone-cache
