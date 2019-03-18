@@ -4,7 +4,9 @@
 
 <p align="center"><img src="images/drone_gopher.png" width="400"></p>
 
-A Drone plugin for caching current workspace files between builds to reduce your build times. You can provide your own cache key templates, specify archive format and you can use an S3 bucket or a mounted volume as storage for your cached files.
+A Drone plugin for caching current workspace files between builds to reduce your build times. `drone-cache` is a small CLI program, written in Go without any external OS dependencies (such as tar, etc).
+
+With `drone-cache`, you can provide your **own cache key templates**, specify **archive format** (tar, tar.gz, etc) and you can use **an S3 bucket or a mounted volume** as storage for your cached files, even better you can implement **your own storage backend** to cover your use case.
 
 For the detailed usage information and a list of the available options please take a look at [usage](#usage) and checkout [examples](#examples). If you want to learn more about custom cache keys, see [cache key templates](docs/cache_key_templates.md).
 

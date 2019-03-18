@@ -145,9 +145,8 @@ pipeline:
   docker-release-tag:
     image: plugins/docker
     repo: meltwater/drone-cache
-    tags:
-      - '${DRONE_TAG}'
-      - latest
+    tags: '${DRONE_TAG}'
+    auto_tag: true
     secrets: [docker_username, docker_password]
     when:
       event: tag
