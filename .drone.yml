@@ -107,7 +107,7 @@ steps:
   pull: true
   image: golang:1.11-alpine
   commands:
-  - "wget -O - -q https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh| sh -s v1.14.0"
+  - "wget -O - -q https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s v1.14.0"
   - ./bin/golangci-lint run -v --enable-all -D gochecknoglobals
   environment:
     CGO_ENABLED: 0
@@ -189,7 +189,7 @@ steps:
     - tag
     - push
     ref:
-    - "refs/tags/*"
+    - refs/tags/*
 
 - name: github-release-tag
   image: golang:1.11
@@ -205,7 +205,7 @@ steps:
     - tag
     - push
     ref:
-    - "refs/tags/*"
+    - refs/tags/*
 
 services:
 - name: filestorage
@@ -230,7 +230,7 @@ trigger:
   - master
   - issues
   event:
-  - push
+  # - push
   - pull_request
   - tag
 
