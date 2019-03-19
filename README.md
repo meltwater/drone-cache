@@ -26,8 +26,6 @@ With restored dependencies from a cache, commands like `mix deps.get` will only 
 
 ### Drone Configuration examples
 
-> The example Yaml configurations in this file are using the legacy 0.8 syntax. If you are using Drone 1.0 or Drone Cloud please ensure you use the appropriate 1.0 syntax. [Learn more here](https://docs.drone.io/config/pipeline/migrating/#plugins).
-
 The following is a sample configuration in your `.drone.yml` file:
 
 #### Simple
