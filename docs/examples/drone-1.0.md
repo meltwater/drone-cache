@@ -14,15 +14,15 @@ name: default
 steps:
   - name: restore-cache
     image: meltwater/drone-cache:dev
+    environment:
+      AWS_ACCESS_KEY_ID:
+        from_secret: aws_access_key_id
+      AWS_SECRET_ACCESS_KEY:
+        from_secret: aws_secret_access_key
     pull: true
     settings:
       restore: true
       bucket: drone-cache-bucket
-      settings:
-      aws_access_key_id:
-        from_secret: aws_access_key_id
-      aws_secret_access_key:
-        from_secret: aws_secret_access_key
       region: eu-west-1
       mount:
         - 'vendor'
@@ -37,13 +37,14 @@ steps:
   - name: rebuild-cache
     image: meltwater/drone-cache:dev
     pull: true
+    environment:
+      AWS_ACCESS_KEY_ID:
+        from_secret: aws_access_key_id
+      AWS_SECRET_ACCESS_KEY:
+        from_secret: aws_secret_access_key
     settings:
       rebuild: true
       bucket: drone-cache-bucket
-      aws_access_key_id:
-        from_secret: aws_access_key_id
-      aws_secret_access_key:
-        from_secret: aws_secret_access_key
       region: eu-west-1
       mount:
         - 'vendor'
@@ -56,18 +57,69 @@ kind: pipeline
 name: default
 
 steps:
-  - name: restore-cache
+  - name: restore-cache-with-filesystem
     image: meltwater/drone-cache:dev
     pull: true
     settings:
+      backend: "filesystem"
       restore: true
-      backend: "filesystem" # (default: s3)
-      bucket: drone-cache-bucket
-      settings:
-      aws_access_key_id:
+      cache_key: "volume"
+      archive_format: "gzip"
+      # filesystem_cache_root: "/tmp/cache"
+      mount:
+        - 'vendor'
+    volumes:
+    - name: cache
+      path: /tmp/cache
+
+  - name: build
+    image: golang:1.11-alpine
+    pull: true
+    commands:
+      - apk add --update make git
+      - make drone-cache
+
+  - name: rebuild-cache-with-filesystem
+    image: meltwater/drone-cache:dev
+    pull: true
+    settings:
+      backend: "filesystem"
+      rebuild: true
+      cache_key: "volume"
+      archive_format: "gzip"
+      # filesystem_cache_root: "/tmp/cache"
+      mount:
+        - 'vendor'
+    volumes:
+    - name: cache
+      path: /tmp/cache
+
+volumes:
+  - name: cache
+    temp: {}
+```
+
+### With custom cache key template
+
+See [cache key templates](#cache-key-templates) section for further information and to learn about syntax.
+
+```yaml
+kind: pipeline
+name: default
+
+steps:
+  - name: restore-cache-with-key
+    image: meltwater/drone-cache:dev
+    environment:
+      AWS_ACCESS_KEY_ID:
         from_secret: aws_access_key_id
-      aws_secret_access_key:
+      AWS_SECRET_ACCESS_KEY:
         from_secret: aws_secret_access_key
+    settings:
+      pull: true
+      restore: true
+      cache_key: '{{ .Repo.Name }}_{{ checksum "go.mod" }}_{{ checksum "go.sum" }}_{{ arch }}_{{ os }}'
+      bucket: drone-cache-bucket
       region: eu-west-1
       mount:
         - 'vendor'
@@ -79,133 +131,97 @@ steps:
       - apk add --update make git
       - make drone-cache
 
-  - name: rebuild-cache
+  - name: rebuild-cache-with-key
     image: meltwater/drone-cache:dev
     pull: true
+    environment:
+      AWS_ACCESS_KEY_ID:
+        from_secret: aws_access_key_id
+      AWS_SECRET_ACCESS_KEY:
+        from_secret: aws_secret_access_key
     settings:
       rebuild: true
-      backend: "filesystem" # (default: s3)
+      cache_key: '{{ .Repo.Name }}_{{ checksum "go.mod" }}_{{ checksum "go.sum" }}_{{ arch }}_{{ os }}'
       bucket: drone-cache-bucket
-      aws_access_key_id:
-        from_secret: aws_access_key_id
-      aws_secret_access_key:
-        from_secret: aws_secret_access_key
       region: eu-west-1
       mount:
         - 'vendor'
 ```
 
-### With custom cache key prefix template
-
-See [cache key templates](#cache-key-templates) section for further information and to learn about syntax.
-
-```yaml
-pipeline:
-  restore-cache:
-    image: meltwater/drone-cache
-    pull: true
-    restore: true
-    cache_key: "{{ .Repo.Name }}_{{ .Commit.Branch }}_{{ .Build.Number }}"
-    bucket: drone-cache-bucket
-    region: eu-west-1
-    secrets: [aws_access_key_id, aws_secret_access_key]
-    mount:
-      - 'deps'
-      - '_dialyzer'
-
-deps:
-    image: elixir:1.6.5
-    pull: true
-    commands:
-      - mix local.hex --force
-      - mix local.rebar --force
-      - mix deps.get
-      - mix dialyzer --halt-exit-status
-
-rebuild-deps-cache:
-    image: meltwater/drone-cache
-    pull: true
-    rebuild: true
-    cache_key: "{{ .Repo.Name }}_{{ .Commit.Branch }}_{{ .Build.Number }}"
-    bucket: drone-cache-bucket
-    region: eu-west-1
-    secrets: [aws_access_key_id, aws_secret_access_key]
-    mount:
-      - 'deps'
-```
-
 ### With gzip compression
 
 ```yaml
-pipeline:
-  restore-cache:
-    image: meltwater/drone-cache
-    pull: true
-    restore: true
-    cache_key: "{{ .Repo.Name }}_{{ .Commit.Branch }}_{{ .Build.Number }}"
-    archive_format: "gzip"
-    bucket: drone-cache-bucket
-    region: eu-west-1
-    secrets: [aws_access_key_id, aws_secret_access_key]
-    mount:
-      - 'deps'
-      - '_dialyzer'
+kind: pipeline
+name: default
 
-deps:
-    image: elixir:1.6.5
+steps:
+  - name: restore-cache-with-gzip
+    image: meltwater/drone-cache:dev
+    pull: true
+    environment:
+      AWS_ACCESS_KEY_ID:
+        from_secret: aws_access_key_id
+      AWS_SECRET_ACCESS_KEY:
+        from_secret: aws_secret_access_key
+    settings:
+      restore: true
+      cache_key: "gzip"
+      archive_format: "gzip"
+      bucket: drone-cache-bucket
+      region: eu-west-1
+      mount:
+        - 'vendor'
+
+  - name: build
+    image: golang:1.11-alpine
     pull: true
     commands:
-      - mix local.hex --force
-      - mix local.rebar --force
-      - mix deps.get
-      - mix dialyzer --halt-exit-status
+      - apk add --update make git
+      - make drone-cache
 
-rebuild-deps-cache:
-    image: meltwater/drone-cache
+  - name: rebuild-cache-with-gzip
+    image: meltwater/drone-cache:dev
     pull: true
-    rebuild: true
-    cache_key: "{{ .Repo.Name }}_{{ .Commit.Branch }}_{{ .Build.Number }}"
-    archive_format: "gzip"
-    bucket: drone-cache-bucket
-    region: eu-west-1
-    secrets: [aws_access_key_id, aws_secret_access_key]
-    mount:
-      - 'deps'
+    environment:
+      AWS_ACCESS_KEY_ID:
+        from_secret: aws_access_key_id
+      AWS_SECRET_ACCESS_KEY:
+        from_secret: aws_secret_access_key
+    settings:
+      rebuild: true
+      cache_key: "gzip"
+      archive_format: "gzip"
+      bucket: drone-cache-bucket
+      region: eu-west-1
+      mount:
+        - 'vendor'
 ```
 
 ### Debug
 
 ```yaml
-pipeline:
-  restore-cache:
-    image: meltwater/drone-cache
-    pull: true
-    restore: true
-    debug: true
-    bucket: drone-cache-bucket
-    region: eu-west-1
-    secrets: [aws_access_key_id, aws_secret_access_key]
-    mount:
-      - 'deps'
-      - '_dialyzer'
+kind: pipeline
+name: default
 
-deps:
-    image: elixir:1.6.5
+steps:
+  - name: restore-cache-debug
+    image: meltwater/drone-cache:dev
+    settings:
+      pull: true
+      restore: true
+      debug: true
+
+  - name: build
+    image: golang:1.11-alpine
     pull: true
     commands:
-      - mix local.hex --force
-      - mix local.rebar --force
-      - mix deps.get
-      - mix dialyzer --halt-exit-status
+      - apk add --update make git
+      - make drone-cache
 
-rebuild-deps-cache:
-    image: meltwater/drone-cache
-    pull: true
-    rebuild: true
-    debug: true
-    bucket: drone-cache-bucket
-    region: eu-west-1
-    secrets: [aws_access_key_id, aws_secret_access_key]
-    mount:
-      - 'deps'
+  - name: restore-cache-debug
+    image: meltwater/drone-cache:dev
+    settings:
+      pull: true
+      rebuild: true
+      debug: true
 ```

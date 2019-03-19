@@ -59,9 +59,9 @@
 
 ## Before v1.0.0
 
-- [ ] Improve documentation
+- [x] Improve documentation
   - [x] Examples
-  - [ ] Drone 1.0 examples
+  - [x] Drone 1.0 examples
 - [x] Inspiration reference
     - https://github.com/bsm/drone-s3-cache
     - https://github.com/Drillster/drone-volume-cache

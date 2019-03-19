@@ -37,15 +37,15 @@ name: default
 steps:
   - name: restore-cache
     image: meltwater/drone-cache:dev
+    environment:
+      AWS_ACCESS_KEY_ID:
+        from_secret: aws_access_key_id
+      AWS_SECRET_ACCESS_KEY:
+        from_secret: aws_secret_access_key
     pull: true
     settings:
       restore: true
       bucket: drone-cache-bucket
-      settings:
-      aws_access_key_id:
-        from_secret: aws_access_key_id
-      aws_secret_access_key:
-        from_secret: aws_secret_access_key
       region: eu-west-1
       mount:
         - 'vendor'
@@ -60,16 +60,18 @@ steps:
   - name: rebuild-cache
     image: meltwater/drone-cache:dev
     pull: true
+    environment:
+      AWS_ACCESS_KEY_ID:
+        from_secret: aws_access_key_id
+      AWS_SECRET_ACCESS_KEY:
+        from_secret: aws_secret_access_key
     settings:
       rebuild: true
       bucket: drone-cache-bucket
-      aws_access_key_id:
-        from_secret: aws_access_key_id
-      aws_secret_access_key:
-        from_secret: aws_secret_access_key
       region: eu-west-1
       mount:
         - 'vendor'
+
 ```
 
 #### Simple (Filesystem/Volume)
@@ -79,21 +81,20 @@ kind: pipeline
 name: default
 
 steps:
-  - name: restore-cache
+  - name: restore-cache-with-filesystem
     image: meltwater/drone-cache:dev
     pull: true
     settings:
+      backend: "filesystem"
       restore: true
-      backend: "filesystem" # (default: s3)
-      bucket: drone-cache-bucket
-      settings:
-      aws_access_key_id:
-        from_secret: aws_access_key_id
-      aws_secret_access_key:
-        from_secret: aws_secret_access_key
-      region: eu-west-1
+      cache_key: "volume"
+      archive_format: "gzip"
+      # filesystem_cache_root: "/tmp/cache"
       mount:
         - 'vendor'
+    volumes:
+    - name: cache
+      path: /tmp/cache
 
   - name: build
     image: golang:1.11-alpine
@@ -102,23 +103,24 @@ steps:
       - apk add --update make git
       - make drone-cache
 
-  - name: rebuild-cache
+  - name: rebuild-cache-with-filesystem
     image: meltwater/drone-cache:dev
     pull: true
     settings:
+      backend: "filesystem"
       rebuild: true
-      backend: "filesystem" # (default: s3)
-      bucket: drone-cache-bucket
-      aws_access_key_id:
-        from_secret: aws_access_key_id
-      aws_secret_access_key:
-        from_secret: aws_secret_access_key
-      region: eu-west-1
+      cache_key: "volume"
+      archive_format: "gzip"
+      # filesystem_cache_root: "/tmp/cache"
       mount:
         - 'vendor'
+    volumes:
+    - name: cache
+      path: /tmp/cache
 ```
 
 ### For more examples for Drone 0.8, see [docs/examples/drone-0.8.md](docs/examples/drone-0.8.md)
+
 ### For more examples for Drone 1.0, see [docs/examples//drone-1.0.md](docs/examples/drone-1.0.md)
 
 ## Usage
