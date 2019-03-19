@@ -1,6 +1,6 @@
 ---
 kind: pipeline
-name: default
+name: build
 
 platform:
   os: linux
@@ -174,39 +174,6 @@ steps:
   - name: cache
     path: /tmp/cache
 
-- name: docker-release-tag
-  image: plugins/docker
-  settings:
-    auto_tag: true
-    docker_password:
-      from_secret: docker_password
-    docker_username:
-      from_secret: docker_username
-    repo: meltwater/drone-cache
-    tags: "${DRONE_TAG}"
-  when:
-    event:
-    - tag
-    - push
-    ref:
-    - refs/tags/*
-
-- name: github-release-tag
-  image: golang:1.11
-  commands:
-  - git status
-  - "curl -sL https://git.io/goreleaser | bash"
-  - git status
-  environment:
-    github_token:
-      from_secret: github_token
-  when:
-    event:
-    - tag
-    - push
-    ref:
-    - refs/tags/*
-
 services:
 - name: filestorage
   image: minio/minio:RELEASE.2018-10-06T00-15-16Z
@@ -230,8 +197,63 @@ trigger:
   - master
   - issues
   event:
-  # - push
+  - push
   - pull_request
   - tag
+
+---
+kind: pipeline
+name: release
+
+platform:
+  os: linux
+  arch: amd64
+
+steps:
+- name: docker-release-tag
+  image: plugins/docker
+  settings:
+    auto_tag: true
+    docker_password:
+      from_secret: docker_password
+    docker_username:
+      from_secret: docker_username
+    repo: meltwater/drone-cache
+    tags: "${DRONE_TAG}"
+  # when:
+  #   event:
+  #   - tag
+  #   - push
+  #   ref:
+  #   - "refs/tags/*"
+
+- name: github-release-tag
+  image: golang:1.11
+  commands:
+  - git status
+  - "curl -sL https://git.io/goreleaser | bash"
+  - git status
+  environment:
+    github_token:
+      from_secret: github_token
+  # when:
+  #   event:
+  #   - tag
+  #   - push
+  #   ref:
+  #   - "refs/tags/*"
+
+trigger:
+  branch:
+  - master
+  - issues
+  event:
+  - push
+  - tag
+  status:
+  - success
+
+depends_on:
+- build
 
 ...
