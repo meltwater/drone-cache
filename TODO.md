@@ -65,7 +65,7 @@
 - [x] Inspiration reference
     - https://github.com/bsm/drone-s3-cache
     - https://github.com/Drillster/drone-volume-cache
-- [ ] Send to https://github.com/drone/drone-plugin-index
+- [x] Send to https://github.com/drone/drone-plugin-index
 
 ## Road to Open Source
 

@@ -1,4 +1,3 @@
-
 # Drone 0.8 Examples
 
 ## Drone Configuration examples
