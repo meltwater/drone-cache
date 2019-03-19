@@ -191,6 +191,7 @@ steps:
       docker_password:
         from_secret: docker_password
     when:
+      event: tag
       ref:
         - refs/tags/v*
 
@@ -204,6 +205,7 @@ steps:
       - curl -sL https://git.io/goreleaser | bash
       - git status
     when:
+      event: tag
       ref:
         - refs/tags/v*
 
