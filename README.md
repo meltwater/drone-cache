@@ -33,82 +33,95 @@ The following is a sample configuration in your `.drone.yml` file:
 #### Simple
 
 ```yaml
-pipeline:
-  restore-cache:
-    image: meltwater/drone-cache
-    pull: true
-    # backend: "s3" (default)
-    restore: true
-    bucket: drone-cache-bucket
-    region: eu-west-1
-    secrets: [aws_access_key_id, aws_secret_access_key]
-    mount:
-      - 'deps'
-      - '_dialyzer'
+kind: pipeline
+name: default
 
-  deps:
-    image: elixir:1.6.5
+steps:
+  - name: restore-cache
+    image: meltwater/drone-cache:dev
+    pull: true
+    settings:
+      restore: true
+      bucket: drone-cache-bucket
+      settings:
+      aws_access_key_id:
+        from_secret: aws_access_key_id
+      aws_secret_access_key:
+        from_secret: aws_secret_access_key
+      region: eu-west-1
+      mount:
+        - 'vendor'
+
+  - name: build
+    image: golang:1.11-alpine
     pull: true
     commands:
-      - mix local.hex --force
-      - mix local.rebar --force
-      - mix deps.get
-      - mix dialyzer --halt-exit-status
+      - apk add --update make git
+      - make drone-cache
 
-rebuild-deps-cache:
-    image: meltwater/drone-cache
+  - name: rebuild-cache
+    image: meltwater/drone-cache:dev
     pull: true
-    # backend: "s3" (default)
-    rebuild: true
-    bucket: drone-cache-bucket
-    region: eu-west-1
-    secrets: [aws_access_key_id, aws_secret_access_key]
-    mount:
-      - 'deps'
+    settings:
+      rebuild: true
+      bucket: drone-cache-bucket
+      aws_access_key_id:
+        from_secret: aws_access_key_id
+      aws_secret_access_key:
+        from_secret: aws_secret_access_key
+      region: eu-west-1
+      mount:
+        - 'vendor'
 ```
 
 #### Simple (Filesystem/Volume)
 
 ```yaml
-pipeline:
-  restore-cache:
-    image: meltwater/drone-cache
-    pull: true
-    backend: "filesystem" # (default: s3)
-    restore: true
-    bucket: drone-cache-bucket
-    region: eu-west-1
-    secrets: [aws_access_key_id, aws_secret_access_key]
-    mount:
-      - 'deps'
-      - '_dialyzer'
-    volumes:
-        - '/drone/tmp/cache:/tmp/cache'
+kind: pipeline
+name: default
 
-  deps:
-    image: elixir:1.6.5
+steps:
+  - name: restore-cache
+    image: meltwater/drone-cache:dev
+    pull: true
+    settings:
+      restore: true
+      backend: "filesystem" # (default: s3)
+      bucket: drone-cache-bucket
+      settings:
+      aws_access_key_id:
+        from_secret: aws_access_key_id
+      aws_secret_access_key:
+        from_secret: aws_secret_access_key
+      region: eu-west-1
+      mount:
+        - 'vendor'
+
+  - name: build
+    image: golang:1.11-alpine
     pull: true
     commands:
-      - mix local.hex --force
-      - mix local.rebar --force
-      - mix deps.get
-      - mix dialyzer --halt-exit-status
+      - apk add --update make git
+      - make drone-cache
 
-rebuild-deps-cache:
-    image: meltwater/drone-cache
+  - name: rebuild-cache
+    image: meltwater/drone-cache:dev
     pull: true
-    backend: "filesystem" # (default: s3)
-    rebuild: true
-    bucket: drone-cache-bucket
-    region: eu-west-1
-    secrets: [aws_access_key_id, aws_secret_access_key]
-    mount:
-      - 'deps'
-    volumes:
-        - '/drone/tmp/cache:/tmp/cache'
+    settings:
+      rebuild: true
+      backend: "filesystem" # (default: s3)
+      bucket: drone-cache-bucket
+      aws_access_key_id:
+        from_secret: aws_access_key_id
+      aws_secret_access_key:
+        from_secret: aws_secret_access_key
+      region: eu-west-1
+      mount:
+        - 'vendor'
 ```
 
-### For more examples see [docs/examples](docs/examples.md)
+### For more examples for Drone 0.8, see [docs/examples/drone-0.8.md](docs/examples/drone-0.8.md)
+### For more examples for Drone 1.0, see [docs/examples//drone-1.0.md](docs/examples/drone-1.0.md)
 
 ## Usage
 
