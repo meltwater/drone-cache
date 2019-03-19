@@ -490,7 +490,7 @@ func removeAllObjects(minioClient *minio.Client, bucketName string) error {
 				return fmt.Errorf("remove all objects failed, %v", err)
 			}
 		case err, open := <-errors:
-			if !open { // Unlikely to happend, I guess, still learning!
+			if !open {
 				return nil
 			}
 			return fmt.Errorf("remove all objects failed, while fetching %v", err)
