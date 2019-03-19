@@ -243,7 +243,6 @@ steps:
 trigger:
   branch:
   - master
-  - issues
   event:
   - push
   - tag
