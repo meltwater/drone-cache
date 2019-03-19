@@ -1,5 +1,4 @@
-
-# Examples
+# Drone 0.8 Examples
 
 ## Drone Configuration examples
 
@@ -85,7 +84,7 @@ rebuild-deps-cache:
         - '/drone/tmp/cache:/tmp/cache'
 ```
 
-### With custom cache key prefix template
+### With custom cache key template
 
 See [cache key templates](#cache-key-templates) section for further information and to learn about syntax.
 

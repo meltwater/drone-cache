@@ -59,13 +59,13 @@
 
 ## Before v1.0.0
 
-- [ ] Improve documentation
+- [x] Improve documentation
   - [x] Examples
-  - [ ] Drone 1.0 examples
+  - [x] Drone 1.0 examples
 - [x] Inspiration reference
     - https://github.com/bsm/drone-s3-cache
     - https://github.com/Drillster/drone-volume-cache
-- [ ] Send to https://github.com/drone/drone-plugin-index
+- [x] Send to https://github.com/drone/drone-plugin-index
 
 ## Road to Open Source
 
@@ -74,8 +74,8 @@
 - [x] Update LICENCE
 - [x] Project artwork
 - [x] Improve README
-- [ ] Open Source :tada:
-- [ ] Add public CI/CD (https://cloud.drone.io/)
+- [x] Open Source :tada:
+- [x] Add public CI/CD (https://cloud.drone.io/)
 
 ## Future work
 

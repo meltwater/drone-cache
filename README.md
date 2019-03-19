@@ -1,6 +1,6 @@
 
 # drone-cache
-[![semver](https://img.shields.io/badge/semver-1.0.0-blue.svg?cacheSeconds=2592000)](https://github.com/meltwater/drone-cache/releases) [![Maintenance](https://img.shields.io/maintenance/yes/2019.svg)](https://github.com/meltwater/drone-cache/commits/master) [![Drone](https://drone.meltwater.io/api/badges/meltwater/drone-cache/status.svg)](https://drone.meltwater.io/meltwater/drone-cache) [![Go Doc](https://godoc.org/github.com/meltwater/drone-cache?status.svg)](http://godoc.org/github.com/meltwater/drone-cache) [![Go Report Card](https://goreportcard.com/badge/github.com/meltwater/drone-cache)](https://goreportcard.com/report/github.com/meltwater/drone-cache) [![](https://images.microbadger.com/badges/image/meltwater/drone-cache.svg)](https://microbadger.com/images/meltwater/drone-cache) [![](https://images.microbadger.com/badges/version/meltwater/drone-cache.svg)](https://microbadger.com/images/meltwater/drone-cache)
+[![semver](https://img.shields.io/badge/semver-1.0.0-blue.svg?cacheSeconds=2592000)](https://github.com/meltwater/drone-cache/releases) [![Maintenance](https://img.shields.io/maintenance/yes/2019.svg)](https://github.com/meltwater/drone-cache/commits/master) [![Drone](https://cloud.drone.io/api/badges/meltwater/drone-cache/status.svg)](https://cloud.drone.io/meltwater/drone-cache) [![Go Doc](https://godoc.org/github.com/meltwater/drone-cache?status.svg)](http://godoc.org/github.com/meltwater/drone-cache) [![Go Report Card](https://goreportcard.com/badge/github.com/meltwater/drone-cache)](https://goreportcard.com/report/github.com/meltwater/drone-cache) [![](https://images.microbadger.com/badges/image/meltwater/drone-cache.svg)](https://microbadger.com/images/meltwater/drone-cache) [![](https://images.microbadger.com/badges/version/meltwater/drone-cache.svg)](https://microbadger.com/images/meltwater/drone-cache)
 
 <p align="center"><img src="images/drone_gopher.png" width="400"></p>
 
@@ -26,89 +26,102 @@ With restored dependencies from a cache, commands like `mix deps.get` will only 
 
 ### Drone Configuration examples
 
-> The example Yaml configurations in this file are using the legacy 0.8 syntax. If you are using Drone 1.0 or Drone Cloud please ensure you use the appropriate 1.0 syntax. [Learn more here](https://docs.drone.io/config/pipeline/migrating/#plugins).
-
 The following is a sample configuration in your `.drone.yml` file:
 
 #### Simple
 
 ```yaml
-pipeline:
-  restore-cache:
-    image: meltwater/drone-cache
-    pull: true
-    # backend: "s3" (default)
-    restore: true
-    bucket: drone-cache-bucket
-    region: eu-west-1
-    secrets: [aws_access_key_id, aws_secret_access_key]
-    mount:
-      - 'deps'
-      - '_dialyzer'
+kind: pipeline
+name: default
 
-  deps:
-    image: elixir:1.6.5
+steps:
+  - name: restore-cache
+    image: meltwater/drone-cache:dev
+    environment:
+      AWS_ACCESS_KEY_ID:
+        from_secret: aws_access_key_id
+      AWS_SECRET_ACCESS_KEY:
+        from_secret: aws_secret_access_key
+    pull: true
+    settings:
+      restore: true
+      bucket: drone-cache-bucket
+      region: eu-west-1
+      mount:
+        - 'vendor'
+
+  - name: build
+    image: golang:1.11-alpine
     pull: true
     commands:
-      - mix local.hex --force
-      - mix local.rebar --force
-      - mix deps.get
-      - mix dialyzer --halt-exit-status
+      - apk add --update make git
+      - make drone-cache
 
-rebuild-deps-cache:
-    image: meltwater/drone-cache
+  - name: rebuild-cache
+    image: meltwater/drone-cache:dev
     pull: true
-    # backend: "s3" (default)
-    rebuild: true
-    bucket: drone-cache-bucket
-    region: eu-west-1
-    secrets: [aws_access_key_id, aws_secret_access_key]
-    mount:
-      - 'deps'
+    environment:
+      AWS_ACCESS_KEY_ID:
+        from_secret: aws_access_key_id
+      AWS_SECRET_ACCESS_KEY:
+        from_secret: aws_secret_access_key
+    settings:
+      rebuild: true
+      bucket: drone-cache-bucket
+      region: eu-west-1
+      mount:
+        - 'vendor'
+
 ```
 
 #### Simple (Filesystem/Volume)
 
 ```yaml
-pipeline:
-  restore-cache:
-    image: meltwater/drone-cache
-    pull: true
-    backend: "filesystem" # (default: s3)
-    restore: true
-    bucket: drone-cache-bucket
-    region: eu-west-1
-    secrets: [aws_access_key_id, aws_secret_access_key]
-    mount:
-      - 'deps'
-      - '_dialyzer'
-    volumes:
-        - '/drone/tmp/cache:/tmp/cache'
+kind: pipeline
+name: default
 
-  deps:
-    image: elixir:1.6.5
+steps:
+  - name: restore-cache-with-filesystem
+    image: meltwater/drone-cache:dev
+    pull: true
+    settings:
+      backend: "filesystem"
+      restore: true
+      cache_key: "volume"
+      archive_format: "gzip"
+      # filesystem_cache_root: "/tmp/cache"
+      mount:
+        - 'vendor'
+    volumes:
+    - name: cache
+      path: /tmp/cache
+
+  - name: build
+    image: golang:1.11-alpine
     pull: true
     commands:
-      - mix local.hex --force
-      - mix local.rebar --force
-      - mix deps.get
-      - mix dialyzer --halt-exit-status
+      - apk add --update make git
+      - make drone-cache
 
-rebuild-deps-cache:
-    image: meltwater/drone-cache
+  - name: rebuild-cache-with-filesystem
+    image: meltwater/drone-cache:dev
     pull: true
-    backend: "filesystem" # (default: s3)
-    rebuild: true
-    bucket: drone-cache-bucket
-    region: eu-west-1
-    secrets: [aws_access_key_id, aws_secret_access_key]
-    mount:
-      - 'deps'
+    settings:
+      backend: "filesystem"
+      rebuild: true
+      cache_key: "volume"
+      archive_format: "gzip"
+      # filesystem_cache_root: "/tmp/cache"
+      mount:
+        - 'vendor'
     volumes:
-        - '/drone/tmp/cache:/tmp/cache'
+    - name: cache
+      path: /tmp/cache
 ```
 
-### For more examples see [docs/examples](docs/examples.md)
+### For more examples for Drone 0.8, see [docs/examples/drone-0.8.md](docs/examples/drone-0.8.md)
+
+### For more examples for Drone 1.0, see [docs/examples//drone-1.0.md](docs/examples/drone-1.0.md)
 
 ## Usage
 
