@@ -221,4 +221,4 @@ services:
       MINIO_REGION: eu-west-1
     commands:
       - minio server /data
-    # ports: [9000]
+    ports: [9000]
