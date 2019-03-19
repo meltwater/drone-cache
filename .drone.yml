@@ -195,11 +195,9 @@ volumes:
 trigger:
   branch:
   - master
-  - issues
   event:
   - push
   - pull_request
-  - tag
 
 ---
 kind: pipeline
@@ -210,6 +208,11 @@ platform:
   arch: amd64
 
 steps:
+- name: fetch
+  image: docker:git
+  commands:
+  - git fetch --tags
+
 - name: docker-release-tag
   image: plugins/docker
   settings:
@@ -220,12 +223,6 @@ steps:
       from_secret: docker_username
     repo: meltwater/drone-cache
     tags: "${DRONE_TAG}"
-  # when:
-  #   event:
-  #   - tag
-  #   - push
-  #   ref:
-  #   - "refs/tags/*"
 
 - name: github-release-tag
   image: golang:1.11
@@ -236,19 +233,12 @@ steps:
   environment:
     github_token:
       from_secret: github_token
-  # when:
-  #   event:
-  #   - tag
-  #   - push
-  #   ref:
-  #   - "refs/tags/*"
 
 trigger:
   branch:
   - master
   - issues
   event:
-  - push
   - tag
   status:
   - success
