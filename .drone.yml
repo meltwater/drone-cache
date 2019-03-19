@@ -219,6 +219,6 @@ services:
       MINIO_ACCESS_KEY: AKIAIOSFODNN7EXAMPLE
       MINIO_SECRET_KEY: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
       MINIO_REGION: eu-west-1
-    # entrypoint: [minio/minio]
-    # commands: [server, /data]
+    commands:
+      - server /data
     # ports: [9000]
