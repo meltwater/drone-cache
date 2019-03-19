@@ -1,227 +1,237 @@
+---
 kind: pipeline
 name: default
+
+platform:
+  os: linux
+  arch: amd64
 
 clone:
   depth: 50
 
-trigger:
-  branch:
-    - master
-    - issues
-  event:
-    - push
-    - pull_request
-    - tag
-
 steps:
-  - name: fetch
-    image: docker:git
-    commands:
-    - git fetch --tags
+- name: fetch
+  image: docker:git
+  commands:
+  - git fetch --tags
 
-  - name: restore-cache
-    image: meltwater/drone-cache:dev
-    environment:
-      AWS_ACCESS_KEY_ID:
-        from_secret: aws_access_key_id
-      AWS_SECRET_ACCESS_KEY:
-        from_secret: aws_secret_access_key
+- name: restore-cache
+  pull: true
+  image: meltwater/drone-cache:dev
+  settings:
+    bucket: drone-cache-bucket
+    mount:
+    - vendor
+    region: eu-west-1
+    restore: true
+  environment:
+    AWS_ACCESS_KEY_ID:
+      from_secret: aws_access_key_id
+    AWS_SECRET_ACCESS_KEY:
+      from_secret: aws_secret_access_key
+
+- name: restore-cache-with-key
+  image: meltwater/drone-cache:dev
+  settings:
+    bucket: drone-cache-bucket
+    cache_key: "{{ .Repo.Name }}_{{ checksum \"go.mod\" }}_{{ checksum \"go.sum\" }}_{{ arch }}_{{ os }}"
+    mount:
+    - vendor
     pull: true
-    settings:
-      restore: true
-      bucket: drone-cache-bucket
-      region: eu-west-1
-      mount:
-        - 'vendor'
+    region: eu-west-1
+    restore: true
+  environment:
+    AWS_ACCESS_KEY_ID:
+      from_secret: aws_access_key_id
+    AWS_SECRET_ACCESS_KEY:
+      from_secret: aws_secret_access_key
 
-  - name: restore-cache-with-key
-    image: meltwater/drone-cache:dev
-    environment:
-      AWS_ACCESS_KEY_ID:
-        from_secret: aws_access_key_id
-      AWS_SECRET_ACCESS_KEY:
-        from_secret: aws_secret_access_key
-    settings:
-      pull: true
-      restore: true
-      cache_key: '{{ .Repo.Name }}_{{ checksum "go.mod" }}_{{ checksum "go.sum" }}_{{ arch }}_{{ os }}'
-      bucket: drone-cache-bucket
-      region: eu-west-1
-      mount:
-        - 'vendor'
+- name: restore-cache-with-gzip
+  pull: true
+  image: meltwater/drone-cache:dev
+  settings:
+    archive_format: gzip
+    bucket: drone-cache-bucket
+    cache_key: gzip
+    mount:
+    - vendor
+    region: eu-west-1
+    restore: true
+  environment:
+    AWS_ACCESS_KEY_ID:
+      from_secret: aws_access_key_id
+    AWS_SECRET_ACCESS_KEY:
+      from_secret: aws_secret_access_key
 
-  - name: restore-cache-with-gzip
-    image: meltwater/drone-cache:dev
-    pull: true
-    environment:
-      AWS_ACCESS_KEY_ID:
-        from_secret: aws_access_key_id
-      AWS_SECRET_ACCESS_KEY:
-        from_secret: aws_secret_access_key
-    settings:
-      restore: true
-      cache_key: "gzip"
-      archive_format: "gzip"
-      bucket: drone-cache-bucket
-      region: eu-west-1
-      mount:
-        - 'vendor'
-
-  - name: restore-cache-with-filesystem
-    image: meltwater/drone-cache:dev
-    pull: true
-    settings:
-      backend: "filesystem"
-      restore: true
-      cache_key: "volume"
-      archive_format: "gzip"
-      # filesystem_cache_root: "/tmp/cache"
-      mount:
-        - 'vendor'
-    volumes:
-    - name: cache
-      path: /tmp/cache
-
-  - name: restore-cache-debug
-    image: meltwater/drone-cache:dev
-    settings:
-      pull: true
-      restore: true
-      debug: true
-
-  - name: build
-    image: golang:1.11-alpine
-    pull: true
-    commands:
-      - apk add --update make git
-      - make drone-cache
-
-  - name: test
-    image: golang:1.11-alpine
-    pull: true
-    environment:
-      CGO_ENABLED: '0'
-      TEST_ENDPOINT: filestorage:9000
-    commands:
-      - go test -v -mod=vendor -cover ./... # NOTICE: -race: Needs CGO enabled
-    volumes:
-    - name: testcache
-      path: /drone/src/testcache/cache
-
-  - name: analyze
-    image: golang:1.11-alpine
-    pull: true
-    environment:
-      CGO_ENABLED: '0'
-    commands:
-      - wget -O - -q https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh| sh -s v1.14.0
-      - ./bin/golangci-lint run -v --enable-all -D gochecknoglobals
-
-  - name: rebuild-cache
-    image: meltwater/drone-cache:dev
-    pull: true
-    environment:
-      AWS_ACCESS_KEY_ID:
-        from_secret: aws_access_key_id
-      AWS_SECRET_ACCESS_KEY:
-        from_secret: aws_secret_access_key
-    settings:
-      rebuild: true
-      bucket: drone-cache-bucket
-      region: eu-west-1
-      mount:
-        - 'vendor'
-
-  - name: rebuild-cache-with-key
-    image: meltwater/drone-cache:dev
-    pull: true
-    environment:
-      AWS_ACCESS_KEY_ID:
-        from_secret: aws_access_key_id
-      AWS_SECRET_ACCESS_KEY:
-        from_secret: aws_secret_access_key
-    settings:
-      rebuild: true
-      cache_key: '{{ .Repo.Name }}_{{ checksum "go.mod" }}_{{ checksum "go.sum" }}_{{ arch }}_{{ os }}'
-      bucket: drone-cache-bucket
-      region: eu-west-1
-      mount:
-        - 'vendor'
-
-  - name: rebuild-cache-with-gzip
-    image: meltwater/drone-cache:dev
-    pull: true
-    environment:
-      AWS_ACCESS_KEY_ID:
-        from_secret: aws_access_key_id
-      AWS_SECRET_ACCESS_KEY:
-        from_secret: aws_secret_access_key
-    settings:
-      rebuild: true
-      cache_key: "gzip"
-      archive_format: "gzip"
-      bucket: drone-cache-bucket
-      region: eu-west-1
-      mount:
-        - 'vendor'
-
-  - name: rebuild-cache-with-filesystem
-    image: meltwater/drone-cache:dev
-    pull: true
-    settings:
-      backend: "filesystem"
-      rebuild: true
-      cache_key: "volume"
-      archive_format: "gzip"
-      # filesystem_cache_root: "/tmp/cache"
-      mount:
-        - 'vendor'
-    volumes:
-    - name: cache
-      path: /tmp/cache
-
-  - name: docker-release-tag
-    image: plugins/docker
-    settings:
-      repo: meltwater/drone-cache
-      tags: '${DRONE_TAG}'
-      auto_tag: true
-      docker_username:
-        from_secret: docker_username
-      docker_password:
-        from_secret: docker_password
-    when:
-      event: tag
-      ref:
-        - refs/tags/v*
-
-  - name: github-release-tag
-    image: golang:1.11 # golang:1.11-alpine
-    environment:
-      github_token:
-        from_secret: github_token
-    commands:
-      - git status
-      - curl -sL https://git.io/goreleaser | bash
-      - git status
-    when:
-      event: tag
-      ref:
-        - refs/tags/v*
-
-volumes:
+- name: restore-cache-with-filesystem
+  pull: true
+  image: meltwater/drone-cache:dev
+  settings:
+    archive_format: gzip
+    backend: filesystem
+    cache_key: volume
+    mount:
+    - vendor
+    restore: true
+  volumes:
   - name: cache
-    temp: {}
+    path: /tmp/cache
+
+- name: restore-cache-debug
+  image: meltwater/drone-cache:dev
+  settings:
+    debug: true
+    pull: true
+    restore: true
+
+- name: build
+  pull: true
+  image: golang:1.11-alpine
+  commands:
+  - apk add --update make git
+  - make drone-cache
+
+- name: test
+  pull: true
+  image: golang:1.11-alpine
+  commands:
+  - go test -v -mod=vendor -cover ./...
+  environment:
+    CGO_ENABLED: 0
+    TEST_ENDPOINT: filestorage:9000
+  volumes:
   - name: testcache
-    temp: {}
+    path: /drone/src/testcache/cache
+
+- name: analyze
+  pull: true
+  image: golang:1.11-alpine
+  commands:
+  - "wget -O - -q https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh| sh -s v1.14.0"
+  - ./bin/golangci-lint run -v --enable-all -D gochecknoglobals
+  environment:
+    CGO_ENABLED: 0
+
+- name: rebuild-cache
+  pull: true
+  image: meltwater/drone-cache:dev
+  settings:
+    bucket: drone-cache-bucket
+    mount:
+    - vendor
+    rebuild: true
+    region: eu-west-1
+  environment:
+    AWS_ACCESS_KEY_ID:
+      from_secret: aws_access_key_id
+    AWS_SECRET_ACCESS_KEY:
+      from_secret: aws_secret_access_key
+
+- name: rebuild-cache-with-key
+  pull: true
+  image: meltwater/drone-cache:dev
+  settings:
+    bucket: drone-cache-bucket
+    cache_key: "{{ .Repo.Name }}_{{ checksum \"go.mod\" }}_{{ checksum \"go.sum\" }}_{{ arch }}_{{ os }}"
+    mount:
+    - vendor
+    rebuild: true
+    region: eu-west-1
+  environment:
+    AWS_ACCESS_KEY_ID:
+      from_secret: aws_access_key_id
+    AWS_SECRET_ACCESS_KEY:
+      from_secret: aws_secret_access_key
+
+- name: rebuild-cache-with-gzip
+  pull: true
+  image: meltwater/drone-cache:dev
+  settings:
+    archive_format: gzip
+    bucket: drone-cache-bucket
+    cache_key: gzip
+    mount:
+    - vendor
+    rebuild: true
+    region: eu-west-1
+  environment:
+    AWS_ACCESS_KEY_ID:
+      from_secret: aws_access_key_id
+    AWS_SECRET_ACCESS_KEY:
+      from_secret: aws_secret_access_key
+
+- name: rebuild-cache-with-filesystem
+  pull: true
+  image: meltwater/drone-cache:dev
+  settings:
+    archive_format: gzip
+    backend: filesystem
+    cache_key: volume
+    mount:
+    - vendor
+    rebuild: true
+  volumes:
+  - name: cache
+    path: /tmp/cache
+
+- name: docker-release-tag
+  image: plugins/docker
+  settings:
+    auto_tag: true
+    docker_password:
+      from_secret: docker_password
+    docker_username:
+      from_secret: docker_username
+    repo: meltwater/drone-cache
+    tags: "${DRONE_TAG}"
+  when:
+    event:
+    - tag
+    - push
+    ref:
+    - "refs/tags/*"
+
+- name: github-release-tag
+  image: golang:1.11
+  commands:
+  - git status
+  - "curl -sL https://git.io/goreleaser | bash"
+  - git status
+  environment:
+    github_token:
+      from_secret: github_token
+  when:
+    event:
+    - tag
+    - push
+    ref:
+    - "refs/tags/*"
 
 services:
-  - name: filestorage
-    image: minio/minio:RELEASE.2018-10-06T00-15-16Z
-    environment:
-      MINIO_ACCESS_KEY: AKIAIOSFODNN7EXAMPLE
-      MINIO_SECRET_KEY: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
-      MINIO_REGION: eu-west-1
-    commands:
-      - minio server /data
-    ports: [9000]
+- name: filestorage
+  image: minio/minio:RELEASE.2018-10-06T00-15-16Z
+  commands:
+  - minio server /data
+  environment:
+    MINIO_ACCESS_KEY: AKIAIOSFODNN7EXAMPLE
+    MINIO_REGION: eu-west-1
+    MINIO_SECRET_KEY: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+  ports:
+  - 9000
+
+volumes:
+- name: cache
+  temp: {}
+- name: testcache
+  temp: {}
+
+trigger:
+  branch:
+  - master
+  - issues
+  event:
+  - push
+  - pull_request
+  - tag
+
+...
