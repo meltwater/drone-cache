@@ -101,9 +101,10 @@ steps:
       CGO_ENABLED: '0'
       TEST_ENDPOINT: filestorage:9000
     commands:
+      - pwd
       - go test -v -mod=vendor -cover ./... # NOTICE: -race: Needs CGO enabled
     volumes:
-    - name: cache
+    - name: testcache
       path: /drone/src/github.com/meltwater/drone-cache/testcache/cache
 
   - name: analyze
@@ -205,8 +206,10 @@ steps:
       ref: refs/tags/*
 
 volumes:
-- name: cache
-  temp: {}
+  - name: cache
+    temp: {}
+  - name: testcache
+    temp: {}
   # host:
   #   path: /var/lib/cache
   # volumes:
