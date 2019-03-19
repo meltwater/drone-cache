@@ -220,5 +220,5 @@ services:
       MINIO_SECRET_KEY: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
       MINIO_REGION: eu-west-1
     commands:
-      - server /data
+      - minio server /data
     # ports: [9000]
