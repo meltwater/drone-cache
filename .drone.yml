@@ -17,53 +17,53 @@ steps:
     commands:
     - git fetch --tags
 
-  - name: restore-cache
-    image: meltwater/drone-cache:dev
-    pull: true
-    settings:
-      restore: true
-      bucket: drone-cache-bucket
-      settings:
-      aws_access_key_id:
-        from_secret: aws_access_key_id
-      aws_secret_access_key:
-        from_secret: aws_secret_access_key
-      region: eu-west-1
-      mount:
-        - 'vendor'
+  # - name: restore-cache
+  #   image: meltwater/drone-cache:dev
+  #   pull: true
+  #   settings:
+  #     restore: true
+  #     bucket: drone-cache-bucket
+  #     settings:
+  #     aws_access_key_id:
+  #       from_secret: aws_access_key_id
+  #     aws_secret_access_key:
+  #       from_secret: aws_secret_access_key
+  #     region: eu-west-1
+  #     mount:
+  #       - 'vendor'
 
-  - name: restore-cache-with-key
-    image: meltwater/drone-cache:dev
-    settings:
-      pull: true
-      restore: true
-      cache_key: '{{ .Repo.Name }}_{{ checksum "go.mod" }}_{{ checksum "go.sum" }}_{{ arch }}_{{ os }}'
-      bucket: drone-cache-bucket
-      settings:
-      aws_access_key_id:
-        from_secret: aws_access_key_id
-      aws_secret_access_key:
-        from_secret: aws_secret_access_key
-      region: eu-west-1
-      mount:
-        - 'vendor'
+  # - name: restore-cache-with-key
+  #   image: meltwater/drone-cache:dev
+  #   settings:
+  #     pull: true
+  #     restore: true
+  #     cache_key: '{{ .Repo.Name }}_{{ checksum "go.mod" }}_{{ checksum "go.sum" }}_{{ arch }}_{{ os }}'
+  #     bucket: drone-cache-bucket
+  #     settings:
+  #     aws_access_key_id:
+  #       from_secret: aws_access_key_id
+  #     aws_secret_access_key:
+  #       from_secret: aws_secret_access_key
+  #     region: eu-west-1
+  #     mount:
+  #       - 'vendor'
 
-  - name: restore-cache-with-gzip
-    image: meltwater/drone-cache:dev
-    pull: true
-    settings:
-      restore: true
-      cache_key: "gzip"
-      archive_format: "gzip"
-      bucket: drone-cache-bucket
-      settings:
-      aws_access_key_id:
-        from_secret: aws_access_key_id
-      aws_secret_access_key:
-        from_secret: aws_secret_access_key
-      region: eu-west-1
-      mount:
-        - 'vendor'
+  # - name: restore-cache-with-gzip
+  #   image: meltwater/drone-cache:dev
+  #   pull: true
+  #   settings:
+  #     restore: true
+  #     cache_key: "gzip"
+  #     archive_format: "gzip"
+  #     bucket: drone-cache-bucket
+  #     settings:
+  #     aws_access_key_id:
+  #       from_secret: aws_access_key_id
+  #     aws_secret_access_key:
+  #       from_secret: aws_secret_access_key
+  #     region: eu-west-1
+  #     mount:
+  #       - 'vendor'
 
   - name: restore-cache-with-filesystem
     image: meltwater/drone-cache:dev
@@ -105,7 +105,7 @@ steps:
       - go test -v -mod=vendor -cover ./... # NOTICE: -race: Needs CGO enabled
     volumes:
     - name: testcache
-      path: /drone/src/github.com/meltwater/drone-cache/testcache/cache
+      path: /drone/src/testcache/cache
 
   - name: analyze
     image: golang:1.11-alpine
@@ -116,50 +116,50 @@ steps:
       - wget -O - -q https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh| sh -s v1.14.0
       - ./bin/golangci-lint run -v --enable-all -D gochecknoglobals
 
-  - name: rebuild-cache
-    image: meltwater/drone-cache:dev
-    pull: true
-    settings:
-      rebuild: true
-      bucket: drone-cache-bucket
-      aws_access_key_id:
-        from_secret: aws_access_key_id
-      aws_secret_access_key:
-        from_secret: aws_secret_access_key
-      region: eu-west-1
-      mount:
-        - 'vendor'
+  # - name: rebuild-cache
+  #   image: meltwater/drone-cache:dev
+  #   pull: true
+  #   settings:
+  #     rebuild: true
+  #     bucket: drone-cache-bucket
+  #     aws_access_key_id:
+  #       from_secret: aws_access_key_id
+  #     aws_secret_access_key:
+  #       from_secret: aws_secret_access_key
+  #     region: eu-west-1
+  #     mount:
+  #       - 'vendor'
 
-  - name: rebuild-cache-with-key
-    image: meltwater/drone-cache:dev
-    pull: true
-    settings:
-      rebuild: true
-      cache_key: '{{ .Repo.Name }}_{{ checksum "go.mod" }}_{{ checksum "go.sum" }}_{{ arch }}_{{ os }}'
-      bucket: drone-cache-bucket
-      aws_access_key_id:
-        from_secret: aws_access_key_id
-      aws_secret_access_key:
-        from_secret: aws_secret_access_key
-      region: eu-west-1
-      mount:
-        - 'vendor'
+  # - name: rebuild-cache-with-key
+  #   image: meltwater/drone-cache:dev
+  #   pull: true
+  #   settings:
+  #     rebuild: true
+  #     cache_key: '{{ .Repo.Name }}_{{ checksum "go.mod" }}_{{ checksum "go.sum" }}_{{ arch }}_{{ os }}'
+  #     bucket: drone-cache-bucket
+  #     aws_access_key_id:
+  #       from_secret: aws_access_key_id
+  #     aws_secret_access_key:
+  #       from_secret: aws_secret_access_key
+  #     region: eu-west-1
+  #     mount:
+  #       - 'vendor'
 
-  - name: rebuild-cache-with-gzip
-    image: meltwater/drone-cache:dev
-    pull: true
-    settings:
-      rebuild: true
-      cache_key: "gzip"
-      archive_format: "gzip"
-      bucket: drone-cache-bucket
-      aws_access_key_id:
-        from_secret: aws_access_key_id
-      aws_secret_access_key:
-        from_secret: aws_secret_access_key
-      region: eu-west-1
-      mount:
-        - 'vendor'
+  # - name: rebuild-cache-with-gzip
+  #   image: meltwater/drone-cache:dev
+  #   pull: true
+  #   settings:
+  #     rebuild: true
+  #     cache_key: "gzip"
+  #     archive_format: "gzip"
+  #     bucket: drone-cache-bucket
+  #     aws_access_key_id:
+  #       from_secret: aws_access_key_id
+  #     aws_secret_access_key:
+  #       from_secret: aws_secret_access_key
+  #     region: eu-west-1
+  #     mount:
+  #       - 'vendor'
 
   - name: rebuild-cache-with-filesystem
     image: meltwater/drone-cache:dev
