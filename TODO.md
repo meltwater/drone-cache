@@ -65,6 +65,7 @@
 - [x] Inspiration reference
     - https://github.com/bsm/drone-s3-cache
     - https://github.com/Drillster/drone-volume-cache
+- [ ] Send to https://github.com/drone/drone-plugin-index
 
 ## Road to Open Source
 
@@ -78,6 +79,9 @@
 
 ## Future work
 
-- [ ] TTL/Retention policy
+- [ ] TTL/Retention policy or Flush
+- [ ] Add Google Cloud Storage Backend
+- [ ] Add SFTP Backend
+- [ ] Add cache key fallback list
 - [ ] Improve Makefile
 - [ ] Add unit tests
