@@ -10,7 +10,7 @@ With `drone-cache`, you can provide your **own cache key templates**, specify **
 
 For the detailed usage information and a list of the available options please take a look at [usage](#usage) and checkout [examples](#examples). If you want to learn more about custom cache keys, see [cache key templates](docs/cache_key_templates.md).
 
-## How it works
+## How does it work
 
 `drone-cache` stores mounted directories and files under a key at the specified backend (by default S3).
 
