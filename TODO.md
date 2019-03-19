@@ -74,8 +74,8 @@
 - [x] Update LICENCE
 - [x] Project artwork
 - [x] Improve README
-- [ ] Open Source :tada:
-- [ ] Add public CI/CD (https://cloud.drone.io/)
+- [x] Open Source :tada:
+- [x] Add public CI/CD (https://cloud.drone.io/)
 
 ## Future work
 
