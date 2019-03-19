@@ -2,12 +2,21 @@ kind: pipeline
 name: default
 
 clone:
-  tags: true
+  depth: 50
 
-branches:
-  - master
+trigger:
+  branch:
+   - master
+  event:
+    - push
+    - pull_request
 
 steps:
+  - name: fetch
+    image: docker:git
+    commands:
+    - git fetch --tags
+
   - name: restore-cache
     image: meltwater/drone-cache:dev
     pull: true
