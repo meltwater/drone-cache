@@ -10,6 +10,7 @@ trigger:
   event:
     - push
     - pull_request
+    - tag
 
 steps:
   - name: fetch
