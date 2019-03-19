@@ -223,6 +223,9 @@ steps:
       from_secret: docker_username
     repo: meltwater/drone-cache
     tags: "${DRONE_TAG}"
+  when:
+    ref:
+    - "refs/tags/*"
 
 - name: github-release-tag
   image: golang:1.11
@@ -233,12 +236,16 @@ steps:
   environment:
     github_token:
       from_secret: github_token
+  when:
+    ref:
+    - "refs/tags/*"
 
 trigger:
   branch:
   - master
   - issues
   event:
+  - push
   - tag
   status:
   - success
