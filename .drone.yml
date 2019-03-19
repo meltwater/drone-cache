@@ -7,6 +7,7 @@ clone:
 trigger:
   branch:
     - master
+    - issues
   event:
     - push
     - pull_request
