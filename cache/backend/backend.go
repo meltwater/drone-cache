@@ -13,6 +13,7 @@ import (
 	"github.com/pkg/errors"
 )
 
+// S3Config is a structure to store S3  backend configuration
 type S3Config struct {
 	// Indicates the files ACL, which should be one
 	// of the following:
@@ -42,10 +43,12 @@ type S3Config struct {
 	PathStyle bool // Use path style instead of domain style. Should be true for minio and false for AWS
 }
 
+// FileSystemConfig is a structure to store filesystem backend configuration
 type FileSystemConfig struct {
 	CacheRoot string
 }
 
+// InitializeS3Backend creates an S3 backend
 func InitializeS3Backend(c S3Config, debug bool) (cache.Backend, error) {
 	awsConf := &aws.Config{
 		Region:           aws.String(c.Region),
@@ -68,6 +71,7 @@ func InitializeS3Backend(c S3Config, debug bool) (cache.Backend, error) {
 	return newS3(c.Bucket, c.ACL, c.Encryption, awsConf), nil
 }
 
+// InitializeFileSystemBackend creates a filesystem backend
 func InitializeFileSystemBackend(c FileSystemConfig, debug bool) (cache.Backend, error) {
 	if strings.TrimRight(path.Clean(c.CacheRoot), "/") == "" {
 		return nil, fmt.Errorf("could not use <%s> as cache root, empty or root path given", c.CacheRoot)

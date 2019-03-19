@@ -189,9 +189,8 @@ steps:
       docker_password:
         from_secret: docker_password
     when:
-      event: tag
-      status: success
-      ref: refs/tags/*
+      ref:
+        - refs/tags/v*
 
   - name: github-release-tag
     image: golang:1.11 # golang:1.11-alpine
@@ -203,9 +202,8 @@ steps:
       - curl -sL https://git.io/goreleaser | bash
       - git status
     when:
-      event: tag
-      status: success
-      ref: refs/tags/*
+      ref:
+        - refs/tags/v*
 
 volumes:
   - name: cache
