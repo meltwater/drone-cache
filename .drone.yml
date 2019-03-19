@@ -245,7 +245,7 @@ trigger:
   - master
   event:
   - push
-  - tag
+  # - tag
   status:
   - success
 
