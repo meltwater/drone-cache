@@ -213,29 +213,20 @@ steps:
   commands:
   - git fetch --tags
 
-- name: docker-release-tag
-  image: plugins/docker
-  settings:
-    auto_tag: true
-    docker_password:
-      from_secret: docker_password
-    docker_username:
-      from_secret: docker_username
-    repo: meltwater/drone-cache
-    tags: "${DRONE_TAG}"
-  when:
-    ref:
-    - "refs/tags/*"
-
 - name: github-release-tag
   image: golang:1.11
   commands:
+  # - TODO install upx
   - git status
   - "curl -sL https://git.io/goreleaser | bash"
   - git status
   environment:
     github_token:
       from_secret: github_token
+    docker_password:
+      from_secret: docker_password
+    docker_username:
+      from_secret: docker_username
   when:
     ref:
     - "refs/tags/*"

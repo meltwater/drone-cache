@@ -1,8 +1,7 @@
 before:
   hooks:
     - make clean
-    - make fetch-dependencies # go mod vendor
-    # OR - go mod download
+    - make fetch-dependencies
 dist: target/dist
 builds:
 - env:
@@ -25,6 +24,8 @@ builds:
     -w
     -X main.Version={{.Version}}
     -X main.DateBuilt={{.Date}}
+  hooks:
+    post: find target/dist -name drone-cache -type f -exec upx {} +
 archive:
   format: tar.gz # default. Also available .zip
   replacements:
@@ -55,3 +56,25 @@ release:
     name: drone-cache
   prerelease: auto # in case there is an indicator for this in the tag e.g. v1.0.0-rc1
   disable: false
+dockers:
+  -
+    goos: linux
+    goarch: amd64
+    goarm: ''
+    binaries:
+    - drone-cache
+    image_templates:
+    - "meltwater/drone-cache:latest"
+    - "meltwater/drone-cache:{{ .Tag }}"
+    - "meltwater/drone-cache:v{{ .Major }}.{{ .Minor }}"
+    - "meltwater/drone-cache:v{{ .Major }}"
+    # Skips the docker push. Could be useful if you also do draft releases.
+    # If set to auto, the release will not be pushed to the docker repository
+    # in case there is an indicator for prerelease in the tag e.g. v1.0.0-rc1
+    # Defaults to false.
+    skip_push: auto
+    dockerfile: Dockerfile
+    build_flag_templates:
+    - "--label=org.label-schema.schema-version=1.0"
+    - "--label=org.label-schema.version={{.Version}}"
+    - "--label=org.label-schema.name={{.ProjectName}}"
