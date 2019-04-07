@@ -8,7 +8,7 @@ A Drone plugin for caching current workspace files between builds to reduce your
 
 With `drone-cache`, you can provide your **own cache key templates**, specify **archive format** (tar, tar.gz, etc) and you can use **an S3 bucket or a mounted volume** as storage for your cached files, even better you can implement **your own storage backend** to cover your use case.
 
-For the detailed usage information and a list of the available options please take a look at [usage](#usage) and checkout [examples](#examples). If you want to learn more about custom cache keys, see [cache key templates](docs/cache_key_templates.md).
+For detailed usage information and a list of available options please take a look at [usage](#usage) and [examples](#examples). If you want to learn more about custom cache keys, see [cache key templates](docs/cache_key_templates.md).
 
 ## How does it work
 
@@ -119,9 +119,10 @@ steps:
       path: /tmp/cache
 ```
 
-### For more examples for Drone 0.8, see [docs/examples/drone-0.8.md](docs/examples/drone-0.8.md)
+#### Other examples
 
-### For more examples for Drone 1.0, see [docs/examples//drone-1.0.md](docs/examples/drone-1.0.md)
+* examples for Drone 0.8, see [docs/examples/drone-0.8.md](docs/examples/drone-0.8.md)
+* examples for Drone 1.0, see [docs/examples/drone-1.0.md](docs/examples/drone-1.0.md)
 
 ## Usage
 
@@ -254,19 +255,18 @@ We use [SemVer](http://semver.org/) for versioning. For the versions available, 
 
 ## Authors and Acknowledgement
 
-* [@dim](https://github.com/dim) Thanks for original work!
+* [@dim](https://github.com/dim) - Thanks for [original work](https://github.com/bsm/drone-s3-cache)!
 * [@kakkoyun](https://github.com/kakkoyun)
 * [@salimane](https://github.com/salimane)
-* [@AdamGlazerMW](https://github.com/AdamGlazerMW)
+* [@AdamGlazerMW](https://github.com/AdamGlazerMW) - Special thanks to Adam for the amazing artwork!
 
-> **Special thanks to Adam for amazing artwork!**
+Also see the list of [all contributors](https://github.com/meltwater/drone-cache/graphs/contributors).
+
 
 ### Inspiration
 
 * https://github.com/bsm/drone-s3-cache (original work)
 * https://github.com/Drillster/drone-volume-cache
-
-Check out for [all contributors](https://github.com/meltwater/drone-cache/graphs/contributors).
 
 ## License and Copyright
 
