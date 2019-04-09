@@ -8,7 +8,7 @@ A Drone plugin for caching current workspace files between builds to reduce your
 
 With `drone-cache`, you can provide your **own cache key templates**, specify **archive format** (tar, tar.gz, etc) and you can use **an S3 bucket or a mounted volume** as storage for your cached files, even better you can implement **your own storage backend** to cover your use case.
 
-For the detailed usage information and a list of the available options please take a look at [usage](#usage) and checkout [examples](#examples). If you want to learn more about custom cache keys, see [cache key templates](docs/cache_key_templates.md).
+For detailed usage information and a list of available options please take a look at [usage](#usage) and [examples](#examples). If you want to learn more about custom cache keys, see [cache key templates](docs/cache_key_templates.md).
 
 ## How does it work
 
@@ -22,13 +22,13 @@ The best example would be to use this with your package managers such as Mix, Bu
 
 With restored dependencies from a cache, commands like `mix deps.get` will only need to download new dependencies, rather than re-download every package on each and every build.
 
-## Examples
+## Example Usage of drone-cache
 
-### Drone Configuration examples
+The following `.drone.yml` configuration show the most common use of drone-cache. 
 
-The following is a sample configuration in your `.drone.yml` file:
+Note: These configs use drone 1.0 syntax. If you are using drone 0.8, check the examples in [docs/examples/drone-0.8.md](docs/examples/drone-0.8.md).
 
-#### Simple
+### Simple (Storing the cache in S3)
 
 ```yaml
 kind: pipeline
@@ -74,54 +74,10 @@ steps:
 
 ```
 
-#### Simple (Filesystem/Volume)
+### Other Examples
 
-```yaml
-kind: pipeline
-name: default
-
-steps:
-  - name: restore-cache-with-filesystem
-    image: meltwater/drone-cache
-    pull: true
-    settings:
-      backend: "filesystem"
-      restore: true
-      cache_key: "volume"
-      archive_format: "gzip"
-      # filesystem_cache_root: "/tmp/cache"
-      mount:
-        - 'vendor'
-    volumes:
-    - name: cache
-      path: /tmp/cache
-
-  - name: build
-    image: golang:1.11-alpine
-    pull: true
-    commands:
-      - apk add --update make git
-      - make drone-cache
-
-  - name: rebuild-cache-with-filesystem
-    image: meltwater/drone-cache
-    pull: true
-    settings:
-      backend: "filesystem"
-      rebuild: true
-      cache_key: "volume"
-      archive_format: "gzip"
-      # filesystem_cache_root: "/tmp/cache"
-      mount:
-        - 'vendor'
-    volumes:
-    - name: cache
-      path: /tmp/cache
-```
-
-### For more examples for Drone 0.8, see [docs/examples/drone-0.8.md](docs/examples/drone-0.8.md)
-
-### For more examples for Drone 1.0, see [docs/examples//drone-1.0.md](docs/examples/drone-1.0.md)
+* examples for Drone 0.8, see [docs/examples/drone-0.8.md](docs/examples/drone-0.8.md)
+* examples for Drone 1.0, see [docs/examples/drone-1.0.md](docs/examples/drone-1.0.md)
 
 ## Usage
 
@@ -254,20 +210,19 @@ We use [SemVer](http://semver.org/) for versioning. For the versions available, 
 
 ## Authors and Acknowledgement
 
-* [@dim](https://github.com/dim) Thanks for original work!
+* [@dim](https://github.com/dim) - Thanks for [original work](https://github.com/bsm/drone-s3-cache)!
 * [@kakkoyun](https://github.com/kakkoyun)
 * [@salimane](https://github.com/salimane)
-* [@AdamGlazerMW](https://github.com/AdamGlazerMW)
+* [@AdamGlazerMW](https://github.com/AdamGlazerMW) - Special thanks to Adam for the amazing artwork!
 
-> **Special thanks to Adam for amazing artwork!**
+Also see the list of [all contributors](https://github.com/meltwater/drone-cache/graphs/contributors).
+
 
 ### Inspiration
 
 * https://github.com/bsm/drone-s3-cache (original work)
 * https://github.com/Drillster/drone-volume-cache
 
-Check out for [all contributors](https://github.com/meltwater/drone-cache/graphs/contributors).
-
 ## License and Copyright
 
-This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details
+This project is licensed under the [Apache License 2.0](LICENSE).
