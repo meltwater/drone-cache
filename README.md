@@ -22,13 +22,13 @@ The best example would be to use this with your package managers such as Mix, Bu
 
 With restored dependencies from a cache, commands like `mix deps.get` will only need to download new dependencies, rather than re-download every package on each and every build.
 
-## Examples
+## Example Usage of drone-cache
 
-### Drone Configuration examples
+The following `.drone.yml` configuration show the most common use of drone-cache. 
 
-The following is a sample configuration in your `.drone.yml` file:
+Note: These configs use drone 1.0 syntax. If you are using drone 0.8, check the examples in [docs/examples/drone-0.8.md](docs/examples/drone-0.8.md).
 
-#### Simple
+### Simple (Storing the cache in S3)
 
 ```yaml
 kind: pipeline
@@ -74,52 +74,7 @@ steps:
 
 ```
 
-#### Simple (Filesystem/Volume)
-
-```yaml
-kind: pipeline
-name: default
-
-steps:
-  - name: restore-cache-with-filesystem
-    image: meltwater/drone-cache:dev
-    pull: true
-    settings:
-      backend: "filesystem"
-      restore: true
-      cache_key: "volume"
-      archive_format: "gzip"
-      # filesystem_cache_root: "/tmp/cache"
-      mount:
-        - 'vendor'
-    volumes:
-    - name: cache
-      path: /tmp/cache
-
-  - name: build
-    image: golang:1.11-alpine
-    pull: true
-    commands:
-      - apk add --update make git
-      - make drone-cache
-
-  - name: rebuild-cache-with-filesystem
-    image: meltwater/drone-cache:dev
-    pull: true
-    settings:
-      backend: "filesystem"
-      rebuild: true
-      cache_key: "volume"
-      archive_format: "gzip"
-      # filesystem_cache_root: "/tmp/cache"
-      mount:
-        - 'vendor'
-    volumes:
-    - name: cache
-      path: /tmp/cache
-```
-
-#### Other examples
+### Other Examples
 
 * examples for Drone 0.8, see [docs/examples/drone-0.8.md](docs/examples/drone-0.8.md)
 * examples for Drone 1.0, see [docs/examples/drone-1.0.md](docs/examples/drone-1.0.md)
