@@ -36,7 +36,7 @@ name: default
 
 steps:
   - name: restore-cache
-    image: meltwater/drone-cache:dev
+    image: meltwater/drone-cache
     environment:
       AWS_ACCESS_KEY_ID:
         from_secret: aws_access_key_id
@@ -58,7 +58,7 @@ steps:
       - make drone-cache
 
   - name: rebuild-cache
-    image: meltwater/drone-cache:dev
+    image: meltwater/drone-cache
     pull: true
     environment:
       AWS_ACCESS_KEY_ID:
