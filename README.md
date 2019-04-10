@@ -8,7 +8,7 @@ A Drone plugin for caching current workspace files between builds to reduce your
 
 With `drone-cache`, you can provide your **own cache key templates**, specify **archive format** (tar, tar.gz, etc) and you can use **an S3 bucket or a mounted volume** as storage for your cached files, even better you can implement **your own storage backend** to cover your use case.
 
-For detailed usage information and a list of available options please take a look at [usage](#usage) and [examples](#examples). If you want to learn more about custom cache keys, see [cache key templates](docs/cache_key_templates.md).
+For detailed usage information and a list of available options please take a look at [usage](#usage) and [examples](#example-usage-of-drone-cache). If you want to learn more about custom cache keys, see [cache key templates](docs/cache_key_templates.md).
 
 > If you want to learn story behind it, you can read our [blogpost](https://underthehood.meltwater.com/blog/2019/04/10/making-drone-builds-10-times-faster/)!
 
