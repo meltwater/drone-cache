@@ -155,10 +155,11 @@ GLOBAL OPTIONS:
 
 ```bash
 $ docker run --rm \
+      -v "$(pwd)":/app \
       -e DRONE_REPO=octocat/hello-world \
       -e DRONE_REPO_BRANCH=master \
       -e DRONE_COMMIT_BRANCH=master \
-      -e PLUGIN_MOUNT=node_modules \
+      -e PLUGIN_MOUNT=/app/node_modules \
       -e PLUGIN_RESTORE=false \
       -e PLUGIN_REBUILD=true \
       -e PLUGIN_BUCKET=<bucket> \
