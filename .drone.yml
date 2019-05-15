@@ -1,6 +1,6 @@
 ---
 kind: pipeline
-name: build
+name: default
 
 platform:
   os: linux
@@ -213,31 +213,28 @@ steps:
   commands:
   - git fetch --tags
 
-- name: github-release-tag
-  image: golang:1.11
+- name: release
+  image: goreleaser/goreleaser:v0.106
   commands:
-  - git status
-  - "curl -sL https://git.io/goreleaser | bash"
-  - git status
+  - apk add --update make upx
+  - goreleaser release
   environment:
-    docker_password:
-      from_secret: docker_password
-    docker_username:
-      from_secret: docker_username
-    github_token:
+    GITHUB_TOKEN:
       from_secret: github_token
 
-trigger:
-  branch:
-  - master
-  event:
-  - push
-  ref:
-  - "refs/tags/*"
-  status:
-  - success
+- name: docker-release
+  image: plugins/docker
+  settings:
+    auto_tag: true
+    password:
+      from_secret: docker_password
+    repo: meltwater/drone-cache
+    tags: latest
+    username:
+      from_secret: docker_username
 
-depends_on:
-- build
+trigger:
+  event:
+  - tag
 
 ...
