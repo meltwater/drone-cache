@@ -115,6 +115,10 @@ func processRebuild(c cache.Cache, cacheKeyTmpl string, mountedDirs []string, m 
 	branch := m.Commit.Branch
 
 	for _, mount := range mountedDirs {
+		if _, err := os.Stat(mount); err != nil {
+			return errors.Wrap(err, fmt.Sprintf("could not mount <%s>, make sure file or directory exists and readable", mount))
+		}
+
 		key, err := cacheKey(m, cacheKeyTmpl, mount, branch)
 		if err != nil {
 			return errors.Wrap(err, "could not generate cache key")

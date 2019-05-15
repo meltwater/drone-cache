@@ -216,27 +216,24 @@ steps:
 - name: github-release-tag
   image: golang:1.11
   commands:
-  # - TODO install upx
   - git status
   - "curl -sL https://git.io/goreleaser | bash"
   - git status
   environment:
-    github_token:
-      from_secret: github_token
     docker_password:
       from_secret: docker_password
     docker_username:
       from_secret: docker_username
-  when:
-    ref:
-    - "refs/tags/*"
+    github_token:
+      from_secret: github_token
 
 trigger:
   branch:
   - master
   event:
   - push
-  # - tag
+  ref:
+  - "refs/tags/*"
   status:
   - success
 

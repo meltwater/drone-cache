@@ -135,6 +135,17 @@ func TestRebuildWithFilesystem(t *testing.T) {
 	}
 }
 
+func TestRebuildNonExisting(t *testing.T) {
+	setup(t)
+	defer cleanUp(t)
+
+	plugin := newTestPlugin("s3", true, false, []string{"./nonexisting/path"}, "", "")
+
+	if err := plugin.Exec(); err == nil {
+		t.Error("plugin exec did not fail as expected, error: <nil>")
+	}
+}
+
 func TestRestore(t *testing.T) {
 	setup(t)
 	defer cleanUp(t)
