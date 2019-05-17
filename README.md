@@ -212,7 +212,7 @@ Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduc
 ## Future work
 
 * [ ] Add s/FTP Backend
-* [ ] Fix goreleaser/drone/docker conflicts
+* [ ] Fix goreleaser/drone/docker conflicts or remove redundancy with Drone jsonnet
 * [ ] Add cache key fallback list
 * [ ] Flush or TTL/Retention policy
 * [ ] Add Google Cloud Storage Backend
