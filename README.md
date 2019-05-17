@@ -209,6 +209,15 @@ $ make docker-build
 
 Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct, and the process for submitting pull requests to us.
 
+## Future work
+
+* [ ] Add s/FTP Backend
+* [ ] Add cache key fallback list
+* [ ] Flush or TTL/Retention policy
+* [ ] Add Google Cloud Storage Backend
+* [ ] Add Microsoft Azure Storage Backend
+* [ ] Add unit tests
+
 ## Versioning
 
 We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/meltwater/drone-cache/tags).
