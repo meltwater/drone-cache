@@ -233,8 +233,8 @@ steps:
     username:
       from_secret: docker_username
 
-trigger:
-  event:
-  - tag
+# trigger:
+#   event:
+#   - tag
 
 ...
