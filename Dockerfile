@@ -4,7 +4,7 @@ RUN apk add --update make upx git ca-certificates tzdata && update-ca-certificat
 
 ADD . /opt
 WORKDIR /opt
-RUN make build-compressed
+RUN make build-compressed # CGO_ENABLED=0 GOOS=linux GOARCH=amd64
 
 # final stage
 FROM scratch

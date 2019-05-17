@@ -222,7 +222,7 @@ steps:
     GITHUB_TOKEN:
       from_secret: github_token
 
-- name: docker-release
+- name: release-docker-linux-amd64
   image: plugins/docker
   settings:
     auto_tag: true
