@@ -9,7 +9,7 @@ builds:
   goos:
     - darwin
     - linux
-    - windows
+    # - windows
   goarch:
     - 386
     - amd64

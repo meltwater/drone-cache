@@ -353,48 +353,8 @@ steps:
       - VCS_REF=$(git rev-parse --short HEAD)
       - VERSION=$(git describe --always --tags --dirty)
 
-- name: release-docker-windows-386
-  image: plugins/docker
-  settings:
-    auto_tag: true
-    auto_tag_suffix: windows-386
-    password:
-      from_secret: docker_password
-    repo: meltwater/drone-cache
-    tags: latest
-    username:
-      from_secret: docker_username
-    build_args_from_env: [ BUILD_DATE, DOCKERFILE_PATH, VCS_REF, VERSION]
-    dockerfile: docker/Dockerfile.windows.386
-    environment:
-      - BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%S%Z")
-      - DOCKERFILE_PATH="/docker/Dockerfile.windows.386"
-      - VCS_REF=$(git rev-parse --short HEAD)
-      - VERSION=$(git describe --always --tags --dirty)
-
-- name: release-docker-windows-amd64
-  image: plugins/docker
-  settings:
-    auto_tag: true
-    auto_tag_suffix: windows-amd64
-    password:
-      from_secret: docker_password
-    repo: meltwater/drone-cache
-    tags: latest
-    username:
-      from_secret: docker_username
-    build_args_from_env: [ BUILD_DATE, DOCKERFILE_PATH, VCS_REF, VERSION]
-    dockerfile: docker/Dockerfile.windows.amd64
-    environment:
-      - BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%S%Z")
-      - DOCKERFILE_PATH="/docker/Dockerfile.windows.amd64
-      - VCS_REF=$(git rev-parse --short HEAD)
-      - VERSION=$(git describe --always --tags --dirty)
-
-    
-
-# trigger:
-#   event:
-#   - tag
+trigger:
+  event:
+  - tag
 
 ...
