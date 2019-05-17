@@ -222,7 +222,7 @@ steps:
     GITHUB_TOKEN:
       from_secret: github_token
 
-- name: docker-release
+- name: release-docker
   image: plugins/docker
   settings:
     auto_tag: true
@@ -232,6 +232,126 @@ steps:
     tags: latest
     username:
       from_secret: docker_username
+      build_args_from_env: [ BUILD_DATE, DOCKERFILE_PATH, VCS_REF, VERSION]
+      environment:
+        - BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%S%Z")
+        - DOCKERFILE_PATH="/Dockerfile"
+        - VCS_REF=$(git rev-parse --short HEAD)
+        - VERSION=$(git describe --always --tags --dirty)
+
+- name: release-docker-linux-386
+  image: plugins/docker
+  settings:
+    auto_tag: true
+    auto_tag_suffix: linux-386
+    password:
+      from_secret: docker_password
+    repo: meltwater/drone-cache
+    tags: latest
+    username:
+      from_secret: docker_username
+    build_args_from_env: [ BUILD_DATE, DOCKERFILE_PATH, VCS_REF, VERSION]
+    dockerfile: docker/Dockerfile.linux.386
+    environment:
+      - BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%S%Z")
+      - DOCKERFILE_PATH="/docker/Dockerfile.linux.386"
+      - VCS_REF=$(git rev-parse --short HEAD)
+      - VERSION=$(git describe --always --tags --dirty)
+
+- name: release-docker-linux-amd64
+  image: plugins/docker
+  settings:
+    auto_tag: true
+    auto_tag_suffix: linux-amd64
+    password:
+      from_secret: docker_password
+    repo: meltwater/drone-cache
+    tags: latest
+    username:
+      from_secret: docker_username
+    build_args_from_env: [ BUILD_DATE, DOCKERFILE_PATH, VCS_REF, VERSION]
+    dockerfile: docker/Dockerfile.linux.amd64
+    environment:
+      - BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%S%Z")
+      - DOCKERFILE_PATH="/docker/Dockerfile.linux.amd64"
+      - VCS_REF=$(git rev-parse --short HEAD)
+      - VERSION=$(git describe --always --tags --dirty)
+
+- name: release-docker-linux-arm_5
+  image: plugins/docker
+  settings:
+    auto_tag: true
+    auto_tag_suffix: linux-arm_5
+    password:
+      from_secret: docker_password
+    repo: meltwater/drone-cache
+    tags: latest
+    username:
+      from_secret: docker_username
+    build_args_from_env: [ BUILD_DATE, DOCKERFILE_PATH, VCS_REF, VERSION]
+    dockerfile: docker/Dockerfile.linux.arm_5
+    environment:
+      - BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%S%Z")
+      - DOCKERFILE_PATH="/docker/Dockerfile.linux.arm_5"
+      - VCS_REF=$(git rev-parse --short HEAD)
+      - VERSION=$(git describe --always --tags --dirty)
+
+- name: release-docker-linux-arm_6
+  image: plugins/docker
+  settings:
+    auto_tag: true
+    auto_tag_suffix: linux-arm_6
+    password:
+      from_secret: docker_password
+    repo: meltwater/drone-cache
+    tags: latest
+    username:
+      from_secret: docker_username
+    build_args_from_env: [ BUILD_DATE, DOCKERFILE_PATH, VCS_REF, VERSION]
+    dockerfile: docker/Dockerfile.linux.arm_6
+    environment:
+      - BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%S%Z")
+      - DOCKERFILE_PATH="/docker/Dockerfile.linux.arm_6"
+      - VCS_REF=$(git rev-parse --short HEAD)
+      - VERSION=$(git describe --always --tags --dirty)
+
+- name: release-docker-linux-arm_7
+  image: plugins/docker
+  settings:
+    auto_tag: true
+    auto_tag_suffix: linux-arm_7
+    password:
+      from_secret: docker_password
+    repo: meltwater/drone-cache
+    tags: latest
+    username:
+      from_secret: docker_username
+    build_args_from_env: [ BUILD_DATE, DOCKERFILE_PATH, VCS_REF, VERSION]
+    dockerfile: docker/Dockerfile.linux.arm_7
+    environment:
+      - BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%S%Z")
+      - DOCKERFILE_PATH="/docker/Dockerfile.linux.arm_7"
+      - VCS_REF=$(git rev-parse --short HEAD)
+      - VERSION=$(git describe --always --tags --dirty)
+
+- name: release-docker-linux-arm64
+  image: plugins/docker
+  settings:
+    auto_tag: true
+    auto_tag_suffix: linux-arm64
+    password:
+      from_secret: docker_password
+    repo: meltwater/drone-cache
+    tags: latest
+    username:
+      from_secret: docker_username
+    build_args_from_env: [ BUILD_DATE, DOCKERFILE_PATH, VCS_REF, VERSION]
+    dockerfile: docker/Dockerfile.linux.arm64
+    environment:
+      - BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%S%Z")
+      - DOCKERFILE_PATH="/docker/Dockerfile.linux.arm64"
+      - VCS_REF=$(git rev-parse --short HEAD)
+      - VERSION=$(git describe --always --tags --dirty)
 
 trigger:
   event:
