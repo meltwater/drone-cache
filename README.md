@@ -212,6 +212,7 @@ Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduc
 ## Future work
 
 * [ ] Add s/FTP Backend
+* [ ] Add missing docker images for multiple OS and Arch or fix goreleaser/drone/docker conflicts
 * [ ] Add cache key fallback list
 * [ ] Flush or TTL/Retention policy
 * [ ] Add Google Cloud Storage Backend
