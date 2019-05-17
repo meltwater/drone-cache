@@ -174,11 +174,11 @@ steps:
   - name: cache
     path: /tmp/cache
 
-- name: release-latest
+- name: release-snapshot
   image: goreleaser/goreleaser:v0.106
   commands:
   - apk add --update make upx
-  - goreleaser release
+  - goreleaser release --rm-dist --snapshot
   environment:
     GITHUB_TOKEN:
       from_secret: github_token
