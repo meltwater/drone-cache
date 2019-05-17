@@ -8,6 +8,6 @@ FROM scratch as runner
 
 COPY --from=builder /usr/share/zoneinfo /usr/share/zoneinfo
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
-COPY --from=builder /opt/windows_amd64/drone-cache /bin/drone-cache
+COPY --from=builder /opt/windows_amd64/drone-cache.exe /bin/drone-cache
 
 ENTRYPOINT ["/bin/drone-cache"]
