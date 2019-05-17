@@ -222,16 +222,42 @@ steps:
     GITHUB_TOKEN:
       from_secret: github_token
 
+# - name: release-docker
+#   image: plugins/docker
+#   settings:
+#     auto_tag: true
+#     password:
+#       from_secret: docker_password
+#     repo: meltwater/drone-cache
+#     tags: latest
+#     username:
+#       from_secret: docker_username
+#     build_args:
+#       - DOCKERFILE_PATH="/docker/Dockerfile.linux.amd64"
+#     environment:
+#       - VERSION=$(git describe --always --tags --dirty)
+#       - BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%S%Z")
+#       - VCS_REF=$(git rev-parse --short HEAD)
+
 - name: release-docker-linux-amd64
   image: plugins/docker
   settings:
     auto_tag: true
+    auto_tag_suffix: linux-amd64
     password:
       from_secret: docker_password
     repo: meltwater/drone-cache
     tags: latest
     username:
       from_secret: docker_username
+    build_args_from_env: [ VERSION, BUILD_DATE, VCS_REF]
+    build_args:
+      - DOCKERFILE_PATH="/docker/Dockerfile.linux.amd64"
+    dockerfile: docker/Dockerfile.linux.amd64
+    environment:
+      - VERSION=$(git describe --always --tags --dirty)
+      - BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%S%Z")
+      - VCS_REF=$(git rev-parse --short HEAD)
 
 # trigger:
 #   event:

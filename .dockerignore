@@ -5,7 +5,6 @@
 *.jpeg
 *.jpg
 .github
-target
 vendor
 backup
 LICENSE

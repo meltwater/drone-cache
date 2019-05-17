@@ -26,17 +26,29 @@ builds:
     -X main.DateBuilt={{.Date}}
   hooks:
     post: find target/dist -name drone-cache -type f -exec upx {} +
-archive:
-  format: tar.gz # default. Also available .zip
-  replacements:
-    darwin: Darwin
-    linux: Linux
-    386: i386
-    amd64: x86_64
-  files:
-    - README.md
-    - CHANGELOG.md
-    - LICENSE
+archives:
+  - id: tarball
+    format: tar.gz
+    replacements:
+      darwin: Darwin
+      linux: Linux
+      386: i386
+      amd64: x86_64
+    files:
+      - README.md
+      - CHANGELOG.md
+      - LICENSE
+  - id: zip
+    format: zip
+    replacements:
+      darwin: Darwin
+      linux: Linux
+      386: i386
+      amd64: x86_64
+    files:
+      - README.md
+      - CHANGELOG.md
+      - LICENSE
 checksum:
   name_template: "{{ .ProjectName }}_{{ .Version }}_checksums.txt" # default
 snapshot:
