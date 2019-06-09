@@ -16,7 +16,7 @@ func main() {
 	app.Name = "Drone cache plugin"
 	app.Usage = "Drone cache plugin"
 	app.Action = run
-	app.Version = "1.0.2"
+	app.Version = "1.0.3"
 	app.Flags = []cli.Flag{
 		// Repo args
 
@@ -26,9 +26,9 @@ func main() {
 			EnvVar: "DRONE_REPO",
 		},
 		cli.StringFlag{
-			Name:   "repo.owner, ro",
-			Usage:  "repository owner",
-			EnvVar: "DRONE_REPO_OWNER",
+			Name:   "repo.namespace, rns",
+			Usage:  "repository namespace",
+			EnvVar: "DRONE_REPO_NAMESPACE",
 		},
 		cli.StringFlag{
 			Name:   "repo.name, rn",
@@ -288,13 +288,14 @@ func run(c *cli.Context) error {
 	plg := plugin.Plugin{
 		Metadata: metadata.Metadata{
 			Repo: metadata.Repo{
-				Owner:   c.String("repo.owner"),
-				Name:    c.String("repo.name"),
-				Link:    c.String("repo.link"),
-				Avatar:  c.String("repo.avatar"),
-				Branch:  c.String("repo.branch"),
-				Private: c.Bool("repo.private"),
-				Trusted: c.Bool("repo.trusted"),
+				Namespace: c.String("repo.namespace"),
+				Owner:     c.String("repo.namespace"),
+				Name:      c.String("repo.name"),
+				Link:      c.String("repo.link"),
+				Avatar:    c.String("repo.avatar"),
+				Branch:    c.String("repo.branch"),
+				Private:   c.Bool("repo.private"),
+				Trusted:   c.Bool("repo.trusted"),
 			},
 			Build: metadata.Build{
 				Number:   c.Int("build.number"),

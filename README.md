@@ -102,7 +102,7 @@ COMMANDS:
 
 GLOBAL OPTIONS:
    --repo.fullname value, --rf value           repository full name [$DRONE_REPO]
-   --repo.owner value, --ro value              repository owner [$DRONE_REPO_OWNER]
+   --repo.namespace value, --ro value          repository namespace [$DRONE_REPO_NAMESPACE]
    --repo.name value, --rn value               repository name [$DRONE_REPO_NAME]
    --repo.link value, --rl value               repository link [$DRONE_REPO_LINK]
    --repo.avatar value, --ra value             repository avatar [$DRONE_REPO_AVATAR]

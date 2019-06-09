@@ -3,13 +3,14 @@ package metadata
 type (
 	// Repo stores information about repository that is built
 	Repo struct {
-		Avatar  string
-		Branch  string
-		Link    string
-		Name    string
-		Owner   string
-		Private bool
-		Trusted bool
+		Avatar    string
+		Branch    string
+		Link      string
+		Name      string
+		Namespace string
+		Owner     string
+		Private   bool
+		Trusted   bool
 	}
 
 	// Build stores information about current build
