@@ -22,13 +22,14 @@ type Backend interface {
 
 // Cache contains configuration for Cache functionality
 type Cache struct {
-	b          Backend
-	archiveFmt string
+	skipSymlinks bool
+	archiveFmt   string
+	b            Backend
 }
 
 // New creates a new cache with given parameters
-func New(b Backend, archiveFmt string) Cache {
-	return Cache{b: b, archiveFmt: archiveFmt}
+func New(b Backend, archiveFmt string, skipSymlinks bool) Cache {
+	return Cache{b: b, archiveFmt: archiveFmt, skipSymlinks: skipSymlinks}
 }
 
 // Push pushes the archived file to the cache
@@ -63,7 +64,7 @@ func (c Cache) Push(src, dst string) error {
 	defer closer()
 
 	// 3. walk through source and add each file
-	err = filepath.Walk(src, writeFileToArchive(tw))
+	err = filepath.Walk(src, writeFileToArchive(tw, c.skipSymlinks))
 	if err != nil {
 		return errors.Wrap(err, "could not add all files to archive")
 	}
@@ -119,10 +120,21 @@ func archiveWriter(w io.Writer, archiveFmt string) (*tar.Writer, func()) {
 	}
 }
 
-func writeFileToArchive(tw *tar.Writer) func(path string, fi os.FileInfo, err error) error {
+func writeFileToArchive(tw *tar.Writer, skipSymlinks bool) func(path string, fi os.FileInfo, err error) error {
 	return func(path string, fi os.FileInfo, perr error) error {
-		if !fi.Mode().IsRegular() { // skip on symbolic links or directories
+		if fi.Mode().IsDir() { // skip on directories
 			return nil
+		}
+
+		if isSymlink(fi) {
+			if skipSymlinks {
+				return nil
+			}
+
+			// TODO !!
+			// 1. if skipSymlinks defined skip
+			// 2. Need different type of tar header
+			// - or Do we need to expand symbolic links?
 		}
 
 		f, err := os.Open(path)
@@ -175,7 +187,7 @@ func extractFilesFromArchive(tr *tar.Reader, dst string) error {
 			return nil
 		// return any other error
 		case err != nil:
-			return errors.Wrap(err, "tar reader failer")
+			return errors.Wrap(err, "tar reader failed")
 		// if the header is nil, skip it
 		case h == nil:
 			continue
@@ -189,6 +201,8 @@ func extractFilesFromArchive(tr *tar.Reader, dst string) error {
 			}
 			continue
 		}
+
+		// TODO Handle symbolic links case!
 
 		dir := filepath.Dir(trt)
 		if err := ensureDir(dir); err != nil {
@@ -215,4 +229,8 @@ func ensureDir(dirName string) error {
 		}
 	}
 	return nil
+}
+
+func isSymlink(fi os.FileInfo) bool {
+	return fi.Mode()&os.ModeSymlink != 0
 }

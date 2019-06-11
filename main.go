@@ -224,7 +224,12 @@ func main() {
 			Value:  "tar",
 			EnvVar: "PLUGIN_ARCHIVE_FORMAT",
 		},
-		cli.StringFlag{
+		cli.BoolFlag{
+			Name:   "skip-symlinks, ss",
+			Usage:  "skip symbolic links in archive",
+			EnvVar: "PLUGIN_SKIP_SYMLINKS, SKIP_SYMLINKS",
+		},
+		cli.BoolFlag{
 			Name:   "debug, d",
 			Usage:  "debug",
 			EnvVar: "PLUGIN_DEBUG, DEBUG",
@@ -348,6 +353,7 @@ func run(c *cli.Context) error {
 				Region:     c.String("region"),
 				Secret:     c.String("secret-key"),
 			},
+			SkipSymlinks: c.Bool("skip-symlinks"),
 		},
 	}
 
