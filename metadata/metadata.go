@@ -3,13 +3,14 @@ package metadata
 type (
 	// Repo stores information about repository that is built
 	Repo struct {
-		Avatar  string
-		Branch  string
-		Link    string
-		Name    string
-		Owner   string
-		Private bool
-		Trusted bool
+		Avatar    string
+		Branch    string
+		Link      string
+		Name      string
+		Namespace string // used by Drone versions >= 1.0
+		Owner     string // used by Drone versions < 1.0
+		Private   bool
+		Trusted   bool
 	}
 
 	// Build stores information about current build

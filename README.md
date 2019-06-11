@@ -1,5 +1,5 @@
-
 # drone-cache
+
 [![semver](https://img.shields.io/badge/semver-1.0.2-blue.svg?cacheSeconds=2592000)](https://github.com/meltwater/drone-cache/releases) [![Maintenance](https://img.shields.io/maintenance/yes/2019.svg)](https://github.com/meltwater/drone-cache/commits/master) [![Drone](https://cloud.drone.io/api/badges/meltwater/drone-cache/status.svg)](https://cloud.drone.io/meltwater/drone-cache) [![Go Doc](https://godoc.org/github.com/meltwater/drone-cache?status.svg)](http://godoc.org/github.com/meltwater/drone-cache) [![Go Report Card](https://goreportcard.com/badge/github.com/meltwater/drone-cache)](https://goreportcard.com/report/github.com/meltwater/drone-cache) [![](https://images.microbadger.com/badges/image/meltwater/drone-cache.svg)](https://microbadger.com/images/meltwater/drone-cache) [![](https://images.microbadger.com/badges/version/meltwater/drone-cache.svg)](https://microbadger.com/images/meltwater/drone-cache)
 
 <p align="center"><img src="images/drone_gopher.png" width="400"></p>
@@ -26,7 +26,7 @@ With restored dependencies from a cache, commands like `mix deps.get` will only 
 
 ## Example Usage of drone-cache
 
-The following `.drone.yml` configuration show the most common use of drone-cache. 
+The following `.drone.yml` configuration show the most common use of drone-cache.
 
 Note: These configs use drone 1.0 syntax. If you are using drone 0.8, check the examples in [docs/examples/drone-0.8.md](docs/examples/drone-0.8.md).
 
@@ -80,8 +80,8 @@ steps:
 
 ### Other Examples
 
-* examples for Drone 0.8, see [docs/examples/drone-0.8.md](docs/examples/drone-0.8.md)
-* examples for Drone 1.0, see [docs/examples/drone-1.0.md](docs/examples/drone-1.0.md)
+- examples for Drone 0.8, see [docs/examples/drone-0.8.md](docs/examples/drone-0.8.md)
+- examples for Drone 1.0, see [docs/examples/drone-1.0.md](docs/examples/drone-1.0.md)
 
 ## Usage
 
@@ -102,6 +102,7 @@ COMMANDS:
 
 GLOBAL OPTIONS:
    --repo.fullname value, --rf value           repository full name [$DRONE_REPO]
+   --repo.namespace value, --rns value         repository namespace [$DRONE_REPO_NAMESPACE]
    --repo.owner value, --ro value              repository owner [$DRONE_REPO_OWNER]
    --repo.name value, --rn value               repository name [$DRONE_REPO_NAME]
    --repo.link value, --rl value               repository link [$DRONE_REPO_LINK]
@@ -211,13 +212,13 @@ Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduc
 
 ## Future work
 
-* [ ] Add s/FTP Backend
-* [ ] Fix goreleaser/drone/docker conflicts or remove redundancy with Drone jsonnet
-* [ ] Add cache key fallback list
-* [ ] Flush or TTL/Retention policy
-* [ ] Add Google Cloud Storage Backend
-* [ ] Add Microsoft Azure Storage Backend
-* [ ] Add unit tests
+- [ ] Add s/FTP Backend
+- [ ] Fix goreleaser/drone/docker conflicts or remove redundancy with Drone jsonnet
+- [ ] Add cache key fallback list
+- [ ] Flush or TTL/Retention policy
+- [ ] Add Google Cloud Storage Backend
+- [ ] Add Microsoft Azure Storage Backend
+- [ ] Add unit tests
 
 ## Versioning
 
@@ -225,18 +226,17 @@ We use [SemVer](http://semver.org/) for versioning. For the versions available, 
 
 ## Authors and Acknowledgement
 
-* [@dim](https://github.com/dim) - Thanks for [original work](https://github.com/bsm/drone-s3-cache)!
-* [@kakkoyun](https://github.com/kakkoyun)
-* [@salimane](https://github.com/salimane)
-* [@AdamGlazerMW](https://github.com/AdamGlazerMW) - Special thanks to Adam for the amazing artwork!
+- [@dim](https://github.com/dim) - Thanks for [original work](https://github.com/bsm/drone-s3-cache)!
+- [@kakkoyun](https://github.com/kakkoyun)
+- [@salimane](https://github.com/salimane)
+- [@AdamGlazerMW](https://github.com/AdamGlazerMW) - Special thanks to Adam for the amazing artwork!
 
 Also see the list of [all contributors](https://github.com/meltwater/drone-cache/graphs/contributors).
 
-
 ### Inspiration
 
-* https://github.com/bsm/drone-s3-cache (original work)
-* https://github.com/Drillster/drone-volume-cache
+- https://github.com/bsm/drone-s3-cache (original work)
+- https://github.com/Drillster/drone-volume-cache
 
 ## License and Copyright
 
