@@ -31,7 +31,7 @@ func main() {
 			EnvVar: "DRONE_REPO_NAMESPACE",
 		},
 		cli.StringFlag{
-			Name:   "repo.owner, owner",
+			Name:   "repo.owner, ro",
 			Usage:  "repository owner (for Drone version < 1.0)",
 			EnvVar: "DRONE_REPO_OWNER",
 		},
