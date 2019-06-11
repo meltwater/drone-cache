@@ -16,7 +16,7 @@ func main() {
 	app.Name = "Drone cache plugin"
 	app.Usage = "Drone cache plugin"
 	app.Action = run
-	app.Version = "1.0.3"
+	app.Version = "1.0.4"
 	app.Flags = []cli.Flag{
 		// Repo args
 
