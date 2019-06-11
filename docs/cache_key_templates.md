@@ -24,13 +24,14 @@ Following metadata object is available and pre-populated with current build info
 ```go
 {
   Repo {
-    Avatar  string "repository avatar [$DRONE_REPO_AVATAR]"
-    Branch  string "repository default branch [$DRONE_REPO_BRANCH]"
-    Link    string "repository link [$DRONE_REPO_LINK]"
-    Name    string "repository name [$DRONE_REPO_NAMESPACE]"
+    Avatar      string "repository avatar [$DRONE_REPO_AVATAR]"
+    Branch      string "repository default branch [$DRONE_REPO_BRANCH]"
+    Link        string "repository link [$DRONE_REPO_LINK]"
+    Name        string "repository name [$DRONE_REPO_NAMESPACE]"
     Namespace   string "repository namespace [$DRONE_REPO_NAMESPACE]"
-    Private bool   "repository is private [$DRONE_REPO_PRIVATE]"
-    Trusted bool   "repository is trusted [$DRONE_REPO_TRUSTED]"
+    Owner       string "repository owner [$DRONE_REPO_OWNER]"
+    Private     bool   "repository is private [$DRONE_REPO_PRIVATE]"
+    Trusted     bool   "repository is trusted [$DRONE_REPO_TRUSTED]"
   }
 
   Build {

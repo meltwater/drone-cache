@@ -327,10 +327,10 @@ rebuild
 restore
 : restore the cache directories
 
-cache-key
+cache_key
 : cache key to use for the cache directories
 
-archive-format
+archive_format
 : archive format to use to store the cache directories (`tar`, `gzip`) (default: `tar`)
 
 debug
@@ -342,10 +342,10 @@ filesystem-cache-root
 endpoint
 : endpoint for the s3 connection
 
-access-key
+access_key
 : AWS access key
 
-secret-key
+secret_key
 : AWS secret key
 
 bucket
