@@ -7,8 +7,8 @@ type (
 		Branch    string
 		Link      string
 		Name      string
-		Namespace string
-		Owner     string
+		Namespace string // used by Drone versions >= 1.0
+		Owner     string // used by Drone versions < 1.0
 		Private   bool
 		Trusted   bool
 	}

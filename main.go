@@ -31,6 +31,11 @@ func main() {
 			EnvVar: "DRONE_REPO_NAMESPACE",
 		},
 		cli.StringFlag{
+			Name:   "repo.owner, owner",
+			Usage:  "repository owner (for Drone version < 1.0)",
+			EnvVar: "DRONE_REPO_OWNER",
+		},
+		cli.StringFlag{
 			Name:   "repo.name, rn",
 			Usage:  "repository name",
 			EnvVar: "DRONE_REPO_NAME",
@@ -289,7 +294,7 @@ func run(c *cli.Context) error {
 		Metadata: metadata.Metadata{
 			Repo: metadata.Repo{
 				Namespace: c.String("repo.namespace"),
-				Owner:     c.String("repo.namespace"),
+				Owner:     c.String("repo.owner"),
 				Name:      c.String("repo.name"),
 				Link:      c.String("repo.link"),
 				Avatar:    c.String("repo.avatar"),
