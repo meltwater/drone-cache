@@ -227,13 +227,11 @@ func main() {
 		cli.BoolFlag{
 			Name:   "skip-symlinks, ss",
 			Usage:  "skip symbolic links in archive",
-			Value:  false,
 			EnvVar: "PLUGIN_SKIP_SYMLINKS, SKIP_SYMLINKS",
 		},
 		cli.BoolFlag{
 			Name:   "debug, d",
 			Usage:  "debug",
-			Value:  false,
 			EnvVar: "PLUGIN_DEBUG, DEBUG",
 		},
 
