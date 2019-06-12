@@ -100,7 +100,7 @@ func (c Cache) Pull(src, dst string) error {
 	// w. extract archive
 	log.Printf("extracting archived directory <%s> to <%s>", src, dst)
 	tr := archiveReader(rc, c.archiveFmt)
-	return errors.Wrap(extractFilesFromArchive(tr, "/"), "could not extract files from downloaded archive")
+	return errors.Wrap(extractFilesFromArchive(tr, dst), "could not extract files from downloaded archive")
 }
 
 // Helpers
@@ -132,12 +132,17 @@ func writeFileToArchive(tw *tar.Writer, skipSymlinks bool) func(path string, fi 
 				return nil
 			}
 
-			linkTarget, err := os.Readlink(fi.Name()) // TODO: test alternative: path
+			linkTarget, err := os.Readlink(path)
 			if err != nil {
 				return errors.Wrap(err, fmt.Sprintf("could not read link <%s>", path))
 			}
 
-			h, err = tar.FileInfoHeader(fi, filepath.ToSlash(linkTarget))
+			absPath, err := filepath.Abs(filepath.ToSlash(linkTarget))
+			if err != nil {
+				return errors.Wrap(err, fmt.Sprintf("could not get absolute path for <%s>", linkTarget))
+			}
+
+			h, err = tar.FileInfoHeader(fi, absPath)
 			if err != nil {
 				return errors.Wrap(err, fmt.Sprintf("could not create header for <%s>", path))
 			}
@@ -200,51 +205,63 @@ func extractFilesFromArchive(tr *tar.Reader, dst string) error {
 			continue
 		}
 
-		// the target location where the dir/file should be created
-		trt := filepath.Join(dst, h.Name)
-		if h.FileInfo().Mode().IsDir() {
-			if err := ensureDir(trt); err != nil {
-				return errors.Wrap(err, fmt.Sprintf("could not create <%s> directory", trt))
-			}
-			continue
-		}
-
-		dir := filepath.Dir(trt)
-		if err := ensureDir(dir); err != nil {
-			return errors.Wrap(err, fmt.Sprintf("could not create <%s> directory", dir))
-		}
-
 		switch h.Typeflag {
 		case tar.TypeDir:
+			if err := ensureDir(h.Name); err != nil {
+				return errors.Wrap(err, fmt.Sprintf("could not create <%s> directory", h.Name))
+			}
 			continue
 		case tar.TypeReg, tar.TypeRegA, tar.TypeChar, tar.TypeBlock, tar.TypeFifo:
-			f, err := os.OpenFile(trt, os.O_CREATE|os.O_RDWR, os.FileMode(h.Mode))
+			trgt := filepath.Join("/", h.Name)
+
+			dir := filepath.Dir(trgt)
+			if err := ensureDir(dir); err != nil {
+				return errors.Wrap(err, fmt.Sprintf("could not create <%s> directory", dir))
+			}
+
+			f, err := os.OpenFile(trgt, os.O_CREATE|os.O_RDWR, os.FileMode(h.Mode))
 			if err != nil {
-				return errors.Wrap(err, fmt.Sprintf("could not open extracted file for writing <%s>", trt))
+				return errors.Wrap(err, fmt.Sprintf("could not open extracted file for writing <%s>", trgt))
 			}
 
 			if _, err := io.Copy(f, tr); err != nil {
 				f.Close()
-				return errors.Wrap(err, fmt.Sprintf("could not copy extracted file for writing <%s>", trt))
+				return errors.Wrap(err, fmt.Sprintf("could not copy extracted file for writing <%s>", trgt))
 			}
 			f.Close()
 			continue
 		case tar.TypeSymlink:
-			if err := unlink(trt); err != nil {
-				return errors.Wrap(err, fmt.Sprintf("could not unlink <%s>", trt))
+			linkPath := filepath.Join(dst, h.Name)
+
+			dir := filepath.Dir(linkPath)
+			if err := ensureDir(dir); err != nil {
+				return errors.Wrap(err, fmt.Sprintf("could not create <%s> directory", dir))
 			}
 
-			if err := os.Symlink(trt, h.Linkname); err != nil {
-				return errors.Wrap(err, fmt.Sprintf("could not create symbolic link <%s>", trt))
+			if err := unlink(linkPath); err != nil {
+				return errors.Wrap(err, fmt.Sprintf("could not unlink <%s>", linkPath))
+			}
+
+			trgt := filepath.Join("/", h.Linkname)
+			if err := os.Symlink(trgt, linkPath); err != nil {
+				return errors.Wrap(err, fmt.Sprintf("could not create symbolic link <%s>", linkPath))
 			}
 			continue
 		case tar.TypeLink:
-			if err := unlink(trt); err != nil {
-				return errors.Wrap(err, fmt.Sprintf("could not unlink <%s>", trt))
+			linkPath := filepath.Join(dst, h.Name)
+
+			dir := filepath.Dir(linkPath)
+			if err := ensureDir(dir); err != nil {
+				return errors.Wrap(err, fmt.Sprintf("could not create <%s> directory", dir))
 			}
 
-			if err := os.Link(trt, h.Linkname); err != nil {
-				return errors.Wrap(err, fmt.Sprintf("could not create hard link <%s>", trt))
+			if err := unlink(linkPath); err != nil {
+				return errors.Wrap(err, fmt.Sprintf("could not unlink <%s>", linkPath))
+			}
+
+			trgt := filepath.Join("/", h.Linkname)
+			if err := os.Link(trgt, linkPath); err != nil {
+				return errors.Wrap(err, fmt.Sprintf("could not create hard link <%s>", linkPath))
 			}
 			continue
 		case tar.TypeXGlobalHeader:

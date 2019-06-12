@@ -3,6 +3,7 @@ package plugin
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/meltwater/drone-cache/cache/backend"
@@ -31,23 +32,81 @@ func TestRebuild(t *testing.T) {
 	setup(t)
 	defer cleanUp(t)
 
-	if mkErr1 := os.MkdirAll("./tmp/1", 0755); mkErr1 != nil {
+	dirPath := "./tmp/1"
+	if mkErr1 := os.MkdirAll(dirPath, 0755); mkErr1 != nil {
 		t.Fatal(mkErr1)
 	}
 
-	file, fErr := os.Create("./tmp/1/file_to_cache.txt")
+	fPath := "./tmp/1/file_to_cache.txt"
+	file, fErr := os.Create(fPath)
 	if fErr != nil {
 		t.Fatal(fErr)
 	}
 
-	_, wErr := file.WriteString("some content\n")
-	if wErr != nil {
-		t.Fatal(wErr)
+	if _, err := file.WriteString("some content\n"); err != nil {
+		t.Fatal(err)
 	}
 	file.Sync()
 	file.Close()
 
+	absPath, err := filepath.Abs(fPath)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	linkAbsPath, err := filepath.Abs("./tmp/1/symlink_to_cache.txt")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if err := os.Symlink(absPath, linkAbsPath); err != nil {
+		t.Fatal(err)
+	}
+
+	plugin := newTestPlugin("s3", true, false, []string{dirPath}, "", "")
+
+	if err := plugin.Exec(); err != nil {
+		t.Errorf("plugin exec failed, error: %v\n", err)
+	}
+}
+
+func TestRebuildSkipSymlinks(t *testing.T) {
+	setup(t)
+	defer cleanUp(t)
+
+	dirPath := "./tmp/1"
+	if mkErr1 := os.MkdirAll(dirPath, 0755); mkErr1 != nil {
+		t.Fatal(mkErr1)
+	}
+
+	fPath := "./tmp/1/file_to_cache.txt"
+	file, fErr := os.Create(fPath)
+	if fErr != nil {
+		t.Fatal(fErr)
+	}
+
+	if _, err := file.WriteString("some content\n"); err != nil {
+		t.Fatal(err)
+	}
+	file.Sync()
+	file.Close()
+
+	absPath, err := filepath.Abs(fPath)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	linkAbsPath, err := filepath.Abs("./tmp/1/symlink_to_cache.txt")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if err := os.Symlink(absPath, linkAbsPath); err != nil {
+		t.Fatal(err)
+	}
+
 	plugin := newTestPlugin("s3", true, false, []string{"./tmp/1"}, "", "")
+	plugin.Config.SkipSymlinks = true
 
 	if err := plugin.Exec(); err != nil {
 		t.Errorf("plugin exec failed, error: %v\n", err)
@@ -67,9 +126,8 @@ func TestRebuildWithCacheKey(t *testing.T) {
 		t.Fatal(fErr)
 	}
 
-	_, wErr := file.WriteString("some content\n")
-	if wErr != nil {
-		t.Fatal(wErr)
+	if _, err := file.WriteString("some content\n"); err != nil {
+		t.Fatal(err)
 	}
 	file.Sync()
 	file.Close()
@@ -94,9 +152,8 @@ func TestRebuildWithGzip(t *testing.T) {
 		t.Fatal(fErr)
 	}
 
-	_, wErr := file.WriteString("some content\n")
-	if wErr != nil {
-		t.Fatal(wErr)
+	if _, err := file.WriteString("some content\n"); err != nil {
+		t.Fatal(err)
 	}
 	file.Sync()
 	file.Close()
@@ -121,9 +178,8 @@ func TestRebuildWithFilesystem(t *testing.T) {
 		t.Fatal(fErr)
 	}
 
-	_, wErr := file.WriteString("some content\n")
-	if wErr != nil {
-		t.Fatal(wErr)
+	if _, err := file.WriteString("some content\n"); err != nil {
+		t.Fatal(err)
 	}
 	file.Sync()
 	file.Close()
@@ -150,41 +206,51 @@ func TestRestore(t *testing.T) {
 	setup(t)
 	defer cleanUp(t)
 
-	if err := os.MkdirAll("./tmp/1", 0755); err != nil {
+	dirPath := "./tmp/1"
+	if err := os.MkdirAll(dirPath, 0755); err != nil {
 		t.Fatal(err)
 	}
 
-	file, cErr := os.Create("./tmp/1/file_to_cache.txt")
+	fPath := "./tmp/1/file_to_cache.txt"
+	file, cErr := os.Create(fPath)
 	if cErr != nil {
 		t.Fatal(cErr)
 	}
 
-	_, wErr := file.WriteString("some content\n")
-	if wErr != nil {
-		t.Fatal(wErr)
+	if _, err := file.WriteString("some content\n"); err != nil {
+		t.Fatal(err)
 	}
 
 	file.Sync()
 	file.Close()
-
-	if mkErr1 := os.MkdirAll("./tmp/1", 0755); mkErr1 != nil {
-		t.Fatal(mkErr1)
-	}
 
 	file1, fErr1 := os.Create("./tmp/1/file1_to_cache.txt")
 	if fErr1 != nil {
 		t.Fatal(fErr1)
 	}
 
-	_, wErr1 := file1.WriteString("some content\n")
-	if wErr1 != nil {
-		t.Fatal(wErr1)
+	if _, err := file1.WriteString("some content\n"); err != nil {
+		t.Fatal(err)
 	}
 
 	file1.Sync()
 	file1.Close()
 
-	plugin := newTestPlugin("s3", true, false, []string{"./tmp/1"}, "", "")
+	absPath, err := filepath.Abs(fPath)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	linkAbsPath, err := filepath.Abs("./tmp/1/symlink_to_cache.txt")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if err := os.Symlink(absPath, linkAbsPath); err != nil {
+		t.Fatal(err)
+	}
+
+	plugin := newTestPlugin("s3", true, false, []string{dirPath}, "", "")
 
 	if err := plugin.Exec(); err != nil {
 		t.Errorf("plugin (rebuild mode) exec failed, error: %v\n", err)
@@ -207,6 +273,15 @@ func TestRestore(t *testing.T) {
 	if _, err := os.Stat("./tmp/1/file1_to_cache.txt"); os.IsNotExist(err) {
 		t.Fatal(err)
 	}
+
+	target, err := os.Readlink("./tmp/1/symlink_to_cache.txt")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if _, err := os.Stat(target); os.IsNotExist(err) {
+		t.Fatal(err)
+	}
 }
 
 func TestRestoreWithCacheKey(t *testing.T) {
@@ -222,9 +297,8 @@ func TestRestoreWithCacheKey(t *testing.T) {
 		t.Fatal(cErr)
 	}
 
-	_, wErr := file.WriteString("some content\n")
-	if wErr != nil {
-		t.Fatal(wErr)
+	if _, err := file.WriteString("some content\n"); err != nil {
+		t.Fatal(err)
 	}
 
 	file.Sync()
@@ -239,9 +313,8 @@ func TestRestoreWithCacheKey(t *testing.T) {
 		t.Fatal(fErr1)
 	}
 
-	_, wErr1 := file1.WriteString("some content\n")
-	if wErr1 != nil {
-		t.Fatal(wErr1)
+	if _, err := file1.WriteString("some content\n"); err != nil {
+		t.Fatal(err)
 	}
 
 	file1.Sync()
@@ -285,9 +358,8 @@ func TestRestoreWithGzip(t *testing.T) {
 		t.Fatal(cErr)
 	}
 
-	_, wErr := file.WriteString("some content\n")
-	if wErr != nil {
-		t.Fatal(wErr)
+	if _, err := file.WriteString("some content\n"); err != nil {
+		t.Fatal(err)
 	}
 
 	file.Sync()
@@ -302,9 +374,8 @@ func TestRestoreWithGzip(t *testing.T) {
 		t.Fatal(fErr1)
 	}
 
-	_, wErr1 := file1.WriteString("some content\n")
-	if wErr1 != nil {
-		t.Fatal(wErr1)
+	if _, err := file1.WriteString("some content\n"); err != nil {
+		t.Fatal(err)
 	}
 
 	file1.Sync()
@@ -348,9 +419,8 @@ func TestRestoreWithFilesystem(t *testing.T) {
 		t.Fatal(cErr)
 	}
 
-	_, wErr := file.WriteString("some content\n")
-	if wErr != nil {
-		t.Fatal(wErr)
+	if _, err := file.WriteString("some content\n"); err != nil {
+		t.Fatal(err)
 	}
 
 	file.Sync()
@@ -365,9 +435,8 @@ func TestRestoreWithFilesystem(t *testing.T) {
 		t.Fatal(fErr1)
 	}
 
-	_, wErr1 := file1.WriteString("some content\n")
-	if wErr1 != nil {
-		t.Fatal(wErr1)
+	if _, err := file1.WriteString("some content\n"); err != nil {
+		t.Fatal(err)
 	}
 
 	file1.Sync()
