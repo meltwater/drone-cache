@@ -362,3 +362,6 @@ acl
 
 encryption
 : server-side encryption algorithm, defaults to `none`. (`AES256`, `aws:kms`)
+
+skip_symlinks
+: skip symbolic links in archive

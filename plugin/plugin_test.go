@@ -211,6 +211,10 @@ func TestRestore(t *testing.T) {
 		t.Fatal(err)
 	}
 
+	if err := os.MkdirAll("./tmp/2", 0755); err != nil {
+		t.Fatal(err)
+	}
+
 	fPath := "./tmp/1/file_to_cache.txt"
 	file, cErr := os.Create(fPath)
 	if cErr != nil {
@@ -250,6 +254,15 @@ func TestRestore(t *testing.T) {
 		t.Fatal(err)
 	}
 
+	linkAbsPath1, err := filepath.Abs("./tmp/2/symlink_to_cache.txt")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if err := os.Symlink("file1_to_cache.txt", linkAbsPath1); err != nil {
+		t.Fatal(err)
+	}
+
 	plugin := newTestPlugin("s3", true, false, []string{dirPath}, "", "")
 
 	if err := plugin.Exec(); err != nil {
@@ -282,6 +295,14 @@ func TestRestore(t *testing.T) {
 	if _, err := os.Stat(target); os.IsNotExist(err) {
 		t.Fatal(err)
 	}
+
+	// if _, err := os.Readlink("./tmp/2/symlink_to_cache.txt"); err != nil {
+	// 	t.Fatal(err)
+	// }
+
+	// if _, err := os.Lstat("./tmp/2/symlink_to_cache.txt"); os.IsNotExist(err) {
+	// 	t.Fatal(err)
+	// }
 }
 
 func TestRestoreWithCacheKey(t *testing.T) {

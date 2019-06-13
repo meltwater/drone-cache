@@ -8,7 +8,7 @@ FROM scratch as runner
 
 COPY --from=builder /usr/share/zoneinfo /usr/share/zoneinfo
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
-COPY --from=builder /opt/linux_amd64/drone-cache /bin/drone-cache
+COPY --from=builder /opt/drone-cache_linux_amd64/drone-cache /bin/drone-cache
 
 ARG BUILD_DATE
 ARG VERSION

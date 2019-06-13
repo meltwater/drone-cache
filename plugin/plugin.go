@@ -91,22 +91,6 @@ func (p *Plugin) Exec() error {
 		if err := processRestore(cch, p.Config.CacheKey, p.Config.Mount, p.Metadata); err != nil {
 			return Error(fmt.Sprintf("[WARNING] could not restore cache, process restore failed, %v\n", err))
 		}
-
-		if c.Debug {
-			for _, mount := range p.Config.Mount {
-				err := filepath.Walk(mount, func(path string, fi os.FileInfo, err error) error {
-					log.Println("[DEBUG] Restored:", mount)
-					if err != nil {
-						return err
-					}
-					log.Println("-", path)
-					return nil
-				})
-				if err != nil {
-					log.Printf("[DEBUG] Could not list restored files: %+v", err)
-				}
-			}
-		}
 	}
 
 	return nil
