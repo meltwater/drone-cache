@@ -97,7 +97,7 @@ func (c Cache) Pull(src, dst string) error {
 	}
 	defer rc.Close()
 
-	// w. extract archive
+	// 2. extract archive
 	log.Printf("extracting archived directory <%s> to <%s>", src, dst)
 	tr := archiveReader(rc, c.archiveFmt)
 	return errors.Wrap(extractFilesFromArchive(tr, dst), "could not extract files from downloaded archive")
