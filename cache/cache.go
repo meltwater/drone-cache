@@ -257,12 +257,11 @@ func extractRegular(h *tar.Header, tr io.Reader) error {
 	if err != nil {
 		return errors.Wrap(err, fmt.Sprintf("could not open extracted file for writing <%s>", h.Name))
 	}
+	defer f.Close()
 
 	if _, err := io.Copy(f, tr); err != nil {
-		f.Close()
 		return errors.Wrap(err, fmt.Sprintf("could not copy extracted file for writing <%s>", h.Name))
 	}
-	f.Close()
 	return nil
 }
 
