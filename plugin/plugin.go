@@ -23,9 +23,10 @@ type (
 		Backend       string
 		CacheKey      string
 
-		Debug   bool
-		Rebuild bool
-		Restore bool
+		Debug        bool
+		SkipSymlinks bool
+		Rebuild      bool
+		Restore      bool
 
 		Mount []string
 
@@ -77,7 +78,7 @@ func (p *Plugin) Exec() error {
 	}
 
 	// 3. Initialize cache
-	cch := cache.New(backend, c.ArchiveFormat)
+	cch := cache.New(backend, c.ArchiveFormat, c.SkipSymlinks)
 
 	// 4. Select mode
 	if c.Rebuild {

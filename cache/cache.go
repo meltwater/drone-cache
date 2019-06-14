@@ -22,13 +22,14 @@ type Backend interface {
 
 // Cache contains configuration for Cache functionality
 type Cache struct {
-	b          Backend
-	archiveFmt string
+	skipSymlinks bool
+	archiveFmt   string
+	b            Backend
 }
 
 // New creates a new cache with given parameters
-func New(b Backend, archiveFmt string) Cache {
-	return Cache{b: b, archiveFmt: archiveFmt}
+func New(b Backend, archiveFmt string, skipSymlinks bool) Cache {
+	return Cache{b: b, archiveFmt: archiveFmt, skipSymlinks: skipSymlinks}
 }
 
 // Push pushes the archived file to the cache
@@ -42,7 +43,7 @@ func (c Cache) Push(src, dst string) error {
 	log.Printf("archiving directory <%s>", src)
 
 	// 2. create a temporary file for the archive
-	if err := ensureDir("/tmp"); err != nil {
+	if err := os.MkdirAll("/tmp", os.FileMode(0755)); err != nil {
 		return errors.Wrap(err, "could not create tmp directory")
 	}
 
@@ -63,7 +64,7 @@ func (c Cache) Push(src, dst string) error {
 	defer closer()
 
 	// 3. walk through source and add each file
-	err = filepath.Walk(src, writeFileToArchive(tw))
+	err = filepath.Walk(src, writeToArchive(tw, c.skipSymlinks))
 	if err != nil {
 		return errors.Wrap(err, "could not add all files to archive")
 	}
@@ -96,10 +97,10 @@ func (c Cache) Pull(src, dst string) error {
 	}
 	defer rc.Close()
 
-	// w. extract archive
+	// 2. extract archive
 	log.Printf("extracting archived directory <%s> to <%s>", src, dst)
 	tr := archiveReader(rc, c.archiveFmt)
-	return errors.Wrap(extractFilesFromArchive(tr, "/"), "could not extract files from downloaded archive")
+	return errors.Wrap(extractFromArchive(tr), "could not extract files from downloaded archive")
 }
 
 // Helpers
@@ -119,36 +120,73 @@ func archiveWriter(w io.Writer, archiveFmt string) (*tar.Writer, func()) {
 	}
 }
 
-func writeFileToArchive(tw *tar.Writer) func(path string, fi os.FileInfo, err error) error {
-	return func(path string, fi os.FileInfo, perr error) error {
-		if !fi.Mode().IsRegular() { // skip on symbolic links or directories
-			return nil
+func writeToArchive(tw *tar.Writer, skipSymlinks bool) func(path string, fi os.FileInfo, err error) error {
+	return func(path string, fi os.FileInfo, pErr error) error {
+		if pErr != nil {
+			return pErr
 		}
 
-		f, err := os.Open(path)
+		var h *tar.Header
+		// Create header for Regular files and Directories
+		var err error
+		h, err = tar.FileInfoHeader(fi, "")
 		if err != nil {
-			return errors.Wrap(err, fmt.Sprintf("could not open file <%s>", path))
-		}
-		defer f.Close()
-
-		h := &tar.Header{
-			Name:    path,
-			Size:    fi.Size(),
-			Mode:    int64(fi.Mode()),
-			ModTime: fi.ModTime(),
+			return errors.Wrap(err, fmt.Sprintf("could not create header for <%s>", path))
 		}
 
-		err = tw.WriteHeader(h)
-		if err != nil {
-			return errors.Wrap(err, fmt.Sprintf("could not write header for file <%s>", path))
+		if isSymlink(fi) {
+			if skipSymlinks {
+				return nil
+			}
+
+			var err error
+			if h, err = createSymlinkHeader(fi, path); err != nil {
+				return errors.Wrap(err, "could not create header for symbolic link")
+			}
 		}
 
-		if _, err := io.Copy(tw, f); err != nil {
-			return errors.Wrap(err, fmt.Sprintf("could not copy the file <%s> data to the tarball", path))
+		h.Name = path // to give absolute path
+
+		if err := tw.WriteHeader(h); err != nil {
+			return errors.Wrap(err, fmt.Sprintf("could not write header for <%s>", path))
+		}
+
+		if fi.Mode().IsRegular() { // open and write only if it is a regular file
+			if err := writeFileToArchive(tw, path); err != nil {
+				return errors.Wrap(err, "could not write file to archive")
+			}
 		}
 
 		return nil
 	}
+}
+
+func createSymlinkHeader(fi os.FileInfo, path string) (*tar.Header, error) {
+	lnk, err := os.Readlink(path)
+	if err != nil {
+		return nil, errors.Wrap(err, fmt.Sprintf("could not read link <%s>", path))
+	}
+
+	h, err := tar.FileInfoHeader(fi, lnk)
+	if err != nil {
+		return nil, errors.Wrap(err, fmt.Sprintf("could not create symlink header for <%s>", path))
+	}
+
+	return h, nil
+}
+
+func writeFileToArchive(tw io.Writer, path string) error {
+	f, err := os.Open(path)
+	if err != nil {
+		return errors.Wrap(err, fmt.Sprintf("could not open file <%s>", path))
+	}
+	defer f.Close()
+
+	if _, err := io.Copy(tw, f); err != nil {
+		return errors.Wrap(err, fmt.Sprintf("could not copy the file <%s> data to the tarball", path))
+	}
+
+	return nil
 }
 
 func archiveReader(r io.Reader, archiveFmt string) *tar.Reader {
@@ -166,53 +204,97 @@ func archiveReader(r io.Reader, archiveFmt string) *tar.Reader {
 	}
 }
 
-func extractFilesFromArchive(tr *tar.Reader, dst string) error {
+func extractFromArchive(tr *tar.Reader) error {
 	for {
 		h, err := tr.Next()
 		switch {
-		// if no more files are found return
-		case err == io.EOF:
+		case err == io.EOF: // if no more files are found return
 			return nil
-		// return any other error
-		case err != nil:
-			return errors.Wrap(err, "tar reader failer")
-		// if the header is nil, skip it
-		case h == nil:
+		case err != nil: // return any other error
+			return errors.Wrap(err, "tar reader failed")
+		case h == nil: // if the header is nil, skip it
 			continue
 		}
 
-		// the target location where the dir/file should be created
-		trt := filepath.Join(dst, h.Name)
-		if h.FileInfo().Mode().IsDir() {
-			if err := ensureDir(trt); err != nil {
-				return errors.Wrap(err, fmt.Sprintf("could not create <%s> directory", trt))
+		switch h.Typeflag {
+		case tar.TypeDir:
+			if err := extractDir(h); err != nil {
+				return err
 			}
 			continue
+		case tar.TypeReg, tar.TypeRegA, tar.TypeChar, tar.TypeBlock, tar.TypeFifo:
+			if err := extractRegular(h, tr); err != nil {
+				return errors.Wrap(err, "could not extract regular file")
+			}
+			continue
+		case tar.TypeSymlink:
+			if err := extractSymlink(h); err != nil {
+				return errors.Wrap(err, "could not extract symbolic link")
+			}
+			continue
+		case tar.TypeLink:
+			if err := extractLink(h); err != nil {
+				return errors.Wrap(err, "could not extract link")
+			}
+			continue
+		case tar.TypeXGlobalHeader:
+			continue
+		default:
+			return fmt.Errorf("could not extract %s, unknown type flag: %c", h.Name, h.Typeflag)
 		}
-
-		dir := filepath.Dir(trt)
-		if err := ensureDir(dir); err != nil {
-			return errors.Wrap(err, fmt.Sprintf("could not create <%s> directory", dir))
-		}
-
-		f, err := os.OpenFile(trt, os.O_CREATE|os.O_RDWR, os.FileMode(h.Mode))
-		if err != nil {
-			return errors.Wrap(err, fmt.Sprintf("could not open extracted file for writing <%s>", trt))
-		}
-
-		if _, err := io.Copy(f, tr); err != nil {
-			f.Close()
-			return errors.Wrap(err, fmt.Sprintf("could not copy extracted file for writing <%s>", trt))
-		}
-		f.Close()
 	}
 }
 
-func ensureDir(dirName string) error {
-	if _, err := os.Stat(dirName); err != nil {
-		if err := os.MkdirAll(dirName, os.FileMode(0755)); err != nil {
-			return errors.Wrap(err, fmt.Sprintf("could not create directory <%s>", dirName))
-		}
+func extractDir(h *tar.Header) error {
+	if err := os.MkdirAll(h.Name, os.FileMode(h.Mode)); err != nil {
+		return errors.Wrap(err, fmt.Sprintf("could not create directory <%s>", h.Name))
+	}
+	return nil
+}
+
+func extractRegular(h *tar.Header, tr io.Reader) error {
+	f, err := os.OpenFile(h.Name, os.O_CREATE|os.O_RDWR, os.FileMode(h.Mode))
+	if err != nil {
+		return errors.Wrap(err, fmt.Sprintf("could not open extracted file for writing <%s>", h.Name))
+	}
+	defer f.Close()
+
+	if _, err := io.Copy(f, tr); err != nil {
+		return errors.Wrap(err, fmt.Sprintf("could not copy extracted file for writing <%s>", h.Name))
+	}
+	return nil
+}
+
+func extractSymlink(h *tar.Header) error {
+	if err := unlink(h.Name); err != nil {
+		return errors.Wrap(err, fmt.Sprintf("could not unlink <%s>", h.Name))
+	}
+
+	if err := os.Symlink(h.Linkname, h.Name); err != nil {
+		return errors.Wrap(err, fmt.Sprintf("could not create symbolic link <%s>", h.Name))
+	}
+	return nil
+}
+
+func extractLink(h *tar.Header) error {
+	if err := unlink(h.Name); err != nil {
+		return errors.Wrap(err, fmt.Sprintf("could not unlink <%s>", h.Name))
+	}
+
+	if err := os.Link(h.Linkname, h.Name); err != nil {
+		return errors.Wrap(err, fmt.Sprintf("could not create hard link <%s>", h.Linkname))
+	}
+	return nil
+}
+
+func isSymlink(fi os.FileInfo) bool {
+	return fi.Mode()&os.ModeSymlink != 0
+}
+
+func unlink(path string) error {
+	_, err := os.Lstat(path)
+	if err == nil {
+		return os.Remove(path)
 	}
 	return nil
 }

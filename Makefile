@@ -33,18 +33,19 @@ build-compressed: drone-cache
 
 .PHONY: build-compressed
 
-docker-build: Dockerfile
+docker-build: release Dockerfile
 	@docker build --build-arg BUILD_DATE="$(BUILD_DATE)" \
 		--build-arg VERSION="$(VERSION)" \
 		--build-arg VCS_REF="$(VCS_REF)" \
 		--build-arg DOCKERFILE_PATH="/Dockerfile" \
 		-t meltwater/drone-cache:latest .
 
-docker-build-dev: Dockerfile
+docker-build-dev: snapshot Dockerfile
 	@docker build --build-arg BUILD_DATE="$(BUILD_DATE)" \
 		--build-arg VERSION="$(VERSION)" \
 		--build-arg VCS_REF="$(VCS_REF)" \
 		--build-arg DOCKERFILE_PATH="/Dockerfile" \
+		--no-cache \
 		-t meltwater/drone-cache:dev .
 
 docker-push: docker-build

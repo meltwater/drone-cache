@@ -16,7 +16,7 @@ func main() {
 	app.Name = "Drone cache plugin"
 	app.Usage = "Drone cache plugin"
 	app.Action = run
-	app.Version = "1.0.3"
+	app.Version = "1.0.4"
 	app.Flags = []cli.Flag{
 		// Repo args
 
@@ -31,7 +31,7 @@ func main() {
 			EnvVar: "DRONE_REPO_NAMESPACE",
 		},
 		cli.StringFlag{
-			Name:   "repo.owner, owner",
+			Name:   "repo.owner, ro",
 			Usage:  "repository owner (for Drone version < 1.0)",
 			EnvVar: "DRONE_REPO_OWNER",
 		},
@@ -224,7 +224,12 @@ func main() {
 			Value:  "tar",
 			EnvVar: "PLUGIN_ARCHIVE_FORMAT",
 		},
-		cli.StringFlag{
+		cli.BoolFlag{
+			Name:   "skip-symlinks, ss",
+			Usage:  "skip symbolic links in archive",
+			EnvVar: "PLUGIN_SKIP_SYMLINKS, SKIP_SYMLINKS",
+		},
+		cli.BoolFlag{
 			Name:   "debug, d",
 			Usage:  "debug",
 			EnvVar: "PLUGIN_DEBUG, DEBUG",
@@ -348,6 +353,7 @@ func run(c *cli.Context) error {
 				Region:     c.String("region"),
 				Secret:     c.String("secret-key"),
 			},
+			SkipSymlinks: c.Bool("skip-symlinks"),
 		},
 	}
 

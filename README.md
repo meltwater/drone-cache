@@ -1,6 +1,6 @@
 # drone-cache
 
-[![semver](https://img.shields.io/badge/semver-1.0.2-blue.svg?cacheSeconds=2592000)](https://github.com/meltwater/drone-cache/releases) [![Maintenance](https://img.shields.io/maintenance/yes/2019.svg)](https://github.com/meltwater/drone-cache/commits/master) [![Drone](https://cloud.drone.io/api/badges/meltwater/drone-cache/status.svg)](https://cloud.drone.io/meltwater/drone-cache) [![Go Doc](https://godoc.org/github.com/meltwater/drone-cache?status.svg)](http://godoc.org/github.com/meltwater/drone-cache) [![Go Report Card](https://goreportcard.com/badge/github.com/meltwater/drone-cache)](https://goreportcard.com/report/github.com/meltwater/drone-cache) [![](https://images.microbadger.com/badges/image/meltwater/drone-cache.svg)](https://microbadger.com/images/meltwater/drone-cache) [![](https://images.microbadger.com/badges/version/meltwater/drone-cache.svg)](https://microbadger.com/images/meltwater/drone-cache)
+[![semver](https://img.shields.io/badge/semver-1.0.4-blue.svg?cacheSeconds=2592000)](https://github.com/meltwater/drone-cache/releases) [![Maintenance](https://img.shields.io/maintenance/yes/2019.svg)](https://github.com/meltwater/drone-cache/commits/master) [![Drone](https://cloud.drone.io/api/badges/meltwater/drone-cache/status.svg)](https://cloud.drone.io/meltwater/drone-cache) [![Go Doc](https://godoc.org/github.com/meltwater/drone-cache?status.svg)](http://godoc.org/github.com/meltwater/drone-cache) [![Go Report Card](https://goreportcard.com/badge/github.com/meltwater/drone-cache)](https://goreportcard.com/report/github.com/meltwater/drone-cache) [![codebeat badge](https://codebeat.co/badges/802c6149-ac2d-4514-8648-f618c63a8d9e)](https://codebeat.co/projects/github-com-meltwater-drone-cache-master) [![](https://images.microbadger.com/badges/image/meltwater/drone-cache.svg)](https://microbadger.com/images/meltwater/drone-cache) [![](https://images.microbadger.com/badges/version/meltwater/drone-cache.svg)](https://microbadger.com/images/meltwater/drone-cache)
 
 <p align="center"><img src="images/drone_gopher.png" width="400"></p>
 
@@ -95,7 +95,7 @@ USAGE:
    drone-cache [global options] command [command options] [arguments...]
 
 VERSION:
-   1.0.2
+   1.0.4
 
 COMMANDS:
      help, h  Shows a list of commands or help for one command
@@ -103,7 +103,7 @@ COMMANDS:
 GLOBAL OPTIONS:
    --repo.fullname value, --rf value           repository full name [$DRONE_REPO]
    --repo.namespace value, --rns value         repository namespace [$DRONE_REPO_NAMESPACE]
-   --repo.owner value, --ro value              repository owner [$DRONE_REPO_OWNER]
+   --repo.owner value, --ro value              repository owner (for Drone version < 1.0) [$DRONE_REPO_OWNER]
    --repo.name value, --rn value               repository name [$DRONE_REPO_NAME]
    --repo.link value, --rl value               repository link [$DRONE_REPO_LINK]
    --repo.avatar value, --ra value             repository avatar [$DRONE_REPO_AVATAR]
@@ -138,7 +138,8 @@ GLOBAL OPTIONS:
    --restore, --res                            restore the cache directories [$PLUGIN_RESTORE]
    --cache-key value, --chk value              cache key to use for the cache directories [$PLUGIN_CACHE_KEY]
    --archive-format value, --arcfmt value      archive format to use to store the cache directories (tar, gzip) (default: "tar") [$PLUGIN_ARCHIVE_FORMAT]
-   --debug value, -d value                     debug [$PLUGIN_DEBUG, $ DEBUG]
+   --skip-symlinks, --ss                       skip symbolic links in archive [$PLUGIN_SKIP_SYMLINKS, $ SKIP_SYMLINKS]
+   --debug, -d                                 debug [$PLUGIN_DEBUG, $ DEBUG]
    --filesystem-cache-root value, --fcr value  local filesystem root directory for the filesystem cache (default: "/tmp/cache") [$PLUGIN_FILESYSTEM_CACHE_ROOT, $ FILESYSTEM_CACHE_ROOT]
    --endpoint value, -e value                  endpoint for the s3 connection [$PLUGIN_ENDPOINT, $S3_ENDPOINT]
    --access-key value, --akey value            AWS access key [$PLUGIN_ACCESS_KEY, $AWS_ACCESS_KEY_ID, $CACHE_AWS_ACCESS_KEY_ID]
@@ -213,10 +214,10 @@ Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduc
 ## Future work
 
 - [ ] Add s/FTP Backend
+- [ ] Add Google Cloud Storage Backend
 - [ ] Fix goreleaser/drone/docker conflicts or remove redundancy with Drone jsonnet
 - [ ] Add cache key fallback list
 - [ ] Flush or TTL/Retention policy
-- [ ] Add Google Cloud Storage Backend
 - [ ] Add Microsoft Azure Storage Backend
 - [ ] Add unit tests
 
