@@ -11,6 +11,8 @@ Bug fixes and new features should include tests.
 Contributors guide: ./CONTRIBUTING.md
 -->
 
+Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct, and the process for submitting pull requests to us.
+
 Fixes #
 
 ## Proposed Changes
@@ -37,6 +39,12 @@ Fixes #
     - [ ] Code compiles correctly/
     - [ ] Created tests which fail without the change (if possible)/
     - [ ] All new and existing tests passed.
-- [ ] Version bump if you have breaking change, update version in documentation (fix or feature that would cause existing functionality to change).
 - [ ] Extended and update the README (if necessary).
 - [ ] Make sure [documentation](./DOCS.md) is up-to-date. Same file should also be updated in [plugin index](https://github.com/drone/drone-plugin-index/blob/master/content/meltwater/drone-cache/index.md) by sending a PR to that repository.
+
+**PLEASE DO NOT INTRODUCE BREAKING CHANGES**
+
+**Keep in mind that users usually use th `latest` tagged images in their pipeline, please make sure you do not interfere with their working workflow.**
+
+- [ ] Version bump if you have to, update version in documentation (fix or feature that would cause existing functionality to change).
+    - We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/meltwater/drone-cache/tags).
