@@ -19,7 +19,8 @@ steps:
   image: minio/mc:RELEASE.2018-09-26T00-42-43Z
   commands:
     - sleep 5
-    - mc config host add minio http://filestorage:9000 AKIAIOSFODNN7EXAMPLE wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY && mc mb --region=eu-west-1 minio/drone-cache-bucket"
+    - mc config host add minio http://filestorage:9000 AKIAIOSFODNN7EXAMPLE wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+    - mc mb --region=eu-west-1 minio/drone-cache-bucket
 
 - name: restore-cache
   pull: true
