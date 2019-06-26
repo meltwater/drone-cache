@@ -152,21 +152,6 @@ steps:
     event:
     - push
 
-- name: restore-cache
-  pull: true
-  image: meltwater/drone-cache:dev
-  settings:
-    bucket: drone-cache-bucket
-    mount:
-    - vendor
-    region: eu-west-1
-    restore: true
-    path_style: true
-    endpoint: filestorage:9000
-  environment:
-    AWS_ACCESS_KEY_ID: AKIAIOSFODNN7EXAMPLE
-    AWS_SECRET_ACCESS_KEY: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
-
 - name: restore-cache-with-key
   image: meltwater/drone-cache:dev
   settings:
@@ -220,6 +205,21 @@ steps:
     debug: true
     pull: true
     restore: true
+
+- name: restore-cache
+  pull: true
+  image: meltwater/drone-cache:dev
+  settings:
+    bucket: drone-cache-bucket
+    mount:
+    - vendor
+    region: eu-west-1
+    restore: true
+    path_style: true
+    endpoint: filestorage:9000
+  environment:
+    AWS_ACCESS_KEY_ID: AKIAIOSFODNN7EXAMPLE
+    AWS_SECRET_ACCESS_KEY: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
 
 - name: build-after
   pull: true
