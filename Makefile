@@ -55,3 +55,11 @@ docker-push-dev: docker-build-dev
 	docker push meltwater/drone-cache:dev
 
 .PHONY: docker-build docker-push
+
+test:
+	./test
+
+analyze:
+	golangci-lint run -v --enable-all -D gochecknoglobals
+
+.PHONY: test analyze
