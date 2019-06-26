@@ -44,7 +44,7 @@ Fixes #
 
 **PLEASE DO NOT INTRODUCE BREAKING CHANGES**
 
-**Keep in mind that users usually use th `latest` tagged images in their pipeline, please make sure you do not interfere with their working workflow.**
+**Keep in mind that users usually use the `latest` tagged images in their pipeline, please make sure you do not interfere with their working workflow.**
 
 - [ ] Version bump if you have to, update version in documentation (fix or feature that would cause existing functionality to change).
     - We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/meltwater/drone-cache/tags).
