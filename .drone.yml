@@ -221,14 +221,14 @@ steps:
     pull: true
     restore: true
 
-- name: build
+- name: build-after
   pull: true
   image: golang:1.11-alpine
   commands:
   - apk add --update make git
   - make drone-cache
 
-- name: test
+- name: test-after
   pull: true
   image: golang:1.11-alpine
   commands:
