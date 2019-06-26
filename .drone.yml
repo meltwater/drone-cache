@@ -22,75 +22,6 @@ steps:
     - mc config host add minio http://filestorage:9000 AKIAIOSFODNN7EXAMPLE wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
     - mc mb --region=eu-west-1 minio/drone-cache-bucket
 
-- name: restore-cache
-  pull: true
-  image: meltwater/drone-cache:dev
-  settings:
-    bucket: drone-cache-bucket
-    mount:
-    - vendor
-    region: eu-west-1
-    restore: true
-    path_style: true
-    endpoint: filestorage:9000
-  environment:
-    AWS_ACCESS_KEY_ID: AKIAIOSFODNN7EXAMPLE
-    AWS_SECRET_ACCESS_KEY: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
-
-- name: restore-cache-with-key
-  image: meltwater/drone-cache:dev
-  settings:
-    bucket: drone-cache-bucket
-    cache_key: "{{ .Repo.Name }}_{{ checksum \"go.mod\" }}_{{ checksum \"go.sum\" }}_{{ arch }}_{{ os }}"
-    mount:
-    - vendor
-    pull: true
-    region: eu-west-1
-    restore: true
-    path_style: true
-    endpoint: filestorage:9000
-  environment:
-    AWS_ACCESS_KEY_ID: AKIAIOSFODNN7EXAMPLE
-    AWS_SECRET_ACCESS_KEY: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
-
-- name: restore-cache-with-gzip
-  pull: true
-  image: meltwater/drone-cache:dev
-  settings:
-    archive_format: gzip
-    bucket: drone-cache-bucket
-    cache_key: gzip
-    mount:
-    - vendor
-    region: eu-west-1
-    restore: true
-    path_style: true
-    endpoint: filestorage:9000
-  environment:
-    AWS_ACCESS_KEY_ID: AKIAIOSFODNN7EXAMPLE
-    AWS_SECRET_ACCESS_KEY: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
-
-- name: restore-cache-with-filesystem
-  pull: true
-  image: meltwater/drone-cache:dev
-  settings:
-    archive_format: gzip
-    backend: filesystem
-    cache_key: volume
-    mount:
-    - vendor
-    restore: true
-  volumes:
-  - name: cache
-    path: /tmp/cache
-
-- name: restore-cache-debug
-  image: meltwater/drone-cache:dev
-  settings:
-    debug: true
-    pull: true
-    restore: true
-
 - name: build
   pull: true
   image: golang:1.11-alpine
@@ -220,6 +151,94 @@ steps:
     - master
     event:
     - push
+
+- name: restore-cache
+  pull: true
+  image: meltwater/drone-cache:dev
+  settings:
+    bucket: drone-cache-bucket
+    mount:
+    - vendor
+    region: eu-west-1
+    restore: true
+    path_style: true
+    endpoint: filestorage:9000
+  environment:
+    AWS_ACCESS_KEY_ID: AKIAIOSFODNN7EXAMPLE
+    AWS_SECRET_ACCESS_KEY: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+
+- name: restore-cache-with-key
+  image: meltwater/drone-cache:dev
+  settings:
+    bucket: drone-cache-bucket
+    cache_key: "{{ .Repo.Name }}_{{ checksum \"go.mod\" }}_{{ checksum \"go.sum\" }}_{{ arch }}_{{ os }}"
+    mount:
+    - vendor
+    pull: true
+    region: eu-west-1
+    restore: true
+    path_style: true
+    endpoint: filestorage:9000
+  environment:
+    AWS_ACCESS_KEY_ID: AKIAIOSFODNN7EXAMPLE
+    AWS_SECRET_ACCESS_KEY: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+
+- name: restore-cache-with-gzip
+  pull: true
+  image: meltwater/drone-cache:dev
+  settings:
+    archive_format: gzip
+    bucket: drone-cache-bucket
+    cache_key: gzip
+    mount:
+    - vendor
+    region: eu-west-1
+    restore: true
+    path_style: true
+    endpoint: filestorage:9000
+  environment:
+    AWS_ACCESS_KEY_ID: AKIAIOSFODNN7EXAMPLE
+    AWS_SECRET_ACCESS_KEY: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+
+- name: restore-cache-with-filesystem
+  pull: true
+  image: meltwater/drone-cache:dev
+  settings:
+    archive_format: gzip
+    backend: filesystem
+    cache_key: volume
+    mount:
+    - vendor
+    restore: true
+  volumes:
+  - name: cache
+    path: /tmp/cache
+
+- name: restore-cache-debug
+  image: meltwater/drone-cache:dev
+  settings:
+    debug: true
+    pull: true
+    restore: true
+
+- name: build
+  pull: true
+  image: golang:1.11-alpine
+  commands:
+  - apk add --update make git
+  - make drone-cache
+
+- name: test
+  pull: true
+  image: golang:1.11-alpine
+  commands:
+  - go test -v -mod=vendor -cover ./...
+  environment:
+    CGO_ENABLED: 0
+    TEST_ENDPOINT: filestorage:9000
+  volumes:
+  - name: testcache
+    path: /drone/src/testcache/cache
 
 services:
 - name: filestorage
