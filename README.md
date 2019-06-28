@@ -199,7 +199,7 @@ Build the binary with the following commands:
 $ go build .
 ```
 
-### Build Docker
+### Build Docker image
 
 Build the docker image with the following commands:
 
@@ -207,19 +207,17 @@ Build the docker image with the following commands:
 $ make docker-build
 ```
 
-## Contributing
+## Releases
 
-Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct, and the process for submitting pull requests to us.
+Release management handled by CI pipeline. When you create a tag on `master` branch, CI handles the rest.
 
-## Future work
+You can find released artifacts (binaries, code, archives) under [releases](https://github.com/meltwater/drone-cache/releases).
 
-- [ ] Add s/FTP Backend
-- [ ] Add Google Cloud Storage Backend
-- [ ] Fix goreleaser/drone/docker conflicts or remove redundancy with Drone jsonnet
-- [ ] Add cache key fallback list
-- [ ] Flush or TTL/Retention policy
-- [ ] Add Microsoft Azure Storage Backend
-- [ ] Add unit tests
+You can find released images at [DockerHub](https://hub.docker.com/r/meltwater/drone-cache/tags).
+
+**PLEASE DO NOT INTRODUCE BREAKING CHANGES**
+
+> Keep in mind that users usually use the image tagged with `latest` in their pipeline, please make sure you do not interfere with their working workflow.
 
 ## Versioning
 
@@ -238,6 +236,20 @@ Also see the list of [all contributors](https://github.com/meltwater/drone-cache
 
 - https://github.com/bsm/drone-s3-cache (original work)
 - https://github.com/Drillster/drone-volume-cache
+
+## Contributing
+
+Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct, and the process for submitting pull requests to us.
+
+## Future work
+
+- [ ] Add s/FTP Backend
+- [ ] Add Google Cloud Storage Backend
+- [ ] Fix goreleaser/drone/docker conflicts or remove redundancy with Drone jsonnet
+- [ ] Add cache key fallback list
+- [ ] Flush or TTL/Retention policy
+- [ ] Add Microsoft Azure Storage Backend
+- [ ] Add unit tests
 
 ## License and Copyright
 
