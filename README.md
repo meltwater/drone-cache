@@ -244,7 +244,9 @@ Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduc
 ## Future work
 
 - [ ] Add s/FTP Backend
-- [ ] Add Google Cloud Storage Backend
+- [ ] Add [Google Cloud Storage Backend](https://cloud.google.com/storage/)
+- [ ] Add [Azure Storage Backend](https://azure.microsoft.com/en-in/services/storage/)
+- [ ] Add [Alibaba OSS Backend](https://www.alibabacloud.com/product/oss)
 - [ ] Fix goreleaser/drone/docker conflicts or remove redundancy with Drone jsonnet
 - [ ] Add cache key fallback list
 - [ ] Flush or TTL/Retention policy
