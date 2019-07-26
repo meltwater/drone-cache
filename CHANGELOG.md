@@ -5,6 +5,45 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.4] - 2019-06-14
+
+### Added
+
+- Add symlinks to archive
+
+### Changed
+
+- Nothing
+
+### Removed
+
+- Nothing.
+
+### Deprecated
+
+- Nothing.
+
+## [1.0.3] - 2019-06-11
+
+### Added
+
+- Add missing stage
+- Add missing labels
+- Add release latest
+- Add snapshot stage
+
+### Changed
+
+f20a2ea Rename DRONE_REPO_OWNER to DRONE_REPO_NAMESPACE
+
+### Removed
+
+- Nothing.
+
+### Deprecated
+
+- Nothing.
+
 ## [1.0.2] - 2019-05-17
 
 ### Added
