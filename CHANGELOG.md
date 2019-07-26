@@ -5,7 +5,132 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.0.0] - 2018-03-??
+## [1.0.2] - 2019-05-17
+
+### Added
+
+- Improvements to build pipeline
+
+### Changed
+
+9532da6 Clean and organize TODOs
+
+### Removed
+
+- Nothing.
+
+### Deprecated
+
+- Nothing.
+
+## [1.0.1] - 2019-05-15
+
+### Added
+
+- Add blogpost link to it
+- Add cache-key parameter to README example
+- Add slack message image
+
+### Changed
+
+dd4c02b Do not try to rebuild cache for the paths do not exist
+48d7eeb Fix drone release
+8eb3a08 Fix image name in README
+d83dea6 Fix link to examples in README
+262bf0e Fix parameter naming issue in examples
+17e23dc Fix pure Docker example in Readme
+4843910 Some README improvements
+8ad9b08 goreleaser releases Docker
+
+### Removed
+
+- Nothing.
+
+### Deprecated
+
+- Nothing.
+
+## [1.0.0] - 2019-04-05
+
+### Added
+
+- Add new drone logo
+- goreleaser releases Docker
+
+### Changed
+
+- Nothing
+
+### Removed
+
+- Nothing.
+
+### Deprecated
+
+- Nothing.
+
+## [1.0.0-rc4] - 2019-04-05
+
+### Added
+
+- Add new drone logo
+- goreleaser releases Docker
+
+### Changed
+
+- Nothing
+
+### Removed
+
+- Nothing.
+
+### Deprecated
+
+- Nothing.
+
+## [1.0.0-rc3] - 2019-03-19
+
+### Added
+
+- Add docs for drone plugin index
+- Add how it works
+- Fix minor command issue
+- Integrate with Drone.io
+- Trigger on a tag
+- Use scratch as base image
+
+### Changed
+
+ba005b6 Improve README
+
+### Removed
+
+- Nothing.
+
+### Deprecated
+
+- Nothing.
+
+## [1.0.0-rc2] - 2019-03-05
+
+### Added
+
+- Fix behaviour with empty credentials
+- Print out more information when debug enabled
+
+### Changed
+
+3ffa242 Improve Documentation
+
+### Removed
+
+- Nothing.
+
+### Deprecated
+
+- Nothing.
+
+## [1.0.0-rc1] - 2019-02-26
 
 ### Added
 
@@ -28,7 +153,7 @@ b9f8e82 Update documentation (#16)
 
 - Nothing.
 
-## [0.9.0] - 2018-02-15
+## [0.9.0] - 2019-02-15
 
 ### Added
 
