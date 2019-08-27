@@ -89,7 +89,7 @@ func (c Cache) pushArchive(dst, archivePath string) error {
 
 // Pull fetches the archived file from the cache and restores to the host machine's file system
 func (c Cache) Pull(src, dst string) error {
-	log.Printf("dowloading archived directory <%s>", src)
+	log.Printf("downloading archived directory <%s>", src)
 	// 1. download archive
 	rc, err := c.b.Get(src)
 	if err != nil {
