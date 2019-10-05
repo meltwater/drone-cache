@@ -51,6 +51,8 @@ steps:
 
 ### Simple (Filesystem/Volume)
 
+NOTE: This will only be effective if your pipeline runs on the same agent each time (for example, if you are running drone in single-machine mode).
+
 ```yaml
 kind: pipeline
 name: default
@@ -95,7 +97,8 @@ steps:
 
 volumes:
   - name: cache
-    temp: {}
+    host:
+      path: /var/lib/cache
 ```
 
 ### With custom cache key template
