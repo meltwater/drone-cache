@@ -243,15 +243,9 @@ Please read [CONTRIBUTING.md](CONTRIBUTING.md) to understand how to submit pull 
 
 ## Future work
 
-- [ ] Add s/FTP Backend
-- [ ] Add [Google Cloud Storage Backend](https://cloud.google.com/storage/)
-- [ ] Add [Azure Storage Backend](https://azure.microsoft.com/en-in/services/storage/)
-- [ ] Add [Alibaba OSS Backend](https://www.alibabacloud.com/product/oss)
-- [ ] Fix goreleaser/drone/docker conflicts or remove redundancy with Drone jsonnet
-- [ ] Add cache key fallback list
-- [ ] Flush or TTL/Retention policy
-- [ ] Add Microsoft Azure Storage Backend
-- [ ] Add unit tests
+We keep all ideas for new features and bug reports in [github.com/meltwater/drone-cache/issues](https://github.com/meltwater/drone-cache/issues).
+
+One bigger area of future investment is to build a couple of [new storage backends](https://github.com/meltwater/drone-cache/labels/storage-backend) for caching the workspace files.
 
 ## License and Copyright
 
