@@ -10,7 +10,7 @@ With `drone-cache`, you can provide your **own cache key templates**, specify **
 
 For detailed usage information and a list of available options please take a look at [usage](#usage) and [examples](#example-usage-of-drone-cache). If you want to learn more about custom cache keys, see [cache key templates](docs/cache_key_templates.md).
 
-> If you want to learn story behind it, you can read our [blogpost](https://underthehood.meltwater.com/blog/2019/04/10/making-drone-builds-10-times-faster/)!
+If you want to learn more about the story behind `drone-cache`, you can read our blogpost [Making Drone Builds 10 Times Faster!](https://underthehood.meltwater.com/blog/2019/04/10/making-drone-builds-10-times-faster/)!
 
 ## How does it work
 
@@ -234,12 +234,12 @@ Also see the list of [all contributors](https://github.com/meltwater/drone-cache
 
 ### Inspiration
 
-- https://github.com/bsm/drone-s3-cache (original work)
-- https://github.com/Drillster/drone-volume-cache
+- [github.com/bsm/drone-s3-cache](https://github.com/bsm/drone-s3-cache) (original work)
+- [github.com/Drillster/drone-volume-cache](https://github.com/Drillster/drone-volume-cache)
 
 ## Contributing
 
-Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct, and the process for submitting pull requests to us.
+Please read [CONTRIBUTING.md](CONTRIBUTING.md) to understand how to submit pull requests to us, and also see our [code of conduct](CODE_OF_CONDUCT.md).
 
 ## Future work
 
