@@ -11,6 +11,8 @@ import (
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/meltwater/drone-cache/cache"
 	"github.com/pkg/errors"
+	"github.com/pkg/sftp"
+	"golang.org/x/crypto/ssh"
 )
 
 // S3Config is a structure to store S3  backend configuration
@@ -87,4 +89,37 @@ func InitializeFileSystemBackend(c FileSystemConfig, debug bool) (cache.Backend,
 	}
 
 	return newFileSystem(c.CacheRoot), nil
+}
+
+// SFTPConfig is a structure to store sftp backend configuration
+type SFTPConfig struct {
+	CacheRoot string
+	Username  string
+	Password  string
+	Host      string
+	Port      string
+}
+
+func InitializeSFTPBackend(c SFTPConfig, debug bool) (cache.Backend, error) {
+	sshConfig := &ssh.ClientConfig{
+		User: c.Username,
+		Auth: []ssh.AuthMethod{
+			ssh.Password(c.Password),
+		},
+	}
+	client, err := ssh.Dial("tcp", fmt.Sprintf("%s:%s", c.Host, c.Port), sshConfig)
+	if err != nil {
+		return nil, err
+	}
+
+	sftpClient, err := sftp.NewClient(client)
+	if err != nil {
+		return nil, err
+	}
+
+	if debug {
+		log.Printf("[DEBUG] sftp backend config: %+v", c)
+	}
+
+	return newSftpBackend(sftpClient, c.CacheRoot), nil
 }
