@@ -1,6 +1,8 @@
 package backend
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestSFTPTruth(t *testing.T) {
 	t.Skip("skipping backend package tests")

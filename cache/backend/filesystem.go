@@ -50,7 +50,7 @@ func (c *filesystem) Put(p string, src io.ReadSeeker) error {
 	defer dst.Close()
 
 	if _, err := io.Copy(dst, src); err != nil {
-		return errors.Wrap(err, "could not write read skeeker as file")
+		return errors.Wrap(err, "could not write read seeker as file")
 	}
 
 	return nil

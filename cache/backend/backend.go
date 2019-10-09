@@ -2,7 +2,9 @@ package backend
 
 import (
 	"fmt"
+	"io/ioutil"
 	"log"
+	"net"
 	"os"
 	"path"
 	"strings"
@@ -91,22 +93,55 @@ func InitializeFileSystemBackend(c FileSystemConfig, debug bool) (cache.Backend,
 	return newFileSystem(c.CacheRoot), nil
 }
 
+type SSHAuthMethod string
+
+const (
+	SSHAuthMethodPassword      SSHAuthMethod = "PASSWORD"
+	SSHAuthMethodPublicKeyFile SSHAuthMethod = "PUBLIC_KEY_FILE"
+)
+
+type SSHAuth struct {
+	Password      string
+	PublicKeyFile string
+	Method        SSHAuthMethod
+}
+
+func readPublicKeyFile(file string) (ssh.AuthMethod, error) {
+	buffer, err := ioutil.ReadFile(file)
+	if err != nil {
+		return nil, errors.Wrap(err, fmt.Sprintf("unable to read file <%s>", file))
+	}
+
+	key, err := ssh.ParsePrivateKey(buffer)
+	if err != nil {
+		return nil, errors.Wrap(err, fmt.Sprintf("unable to parse private key"))
+	}
+	return ssh.PublicKeys(key), nil
+}
+
 // SFTPConfig is a structure to store sftp backend configuration
 type SFTPConfig struct {
 	CacheRoot string
 	Username  string
-	Password  string
 	Host      string
 	Port      string
+	Auth      SSHAuth
 }
 
 func InitializeSFTPBackend(c SFTPConfig, debug bool) (cache.Backend, error) {
+	authMethod, err := getAuthMethod(c)
+	if err != nil {
+		return nil, err
+	}
+
 	sshConfig := &ssh.ClientConfig{
 		User: c.Username,
-		Auth: []ssh.AuthMethod{
-			ssh.Password(c.Password),
+		Auth: authMethod,
+		HostKeyCallback: func(hostname string, remote net.Addr, key ssh.PublicKey) error {
+			return nil
 		},
 	}
+
 	client, err := ssh.Dial("tcp", fmt.Sprintf("%s:%s", c.Host, c.Port), sshConfig)
 	if err != nil {
 		return nil, err
@@ -122,4 +157,24 @@ func InitializeSFTPBackend(c SFTPConfig, debug bool) (cache.Backend, error) {
 	}
 
 	return newSftpBackend(sftpClient, c.CacheRoot), nil
+}
+
+func getAuthMethod(c SFTPConfig) ([]ssh.AuthMethod, error) {
+	var authMethod []ssh.AuthMethod
+
+	if c.Auth.Method == SSHAuthMethodPassword {
+		authMethod = []ssh.AuthMethod{
+			ssh.Password(c.Auth.Password),
+		}
+	} else if c.Auth.Method == SSHAuthMethodPublicKeyFile {
+		if pkAuthMethod, err := readPublicKeyFile(c.Auth.PublicKeyFile); err != nil {
+			return nil, err
+		} else {
+			authMethod = []ssh.AuthMethod{
+				pkAuthMethod,
+			}
+		}
+	}
+
+	return authMethod, nil
 }
