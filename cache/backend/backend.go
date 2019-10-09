@@ -129,25 +129,12 @@ type SFTPConfig struct {
 }
 
 func InitializeSFTPBackend(c SFTPConfig, debug bool) (cache.Backend, error) {
-	authMethod, err := getAuthMethod(c)
+	sshClient, err := getSSHClient(c)
 	if err != nil {
 		return nil, err
 	}
 
-	sshConfig := &ssh.ClientConfig{
-		User: c.Username,
-		Auth: authMethod,
-		HostKeyCallback: func(hostname string, remote net.Addr, key ssh.PublicKey) error {
-			return nil
-		},
-	}
-
-	client, err := ssh.Dial("tcp", fmt.Sprintf("%s:%s", c.Host, c.Port), sshConfig)
-	if err != nil {
-		return nil, err
-	}
-
-	sftpClient, err := sftp.NewClient(client)
+	sftpClient, err := sftp.NewClient(sshClient)
 	if err != nil {
 		return nil, err
 	}
@@ -159,23 +146,36 @@ func InitializeSFTPBackend(c SFTPConfig, debug bool) (cache.Backend, error) {
 	return newSftpBackend(sftpClient, c.CacheRoot), nil
 }
 
-func getAuthMethod(c SFTPConfig) ([]ssh.AuthMethod, error) {
-	var authMethod []ssh.AuthMethod
-
-	if c.Auth.Method == SSHAuthMethodPassword {
-		authMethod = []ssh.AuthMethod{
-			ssh.Password(c.Auth.Password),
-		}
-	} else if c.Auth.Method == SSHAuthMethodPublicKeyFile {
-		pkAuthMethod, err := readPublicKeyFile(c.Auth.PublicKeyFile)
-		if err != nil {
-			return nil, err
-		}
-
-		authMethod = []ssh.AuthMethod{
-			pkAuthMethod,
-		}
+func getSSHClient(c SFTPConfig) (*ssh.Client, error) {
+	authMethod, err := getAuthMethod(c)
+	if err != nil {
+		return nil, err
 	}
 
-	return authMethod, nil
+	client, err := ssh.Dial("tcp", fmt.Sprintf("%s:%s", c.Host, c.Port), &ssh.ClientConfig{
+		User: c.Username,
+		Auth: authMethod,
+		HostKeyCallback: func(hostname string, remote net.Addr, key ssh.PublicKey) error {
+			return nil
+		},
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return client, nil
+}
+
+func getAuthMethod(c SFTPConfig) ([]ssh.AuthMethod, error) {
+	if c.Auth.Method == SSHAuthMethodPassword {
+		return []ssh.AuthMethod{
+			ssh.Password(c.Auth.Password),
+		}, nil
+	} else if c.Auth.Method == SSHAuthMethodPublicKeyFile {
+		pkAuthMethod, err := readPublicKeyFile(c.Auth.PublicKeyFile)
+		return []ssh.AuthMethod{
+			pkAuthMethod,
+		}, err
+	}
+	return nil, errors.New("ssh method auth is not recognized, should be PASSWORD or PUBLIC_KEY_FILE")
 }
