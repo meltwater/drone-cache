@@ -167,12 +167,13 @@ func getAuthMethod(c SFTPConfig) ([]ssh.AuthMethod, error) {
 			ssh.Password(c.Auth.Password),
 		}
 	} else if c.Auth.Method == SSHAuthMethodPublicKeyFile {
-		if pkAuthMethod, err := readPublicKeyFile(c.Auth.PublicKeyFile); err != nil {
+		pkAuthMethod, err := readPublicKeyFile(c.Auth.PublicKeyFile)
+		if err != nil {
 			return nil, err
-		} else {
-			authMethod = []ssh.AuthMethod{
-				pkAuthMethod,
-			}
+		}
+
+		authMethod = []ssh.AuthMethod{
+			pkAuthMethod,
 		}
 	}
 
