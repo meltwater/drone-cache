@@ -126,7 +126,7 @@ steps:
     event:
     - push
 
-- name: release-docker-latest
+- name: release-docker-dev
   image: plugins/docker
   settings:
     build_args_from_env:
@@ -143,7 +143,7 @@ steps:
     password:
       from_secret: docker_password
     repo: meltwater/drone-cache
-    tags: latest
+    tags: dev
     username:
       from_secret: docker_username
   when:
@@ -287,6 +287,32 @@ steps:
   environment:
     GITHUB_TOKEN:
       from_secret: github_token
+
+- name: release-docker-latest
+  image: plugins/docker
+  settings:
+    build_args_from_env:
+    - BUILD_DATE
+    - DOCKERFILE_PATH
+    - VCS_REF
+    - VERSION
+    dockerfile: docker/Dockerfile.linux.386
+    environment:
+    - "BUILD_DATE=$(date -u +\"%Y-%m-%dT%H:%M:%S%Z\")"
+    - "DOCKERFILE_PATH=\"/docker/Dockerfile.linux.386\""
+    - VCS_REF=$(git rev-parse --short HEAD)
+    - VERSION=$(git describe --always --tags --dirty)
+    password:
+      from_secret: docker_password
+    repo: meltwater/drone-cache
+    tags: latest
+    username:
+      from_secret: docker_username
+  when:
+    branch:
+    - master
+    event:
+    - push
 
 - name: release-docker
   image: plugins/docker
