@@ -283,8 +283,8 @@ func main() {
 
 		cli.StringFlag{
 			Name:   "endpoint, e",
-			Usage:  "endpoint for the s3 connection",
-			EnvVar: "PLUGIN_ENDPOINT,S3_ENDPOINT",
+			Usage:  "endpoint for the s3/cloud storage connection",
+			EnvVar: "PLUGIN_ENDPOINT,S3_ENDPOINT,CLOUD_STORAGE_ENDPOINT",
 		},
 		cli.StringFlag{
 			Name:   "access-key, akey",
@@ -293,13 +293,13 @@ func main() {
 		},
 		cli.StringFlag{
 			Name:   "secret-key, skey",
-			Usage:  "AWS secret key",
-			EnvVar: "PLUGIN_SECRET_KEY,AWS_SECRET_ACCESS_KEY,CACHE_AWS_SECRET_ACCESS_KEY",
+			Usage:  "AWS/GCP secret key",
+			EnvVar: "PLUGIN_SECRET_KEY,AWS_SECRET_ACCESS_KEY,CACHE_AWS_SECRET_ACCESS_KEY,GCP_API_KEY",
 		},
 		cli.StringFlag{
 			Name:   "bucket, bckt",
 			Usage:  "AWS bucket name",
-			EnvVar: "PLUGIN_BUCKET,S3_BUCKET",
+			EnvVar: "PLUGIN_BUCKET,S3_BUCKET,CLOUD_STORAGE_BUCKET",
 		},
 		cli.StringFlag{
 			Name:   "region, reg",
@@ -450,6 +450,7 @@ func run(c *cli.Context) error {
 			FileSystem: backend.FileSystemConfig{
 				CacheRoot: c.String("filesystem-cache-root"),
 			},
+
 			S3: backend.S3Config{
 				ACL:        c.String("acl"),
 				Bucket:     c.String("bucket"),
@@ -460,6 +461,7 @@ func run(c *cli.Context) error {
 				Region:     c.String("region"),
 				Secret:     c.String("secret-key"),
 			},
+
 			Azure: backend.AzureConfig{
 				AccountName:    c.String("azure-account-name"),
 				AccountKey:     c.String("azure-account-key"),
@@ -467,6 +469,7 @@ func run(c *cli.Context) error {
 				BlobStorageURL: c.String("azure-blob-storage-url"),
 				Azurite:        false,
 			},
+
 			SFTP: backend.SFTPConfig{
 				CacheRoot: c.String("sftp-cache-root"),
 				Username:  c.String("sftp-username"),
@@ -477,6 +480,14 @@ func run(c *cli.Context) error {
 					PublicKeyFile: c.String("sftp-public-key-file"),
 					Method:        backend.SSHAuthMethod(c.String("sftp-auth-method")),
 				},
+			},
+
+			// TODO: Think about naming of variables, reusing can be confusing, prefixing?
+			CloudStorage: backend.CloudStorageConfig{
+				Bucket:     c.String("bucket"),
+				Encryption: c.String("encryption"),
+				Endpoint:   c.String("endpoint"),
+				APIKey:     c.String("secret-key"),
 			},
 
 			SkipSymlinks: c.Bool("skip-symlinks"),

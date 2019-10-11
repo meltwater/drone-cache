@@ -1,6 +1,7 @@
 module github.com/meltwater/drone-cache
 
 require (
+	cloud.google.com/go/storage v1.1.0
 	github.com/Azure/azure-storage-blob-go v0.8.0
 	github.com/Azure/go-autorest/autorest/adal v0.8.1 // indirect
 	github.com/aws/aws-sdk-go v1.16.35
@@ -19,6 +20,7 @@ require (
 	github.com/urfave/cli v1.20.0
 	golang.org/x/crypto v0.0.0-20191206172530-e9b2fee46413
 	golang.org/x/sys v0.0.0-20191008105621-543471e840be // indirect
+	google.golang.org/api v0.9.0
 	gopkg.in/ini.v1 v1.41.0 // indirect
 )
 
