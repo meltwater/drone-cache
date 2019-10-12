@@ -117,6 +117,7 @@ steps:
   commands:
   - apk add --update make upx
   - goreleaser release --rm-dist --snapshot
+  - echo "$(git rev-parse --abbrev-ref HEAD)-$(git rev-parse --short HEAD)" > .tags
   environment:
     GITHUB_TOKEN:
       from_secret: github_token
@@ -126,7 +127,7 @@ steps:
     event:
     - push
 
-- name: release-docker-dev
+- name: release-docker-vsc-ref
   image: plugins/docker
   settings:
     build_args_from_env:
@@ -143,7 +144,7 @@ steps:
     password:
       from_secret: docker_password
     repo: meltwater/drone-cache
-    tags: dev
+    # tags: this releases with tags in .tags
     username:
       from_secret: docker_username
   when:
