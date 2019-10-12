@@ -27,7 +27,7 @@ the requirements below.
 ## Pull Request Checklist
 
 - [x] Read the **CONTRIBUTING** document. (It's checked since you are already here.)
-- [ ] Read the **CODE OF CONDUCT** document.
+- [ ] Read the [**CODE OF CONDUCT**](CODE_OF_CONDUCT.md) document.
 - [ ] Add tests to cover changes.
 - [ ] Ensure your code follows the code style of this project.
 - [ ] Ensure CI and all other PR checks are green OR

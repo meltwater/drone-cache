@@ -95,7 +95,7 @@ f20a2ea Rename DRONE_REPO_OWNER to DRONE_REPO_NAMESPACE
 - Fix image name in README
 - Fix link to examples in README
 - Fix parameter naming issue in examples
-- Fix pure Docker example in Readme
+- Fix pure Docker example in README
 - Some README improvements
 - goreleaser releases Docker
 
