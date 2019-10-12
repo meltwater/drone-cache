@@ -17,8 +17,8 @@ the requirements below.
 0. Check out [Pull Request Checklist](#pull-request-checklist), ensure you have fulfilled each step.
 1. Ensure any install or build dependencies are removed before the end of the layer when doing a
    build.
-2. Please ensure the [README](README.md) and [DOCS](./DOCS.md) are up-to-date with details of changes to the interface, this includes new environment.
-   variables, exposed ports, useful file locations and container parameters.
+2. Please ensure the [README](README.md) and [DOCS](./DOCS.md) are up-to-date with details of changes to the command-line interface,
+    this includes new environment variables, exposed ports, useful file locations and container parameters.
 3. **PLEASE ENSURE YOU DO NOT INTRODUCE BREAKING CHANGES.**
 4. **PLEASE ENSURE BUG FIXES AND NEW FEATURES INCLUDE TESTS.**
 5. You may merge the Pull Request in once you have the sign-off of one other maintainer/code owner,
@@ -26,17 +26,17 @@ the requirements below.
 
 ## Pull Request Checklist
 
-- [x] Read the **CONTRIBUTING** document. (It's checked since you are alread here.)
+- [x] Read the **CONTRIBUTING** document. (It's checked since you are already here.)
 - [ ] Read the **CODE OF CONDUCT** document.
 - [ ] Add tests to cover changes.
-- [ ] Make sure your code follows the code style of this project
-- [ ] Make sure CI and all other PR checks are green OR
+- [ ] Ensure your code follows the code style of this project.
+- [ ] Ensure CI and all other PR checks are green OR
     - [ ] Code compiles correctly.
     - [ ] Created tests which fail without the change (if possible).
     - [ ] All new and existing tests passed.
-- [ ] Add your changes to [CHANGELOG](CHANGELOG.md).
+- [ ] Add your changes to `Unreleased` section of [CHANGELOG](CHANGELOG.md).
 - [ ] Improve and update the [README](README.md) (if necessary).
-- [ ] Make sure [documentation](./DOCS.md) is up-to-date. Same file should also be updated in [plugin index](https://github.com/drone/drone-plugin-index/blob/master/content/meltwater/drone-cache/index.md) by sending a PR to that repository.
+- [ ] Ensure [documentation](./DOCS.md) is up-to-date. The same file will be updated in [plugin index](https://github.com/drone/drone-plugin-index/blob/master/content/meltwater/drone-cache/index.md) when your PR is accepted, so it will be available for end-users at http://plugins.drone.io.
 
 ## Release Process
 
@@ -46,8 +46,9 @@ the requirements below.
 1. Increase the version numbers in any examples files and the README.md to the new version that this
    release would represent. The versioning scheme we use is [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/meltwater/drone-cache/tags).
 
-2. Make sure [CHANGELOG](CHANGELOG.md) is up-to-date.
-3. Create a tag on master. Any changes on master will trigger a release with given tag and `latest tag.
+2. Ensure [CHANGELOG](CHANGELOG.md) is up-to-date with new version changes.
+3. Update version references.
+4. Create a tag on master. Any changes on master will trigger a release with given tag and `latest tag.
 
     ```console
     $ git tag -am 'vX.X.X'

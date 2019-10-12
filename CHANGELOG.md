@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Ureleased
+
+### Added
+
+- Nothing.
+
+### Changed
+
+- Nothing
+
+### Removed
+
+- Nothing.
+
+### Deprecated
+
+- Nothing.
+
 ## [1.0.4] - 2019-06-14
 
 ### Added
@@ -72,14 +90,14 @@ f20a2ea Rename DRONE_REPO_OWNER to DRONE_REPO_NAMESPACE
 
 ### Changed
 
-dd4c02b Do not try to rebuild cache for the paths do not exist
-48d7eeb Fix drone release
-8eb3a08 Fix image name in README
-d83dea6 Fix link to examples in README
-262bf0e Fix parameter naming issue in examples
-17e23dc Fix pure Docker example in Readme
-4843910 Some README improvements
-8ad9b08 goreleaser releases Docker
+- Do not try to rebuild cache for the paths do not exist
+- Fix drone release
+- Fix image name in README
+- Fix link to examples in README
+- Fix parameter naming issue in examples
+- Fix pure Docker example in Readme
+- Some README improvements
+- goreleaser releases Docker
 
 ### Removed
 
@@ -159,7 +177,7 @@ ba005b6 Improve README
 
 ### Changed
 
-3ffa242 Improve Documentation
+- Improve Documentation
 
 ### Removed
 
@@ -181,8 +199,8 @@ ba005b6 Improve README
 
 ### Changed
 
-51a7b44 Enable more linters and fix discovered issues (#14)
-b9f8e82 Update documentation (#16)
+- Enable more linters and fix discovered issues (#14)
+- Update documentation (#16)
 
 ### Removed
 
