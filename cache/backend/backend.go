@@ -106,19 +106,6 @@ type SSHAuth struct {
 	Method        SSHAuthMethod
 }
 
-func readPublicKeyFile(file string) (ssh.AuthMethod, error) {
-	buffer, err := ioutil.ReadFile(file)
-	if err != nil {
-		return nil, errors.Wrap(err, fmt.Sprintf("unable to read file <%s>", file))
-	}
-
-	key, err := ssh.ParsePrivateKey(buffer)
-	if err != nil {
-		return nil, errors.Wrap(err, fmt.Sprintf("unable to parse private key"))
-	}
-	return ssh.PublicKeys(key), nil
-}
-
 // SFTPConfig is a structure to store sftp backend configuration
 type SFTPConfig struct {
 	CacheRoot string
@@ -136,7 +123,7 @@ func InitializeSFTPBackend(c SFTPConfig, debug bool) (cache.Backend, error) {
 
 	sftpClient, err := sftp.NewClient(sshClient)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "unable to connect to ssh with sftp protocol")
 	}
 
 	if debug {
@@ -149,7 +136,7 @@ func InitializeSFTPBackend(c SFTPConfig, debug bool) (cache.Backend, error) {
 func getSSHClient(c SFTPConfig) (*ssh.Client, error) {
 	authMethod, err := getAuthMethod(c)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, " unable to get ssh auth method")
 	}
 
 	client, err := ssh.Dial("tcp", fmt.Sprintf("%s:%s", c.Host, c.Port), &ssh.ClientConfig{
@@ -160,7 +147,7 @@ func getSSHClient(c SFTPConfig) (*ssh.Client, error) {
 		},
 	})
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "unable to connect to ssh")
 	}
 
 	return client, nil
@@ -178,4 +165,17 @@ func getAuthMethod(c SFTPConfig) ([]ssh.AuthMethod, error) {
 		}, err
 	}
 	return nil, errors.New("ssh method auth is not recognized, should be PASSWORD or PUBLIC_KEY_FILE")
+}
+
+func readPublicKeyFile(file string) (ssh.AuthMethod, error) {
+	buffer, err := ioutil.ReadFile(file)
+	if err != nil {
+		return nil, errors.Wrap(err, fmt.Sprintf("unable to read file <%s>", file))
+	}
+
+	key, err := ssh.ParsePrivateKey(buffer)
+	if err != nil {
+		return nil, errors.Wrap(err, fmt.Sprintf("unable to parse private key"))
+	}
+	return ssh.PublicKeys(key), nil
 }
