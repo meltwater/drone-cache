@@ -37,6 +37,7 @@ steps:
   environment:
     CGO_ENABLED: 0
     TEST_ENDPOINT: filestorage:9000
+    TEST_SFTP_HOST: sftp
   volumes:
   - name: testcache
     path: /drone/src/testcache/cache
@@ -237,6 +238,7 @@ steps:
   environment:
     CGO_ENABLED: 0
     TEST_ENDPOINT: filestorage:9000
+    TEST_SFTP_HOST: sftp
   volumes:
   - name: testcache
     path: /drone/src/testcache/cache
@@ -252,6 +254,12 @@ services:
     MINIO_SECRET_KEY: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
   ports:
   - 9000
+- name: sftp
+  image: atmoz/sftp
+  ports:
+  - 22
+  commands:
+  - /entrypoint foo:pass:::upload
 
 volumes:
 - name: cache

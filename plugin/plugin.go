@@ -32,6 +32,7 @@ type (
 
 		S3         backend.S3Config
 		FileSystem backend.FileSystemConfig
+		SFTP       backend.SFTPConfig
 	}
 
 	// Plugin stores metadata about current plugin
@@ -105,6 +106,9 @@ func initializeBackend(c Config) (cache.Backend, error) {
 	case "filesystem":
 		log.Println("[IMPORTANT] using filesystem as backend")
 		return backend.InitializeFileSystemBackend(c.FileSystem, c.Debug)
+	case "sftp":
+		log.Println("[IMPORTANT] using sftp as backend")
+		return backend.InitializeSFTPBackend(c.SFTP, c.Debug)
 	default:
 		return nil, errors.New("unknown backend")
 	}

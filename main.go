@@ -287,6 +287,42 @@ func main() {
 			Usage:  "server-side encryption algorithm, defaults to none. (AES256, aws:kms)",
 			EnvVar: "PLUGIN_ENCRYPTION",
 		},
+
+		cli.StringFlag{
+			Name:   "sftp-cache-root",
+			Usage:  "sftp root directory",
+			EnvVar: "SFTP_CACHE_ROOT",
+		},
+		cli.StringFlag{
+			Name:   "sftp-username",
+			Usage:  "sftp username",
+			EnvVar: "SFTP_USERNAME",
+		},
+		cli.StringFlag{
+			Name:   "sftp-password",
+			Usage:  "sftp password",
+			EnvVar: "SFTP_PASSWORD",
+		},
+		cli.StringFlag{
+			Name:   "ftp-public-key-file",
+			Usage:  "sftp public key file path",
+			EnvVar: "SFTP_PUBLIC_KEY_FILE",
+		},
+		cli.StringFlag{
+			Name:   "sftp-auth-method",
+			Usage:  "sftp auth method, defaults to none. (PASSWORD, PUBLIC_KEY_FILE)",
+			EnvVar: "SFTP_AUTH_METHOD",
+		},
+		cli.StringFlag{
+			Name:   "sftp-host",
+			Usage:  "sftp host",
+			EnvVar: "SFTP_HOST",
+		},
+		cli.StringFlag{
+			Name:   "sftp-host",
+			Usage:  "sftp port",
+			EnvVar: "SFTP_PORT",
+		},
 	}
 
 	if err := app.Run(os.Args); err != nil {
@@ -352,6 +388,17 @@ func run(c *cli.Context) error {
 				PathStyle:  c.Bool("path-style"),
 				Region:     c.String("region"),
 				Secret:     c.String("secret-key"),
+			},
+			SFTP: backend.SFTPConfig{
+				CacheRoot: c.String("sftp-cache-root"),
+				Username:  c.String("sftp-username"),
+				Host:      c.String("sftp-host"),
+				Port:      c.String("sftp-port"),
+				Auth: backend.SSHAuth{
+					Password:      c.String("sftp-password"),
+					PublicKeyFile: c.String("sftp-public-key-file"),
+					Method:        backend.SSHAuthMethod(c.String("sftp-auth-method")),
+				},
 			},
 			SkipSymlinks: c.Bool("skip-symlinks"),
 		},
