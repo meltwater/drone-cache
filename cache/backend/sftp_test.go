@@ -7,6 +7,12 @@ import (
 	"testing"
 )
 
+const defaultSFTPHost = "127.0.0.1"
+const defaultSFTPPort = "22"
+
+var host = getEnv("TEST_SFTP_HOST", defaultSFTPHost)
+var port = getEnv("TEST_SFTP_PORT", defaultSFTPPort)
+
 func TestSFTPTruth(t *testing.T) {
 	cli, err := InitializeSFTPBackend(SFTPConfig{
 		CacheRoot: "/upload",
@@ -15,8 +21,8 @@ func TestSFTPTruth(t *testing.T) {
 			Password: "pass",
 			Method:   SSHAuthMethodPassword,
 		},
-		Host: "localhost",
-		Port: "22",
+		Host: host,
+		Port: port,
 	}, true)
 	if err != nil {
 		t.Fatal(err)
@@ -45,4 +51,12 @@ func TestSFTPTruth(t *testing.T) {
 	}
 
 	_ = os.Remove("test")
+}
+
+func getEnv(key, defaultVal string) string {
+	value, ok := os.LookupEnv(key)
+	if !ok {
+		return defaultVal
+	}
+	return value
 }

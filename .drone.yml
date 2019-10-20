@@ -37,6 +37,7 @@ steps:
   environment:
     CGO_ENABLED: 0
     TEST_ENDPOINT: filestorage:9000
+    TEST_SFTP_HOST: sftp
   volumes:
   - name: testcache
     path: /drone/src/testcache/cache
@@ -237,6 +238,7 @@ steps:
   environment:
     CGO_ENABLED: 0
     TEST_ENDPOINT: filestorage:9000
+    TEST_SFTP_HOST: sftp
   volumes:
   - name: testcache
     path: /drone/src/testcache/cache
