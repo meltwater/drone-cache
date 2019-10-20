@@ -51,6 +51,16 @@ steps:
   environment:
     CGO_ENABLED: 0
 
+- name: release-snapshot-dev
+  image: goreleaser/goreleaser:v0.109
+  commands:
+  - apk add --update make upx
+  - goreleaser release --rm-dist --snapshot
+  - echo "$(git rev-parse --abbrev-ref HEAD)-$(git rev-parse --short HEAD)" > .tags
+  environment:
+    GITHUB_TOKEN:
+      from_secret: github_token
+
 - name: release-docker-dev
   image: plugins/docker
   settings:
