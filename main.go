@@ -325,7 +325,7 @@ func main() {
 			EnvVar: "SFTP_HOST",
 		},
 		cli.StringFlag{
-			Name:   "sftp-host",
+			Name:   "sftp-port",
 			Usage:  "sftp port",
 			EnvVar: "SFTP_PORT",
 		},
