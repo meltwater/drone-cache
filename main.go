@@ -310,7 +310,7 @@ func main() {
 		},
 		cli.StringFlag{
 			Name:   "sftp-auth-method",
-			Usage:  "sftp auth method (PASSWORD, PUBLIC_KEY_FILE), in case of password use sftp-password else use ftp-public-key-file",
+			Usage:  "sftp auth method, defaults to none. (PASSWORD, PUBLIC_KEY_FILE)",
 			EnvVar: "SFTP_AUTH_METHOD",
 		},
 		cli.StringFlag{

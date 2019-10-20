@@ -259,7 +259,7 @@ services:
   ports:
   - 22
   commands:
-  - foo:pass:::upload
+  - /entrypoint foo:pass:::upload
 
 volumes:
 - name: cache
