@@ -252,6 +252,12 @@ services:
     MINIO_SECRET_KEY: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
   ports:
   - 9000
+- name: sftp
+  image: atmoz/sftp
+  ports:
+  - 22
+  commands:
+  - foo:pass:::upload
 
 volumes:
 - name: cache
