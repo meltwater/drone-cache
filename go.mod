@@ -1,6 +1,7 @@
 module github.com/meltwater/drone-cache
 
 require (
+	github.com/aliyun/aliyun-oss-go-sdk v2.0.3+incompatible
 	github.com/aws/aws-sdk-go v1.16.35
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/go-ini/ini v1.41.0 // indirect
@@ -18,5 +19,6 @@ require (
 	golang.org/x/net v0.0.0-20190213061140-3a22650c66bd // indirect
 	golang.org/x/sys v0.0.0-20190214214411-e77772198cdc // indirect
 	golang.org/x/text v0.3.0 // indirect
+	golang.org/x/time v0.0.0-20190921001708-c4c64cad1fd0 // indirect
 	gopkg.in/ini.v1 v1.41.0 // indirect
 )

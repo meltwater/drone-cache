@@ -7,6 +7,7 @@ import (
 	"path"
 	"strings"
 
+	"github.com/aliyun/aliyun-oss-go-sdk/oss"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/meltwater/drone-cache/cache"
@@ -48,6 +49,17 @@ type FileSystemConfig struct {
 	CacheRoot string
 }
 
+// AlibabaOSSConfig a structure to store AlibabaOSS backend configuration
+type AlibabaOSSConfig struct {
+	Endpoint string
+
+	Bucket string
+
+	// An AccessKey (AK) is composed of an AccessKeyId and an AccessKeySecret.
+	// They work in pairs to perform access identity verification.
+	AccesKeyID, AccesKeySecret string
+}
+
 // InitializeS3Backend creates an S3 backend
 func InitializeS3Backend(c S3Config, debug bool) (cache.Backend, error) {
 	awsConf := &aws.Config{
@@ -87,4 +99,26 @@ func InitializeFileSystemBackend(c FileSystemConfig, debug bool) (cache.Backend,
 	}
 
 	return newFileSystem(c.CacheRoot), nil
+}
+
+// InitializeOSSBackend creates an AlibabaOSS backend
+func InitializeOSSBackend(c AlibabaOSSConfig, debug bool) (cache.Backend, error) {
+	ossConf := &oss.Config{}
+
+	if c.Endpoint != "" {
+		ossConf.Endpoint = c.Endpoint
+	}
+
+	if c.AccesKeyID != "" {
+		ossConf.AccessKeyID = c.AccesKeyID
+	}
+
+	if c.AccesKeySecret != "" {
+		ossConf.AccessKeySecret = c.AccesKeySecret
+	}
+
+	if debug {
+		log.Printf("[DEBUG] alibaba oss config: %+v", c)
+	}
+	return newAlibabaOss(c.Bucket, ossConf)
 }

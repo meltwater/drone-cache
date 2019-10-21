@@ -32,6 +32,7 @@ type (
 
 		S3         backend.S3Config
 		FileSystem backend.FileSystemConfig
+		AlibabaOSS backend.AlibabaOSSConfig
 	}
 
 	// Plugin stores metadata about current plugin
@@ -105,6 +106,9 @@ func initializeBackend(c Config) (cache.Backend, error) {
 	case "filesystem":
 		log.Println("[IMPORTANT] using filesystem as backend")
 		return backend.InitializeFileSystemBackend(c.FileSystem, c.Debug)
+	case "oss":
+		log.Println("[IMPORTANT] using alibaba oss as backend")
+		return backend.InitializeOSSBackend(c.AlibabaOSS, c.Debug)
 	default:
 		return nil, errors.New("unknown backend")
 	}
