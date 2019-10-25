@@ -22,6 +22,7 @@ type s3Backend struct {
 // newS3 returns a new S3 remote Backend implemented
 func newS3(bucket, acl, encryption string, conf *aws.Config) cache.Backend {
 	client := s3.New(session.Must(session.NewSessionWithOptions(session.Options{})), conf)
+
 	return &s3Backend{
 		bucket:     bucket,
 		acl:        acl,
@@ -54,6 +55,8 @@ func (c *s3Backend) Put(p string, src io.ReadSeeker) error {
 	if c.encryption != "" {
 		in.ServerSideEncryption = aws.String(c.encryption)
 	}
+
 	_, err := c.client.PutObject(in)
+
 	return errors.Wrap(err, "couldn't put the object")
 }

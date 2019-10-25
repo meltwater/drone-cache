@@ -6,17 +6,21 @@ import (
 
 	"github.com/urfave/cli"
 
+	"github.com/meltwater/drone-cache/cache"
 	"github.com/meltwater/drone-cache/cache/backend"
 	"github.com/meltwater/drone-cache/metadata"
 	"github.com/meltwater/drone-cache/plugin"
 )
 
+var version = "0.0.0"
+
+//nolint:funlen
 func main() {
 	app := cli.NewApp()
 	app.Name = "Drone cache plugin"
 	app.Usage = "Drone cache plugin"
 	app.Action = run
-	app.Version = "1.0.4"
+	app.Version = version
 	app.Flags = []cli.Flag{
 		// Repo args
 
@@ -221,8 +225,15 @@ func main() {
 		cli.StringFlag{
 			Name:   "archive-format, arcfmt",
 			Usage:  "archive format to use to store the cache directories (tar, gzip)",
-			Value:  "tar",
+			Value:  cache.DefaultArchiveFormat,
 			EnvVar: "PLUGIN_ARCHIVE_FORMAT",
+		},
+		cli.IntFlag{
+			Name: "compression-level, cpl",
+			Usage: `compression level to use for gzip compression when archive-format specified as gzip
+			(check https://godoc.org/compress/flate#pkg-constants for available options)`,
+			Value:  cache.DefaultCompressionLevel,
+			EnvVar: "PLUGIN_COMPRESSION_LEVEL",
 		},
 		cli.BoolFlag{
 			Name:   "skip-symlinks, ss",
@@ -336,6 +347,7 @@ func main() {
 	}
 }
 
+//nolint:funlen
 func run(c *cli.Context) error {
 	plg := plugin.Plugin{
 		Metadata: metadata.Metadata{
@@ -374,13 +386,14 @@ func run(c *cli.Context) error {
 			},
 		},
 		Config: plugin.Config{
-			ArchiveFormat: c.String("archive-format"),
-			Backend:       c.String("backend"),
-			CacheKey:      c.String("cache-key"),
-			Debug:         c.Bool("debug"),
-			Mount:         c.StringSlice("mount"),
-			Rebuild:       c.Bool("rebuild"),
-			Restore:       c.Bool("restore"),
+			ArchiveFormat:    c.String("archive-format"),
+			Backend:          c.String("backend"),
+			CacheKey:         c.String("cache-key"),
+			CompressionLevel: c.Int("compression-level"),
+			Debug:            c.Bool("debug"),
+			Mount:            c.StringSlice("mount"),
+			Rebuild:          c.Bool("rebuild"),
+			Restore:          c.Bool("restore"),
 
 			FileSystem: backend.FileSystemConfig{
 				CacheRoot: c.String("filesystem-cache-root"),
@@ -424,6 +437,7 @@ func run(c *cli.Context) error {
 	if _, ok := err.(plugin.Error); ok {
 		// If it is an expected error log it, handle it gracefully
 		log.Println(err)
+
 		return nil
 	}
 

@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/meltwater/drone-cache/cache"
 	"github.com/meltwater/drone-cache/cache/backend"
 
 	"github.com/minio/minio-go"
@@ -485,12 +486,13 @@ func newTestPlugin(bck string, rebuild, restore bool, mount []string, cacheKey, 
 			},
 		},
 		Config: Config{
-			ArchiveFormat: archiveFmt,
-			Backend:       bck,
-			CacheKey:      cacheKey,
-			Mount:         mount,
-			Rebuild:       rebuild,
-			Restore:       restore,
+			ArchiveFormat:    archiveFmt,
+			CompressionLevel: cache.DefaultCompressionLevel,
+			Backend:          bck,
+			CacheKey:         cacheKey,
+			Mount:            mount,
+			Rebuild:          rebuild,
+			Restore:          restore,
 
 			FileSystem: backend.FileSystemConfig{
 				CacheRoot: "../testcache/cache",

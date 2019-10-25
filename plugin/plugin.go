@@ -23,6 +23,8 @@ type (
 		Backend       string
 		CacheKey      string
 
+		CompressionLevel int
+
 		Debug        bool
 		SkipSymlinks bool
 		Rebuild      bool
@@ -54,6 +56,7 @@ func (p *Plugin) Exec() error {
 	// 1. Check parameters
 	if c.Debug {
 		log.Println("DEBUG MODE enabled!")
+
 		for _, pair := range os.Environ() {
 			log.Println(pair)
 		}
@@ -79,7 +82,11 @@ func (p *Plugin) Exec() error {
 	}
 
 	// 3. Initialize cache
-	cch := cache.New(backend, c.ArchiveFormat, c.SkipSymlinks)
+	cch := cache.New(backend,
+		cache.WithArchiveFormat(c.ArchiveFormat),
+		cache.WithSkipSymlinks(c.SkipSymlinks),
+		cache.WithCompressionLevel(c.CompressionLevel),
+	)
 
 	// 4. Select mode
 	if c.Rebuild {
@@ -128,14 +135,18 @@ func processRebuild(c cache.Cache, cacheKeyTmpl string, mountedDirs []string, m 
 		if err != nil {
 			return errors.Wrap(err, "could not generate cache key")
 		}
+
 		path := filepath.Join(m.Repo.Name, key)
 
 		log.Printf("rebuilding cache for directory <%s> to remote cache <%s>", mount, path)
+
 		if err := c.Push(mount, path); err != nil {
 			return errors.Wrap(err, "could not upload")
 		}
 	}
+
 	log.Printf("cache built in %v", time.Since(now))
+
 	return nil
 }
 
@@ -149,14 +160,17 @@ func processRestore(c cache.Cache, cacheKeyTmpl string, mountedDirs []string, m 
 		if err != nil {
 			return errors.Wrap(err, "could not generate cache key")
 		}
-		path := filepath.Join(m.Repo.Name, key)
 
+		path := filepath.Join(m.Repo.Name, key)
 		log.Printf("restoring directory <%s> from remote cache <%s>", mount, path)
+
 		if err := c.Pull(path, mount); err != nil {
 			return errors.Wrap(err, "could not download")
 		}
 	}
+
 	log.Printf("cache restored in %v", time.Since(now))
+
 	return nil
 }
 
@@ -165,6 +179,7 @@ func processRestore(c cache.Cache, cacheKeyTmpl string, mountedDirs []string, m 
 // cacheKey generates key from given template as parameter or fallbacks hash
 func cacheKey(p metadata.Metadata, cacheKeyTmpl, mount, branch string) (string, error) {
 	log.Println("using provided cache key template")
+
 	key, err := cachekey.Generate(cacheKeyTmpl, mount, metadata.Metadata{
 		Build:  p.Build,
 		Commit: p.Commit,
@@ -174,6 +189,7 @@ func cacheKey(p metadata.Metadata, cacheKeyTmpl, mount, branch string) (string, 
 	if err != nil {
 		log.Printf("%v, falling back to default key", err)
 		key, err = cachekey.Hash(mount, branch)
+
 		if err != nil {
 			return "", errors.Wrap(err, "could not generate hash key for mounted")
 		}

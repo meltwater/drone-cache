@@ -20,3 +20,5 @@ require (
 	golang.org/x/crypto v0.0.0-20190820162420-60c769a6c586
 	gopkg.in/ini.v1 v1.41.0 // indirect
 )
+
+go 1.13

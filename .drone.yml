@@ -42,11 +42,11 @@ steps:
   - name: testcache
     path: /drone/src/testcache/cache
 
-- name: analyze
+- name: lint
   pull: true
   image: golang:1.11-alpine
   commands:
-  - "wget -O - -q https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s v1.14.0"
+  - "wget -O - -q https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s v1.21.0"
   - ./bin/golangci-lint run -v --enable-all -D gochecknoglobals
   environment:
     CGO_ENABLED: 0
@@ -331,7 +331,7 @@ steps:
   image: goreleaser/goreleaser:v0.109
   commands:
   - apk add --update make upx
-  - goreleaser release
+  - make release
   environment:
     GITHUB_TOKEN:
       from_secret: github_token

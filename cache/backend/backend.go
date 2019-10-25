@@ -162,6 +162,7 @@ func getAuthMethod(c SFTPConfig) ([]ssh.AuthMethod, error) {
 			pkAuthMethod,
 		}, err
 	}
+
 	return nil, errors.New("ssh method auth is not recognized, should be PASSWORD or PUBLIC_KEY_FILE")
 }
 
@@ -175,5 +176,6 @@ func readPublicKeyFile(file string) (ssh.AuthMethod, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("unable to parse private key"))
 	}
+
 	return ssh.PublicKeys(key), nil
 }

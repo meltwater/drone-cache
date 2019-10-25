@@ -23,6 +23,7 @@ func (s sftpBackend) Get(path string) (io.ReadCloser, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, "could not get the object")
 	}
+
 	return s.client.Open(absPath)
 }
 

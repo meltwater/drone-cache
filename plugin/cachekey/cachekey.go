@@ -57,6 +57,7 @@ func Generate(tmpl, mount string, data metadata.Metadata) (string, error) {
 	}
 
 	var b strings.Builder
+
 	err = t.Execute(&b, data)
 	if err != nil {
 		return "", errors.Wrap(err, fmt.Sprintf("could not build <%s> as cache key, falling back to default. %+v", tmpl, err))
@@ -76,6 +77,7 @@ func Hash(parts ...string) (string, error) {
 	for i, p := range parts {
 		readers[i] = strings.NewReader(p)
 	}
+
 	return readerHasher(readers...)
 }
 
@@ -84,10 +86,12 @@ func Hash(parts ...string) (string, error) {
 // readerHasher generic md5 hash generater from io.Readers
 func readerHasher(readers ...io.Reader) (string, error) {
 	h := md5.New() // #nosec
+
 	for _, r := range readers {
 		if _, err := io.Copy(h, r); err != nil {
 			return "", errors.Wrap(err, "could not write reader as hash")
 		}
 	}
+
 	return fmt.Sprintf("%x", h.Sum(nil)), nil
 }

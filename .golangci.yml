@@ -5,3 +5,14 @@ run:
   deadline: 1m
   tests: false
   modules-download-mode: vendor
+
+linters:
+  enable-all: true
+  disable:
+    - gochecknoglobals
+
+linters-settings:
+  errcheck:
+    exclude: .errcheck_excludes
+  lll:
+    line-length: 140
