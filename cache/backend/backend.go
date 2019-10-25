@@ -3,14 +3,16 @@ package backend
 import (
 	"fmt"
 	"io/ioutil"
-	"log"
 	"os"
 	"path"
 	"strings"
 
+	"github.com/meltwater/drone-cache/cache"
+
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
-	"github.com/meltwater/drone-cache/cache"
+	"github.com/go-kit/kit/log"
+	"github.com/go-kit/kit/log/level"
 	"github.com/pkg/errors"
 	"github.com/pkg/sftp"
 	"golang.org/x/crypto/ssh"
@@ -52,7 +54,7 @@ type FileSystemConfig struct {
 }
 
 // InitializeS3Backend creates an S3 backend
-func InitializeS3Backend(c S3Config, debug bool) (cache.Backend, error) {
+func InitializeS3Backend(logger log.Logger, c S3Config, debug bool) (cache.Backend, error) {
 	awsConf := &aws.Config{
 		Region:           aws.String(c.Region),
 		Endpoint:         &c.Endpoint,
@@ -63,11 +65,12 @@ func InitializeS3Backend(c S3Config, debug bool) (cache.Backend, error) {
 	if c.Key != "" && c.Secret != "" {
 		awsConf.Credentials = credentials.NewStaticCredentials(c.Key, c.Secret, "")
 	} else {
-		log.Println("aws key and/or Secret not provided (falling back to anonymous credentials)")
+		level.Warn(logger).Log("msg", "aws key and/or Secret not provided (falling back to anonymous credentials)")
 	}
 
+	level.Debug(logger).Log("msg", "s3 backend", "config", fmt.Sprintf("%+v", c))
+
 	if debug {
-		log.Printf("[DEBUG] s3 backend config: %+v", c)
 		awsConf.WithLogLevel(aws.LogDebugWithHTTPBody)
 	}
 
@@ -75,7 +78,7 @@ func InitializeS3Backend(c S3Config, debug bool) (cache.Backend, error) {
 }
 
 // InitializeFileSystemBackend creates a filesystem backend
-func InitializeFileSystemBackend(c FileSystemConfig, debug bool) (cache.Backend, error) {
+func InitializeFileSystemBackend(logger log.Logger, c FileSystemConfig, debug bool) (cache.Backend, error) {
 	if strings.TrimRight(path.Clean(c.CacheRoot), "/") == "" {
 		return nil, fmt.Errorf("could not use <%s> as cache root, empty or root path given", c.CacheRoot)
 	}
@@ -85,9 +88,7 @@ func InitializeFileSystemBackend(c FileSystemConfig, debug bool) (cache.Backend,
 		return nil, errors.Wrap(err, msg)
 	}
 
-	if debug {
-		log.Printf("[DEBUG] filesystem backend config: %+v", c)
-	}
+	level.Debug(logger).Log("msg", "filesystem backend", "config", fmt.Sprintf("%+v", c))
 
 	return newFileSystem(c.CacheRoot), nil
 }
@@ -114,7 +115,7 @@ type SFTPConfig struct {
 	Auth      SSHAuth
 }
 
-func InitializeSFTPBackend(c SFTPConfig, debug bool) (cache.Backend, error) {
+func InitializeSFTPBackend(logger log.Logger, c SFTPConfig, debug bool) (cache.Backend, error) {
 	sshClient, err := getSSHClient(c)
 	if err != nil {
 		return nil, err
@@ -125,9 +126,7 @@ func InitializeSFTPBackend(c SFTPConfig, debug bool) (cache.Backend, error) {
 		return nil, errors.Wrap(err, "unable to connect to ssh with sftp protocol")
 	}
 
-	if debug {
-		log.Printf("[DEBUG] sftp backend config: %+v", c)
-	}
+	level.Debug(logger).Log("msg", "sftp backend", "config", fmt.Sprintf("%+v", c))
 
 	return newSftpBackend(sftpClient, c.CacheRoot), nil
 }

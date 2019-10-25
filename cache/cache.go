@@ -7,10 +7,11 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
-	"log"
 	"os"
 	"path/filepath"
 
+	"github.com/go-kit/kit/log"
+	"github.com/go-kit/kit/log/level"
 	"github.com/pkg/errors"
 )
 
@@ -22,12 +23,14 @@ type Backend interface {
 
 // Cache contains configuration for Cache functionality
 type Cache struct {
+	logger log.Logger
+
 	b    Backend
 	opts options
 }
 
 // New creates a new cache with given parameters
-func New(b Backend, opts ...Option) Cache {
+func New(logger log.Logger, b Backend, opts ...Option) Cache {
 	options := options{
 		archiveFmt:       DefaultArchiveFormat,
 		compressionLevel: DefaultCompressionLevel,
@@ -36,7 +39,11 @@ func New(b Backend, opts ...Option) Cache {
 		o.apply(&options)
 	}
 
-	return Cache{b: b, opts: options}
+	return Cache{
+		logger: log.With(logger, "component", "cache"),
+		b:      b,
+		opts:   options,
+	}
 }
 
 // Push pushes the archived file to the cache
@@ -47,7 +54,7 @@ func (c Cache) Push(src, dst string) error {
 		return errors.Wrap(err, "could not read source directory")
 	}
 
-	log.Printf("archiving directory <%s>", src)
+	level.Info(c.logger).Log("msg", "archiving directory", "src", src)
 
 	// 2. create a temporary file for the archive
 	if err := os.MkdirAll("/tmp", os.FileMode(0755)); err != nil {
@@ -71,7 +78,7 @@ func (c Cache) Push(src, dst string) error {
 		return errors.Wrap(err, "could not initialize archive writer")
 	}
 
-	log.Printf("[DEBUG] archive compression level <%d>", c.opts.compressionLevel)
+	level.Debug(c.logger).Log("msg", "archive compression level", "level", c.opts.compressionLevel)
 
 	closer := func() {
 		twCloser()
@@ -90,7 +97,7 @@ func (c Cache) Push(src, dst string) error {
 	closer()
 
 	// 5. upload archive file to server
-	log.Printf("uploading archived directory <%s> to <%s>", src, dst)
+	level.Info(c.logger).Log("msg", "uploading archived directory", "src", src, "dst", dst)
 
 	return c.pushArchive(dst, archivePath)
 }
@@ -107,7 +114,7 @@ func (c Cache) pushArchive(dst, archivePath string) error {
 
 // Pull fetches the archived file from the cache and restores to the host machine's file system
 func (c Cache) Pull(src, dst string) error {
-	log.Printf("downloading archived directory <%s>", src)
+	level.Info(c.logger).Log("msg", "downloading archived directory", "src", src)
 	// 1. download archive
 	rc, err := c.b.Get(src)
 	if err != nil {
@@ -116,7 +123,7 @@ func (c Cache) Pull(src, dst string) error {
 	defer rc.Close()
 
 	// 2. extract archive
-	log.Printf("extracting archived directory <%s> to <%s>", src, dst)
+	level.Info(c.logger).Log("msg", "extracting archived directory", "src", src, "dst", dst)
 
 	return errors.Wrap(
 		extractFromArchive(archiveReader(rc, c.opts.archiveFmt)),

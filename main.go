@@ -1,15 +1,17 @@
 package main
 
 import (
-	"log"
+	stdlog "log"
 	"os"
-
-	"github.com/urfave/cli"
 
 	"github.com/meltwater/drone-cache/cache"
 	"github.com/meltwater/drone-cache/cache/backend"
+	"github.com/meltwater/drone-cache/internal"
 	"github.com/meltwater/drone-cache/metadata"
 	"github.com/meltwater/drone-cache/plugin"
+
+	"github.com/go-kit/kit/log/level"
+	"github.com/urfave/cli"
 )
 
 var version = "0.0.0"
@@ -22,6 +24,21 @@ func main() {
 	app.Action = run
 	app.Version = version
 	app.Flags = []cli.Flag{
+		// Logger args
+
+		cli.StringFlag{
+			Name:   "log.level, ll",
+			Usage:  "log filtering level. ('error', 'warn', 'info', 'debug')",
+			Value:  internal.LogLevelInfo,
+			EnvVar: "PLUGIN_LOG_LEVEL, LOG_LEVEL",
+		},
+		cli.StringFlag{
+			Name:   "log.format, lf",
+			Usage:  "log format to use. ('logfmt', 'json')",
+			Value:  internal.LogFormatLogfmt,
+			EnvVar: "PLUGIN_LOG_FORMAT, LOG_FORMAT",
+		},
+
 		// Repo args
 
 		cli.StringFlag{
@@ -343,13 +360,21 @@ func main() {
 	}
 
 	if err := app.Run(os.Args); err != nil {
-		log.Fatalf("%+v", err)
+		stdlog.Fatalf("%+v", err)
 	}
 }
 
 //nolint:funlen
 func run(c *cli.Context) error {
+	var logLevel = c.String("log.level")
+	if c.Bool("debug") {
+		logLevel = internal.LogLevelDebug
+	}
+
+	logger := internal.NewLogger(logLevel, c.String("log.format"), "drone-cache")
+
 	plg := plugin.Plugin{
+		Logger: logger,
 		Metadata: metadata.Metadata{
 			Repo: metadata.Repo{
 				Namespace: c.String("repo.namespace"),
@@ -429,14 +454,14 @@ func run(c *cli.Context) error {
 	}
 
 	if c.Bool("exit-code") {
-		// If it is exit-code enabled, always exit with error
-		log.Println("silent fails disabled, exiting with status code on error")
+		// If it is exit-code enabled, always exit with error.
+		level.Warn(logger).Log("msg", "silent fails disabled, exiting with status code on error")
 		return err
 	}
 
 	if _, ok := err.(plugin.Error); ok {
-		// If it is an expected error log it, handle it gracefully
-		log.Println(err)
+		// If it is an expected error log it, handle it gracefully,
+		level.Error(logger).Log("err", err)
 
 		return nil
 	}

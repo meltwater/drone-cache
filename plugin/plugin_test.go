@@ -8,10 +8,10 @@ import (
 
 	"github.com/meltwater/drone-cache/cache"
 	"github.com/meltwater/drone-cache/cache/backend"
-
-	"github.com/minio/minio-go"
-
 	"github.com/meltwater/drone-cache/metadata"
+
+	"github.com/go-kit/kit/log"
+	"github.com/minio/minio-go"
 )
 
 const (
@@ -476,6 +476,7 @@ func TestRestoreWithFilesystem(t *testing.T) {
 
 func newTestPlugin(bck string, rebuild, restore bool, mount []string, cacheKey, archiveFmt string) Plugin {
 	return Plugin{
+		Logger: log.NewNopLogger(),
 		Metadata: metadata.Metadata{
 			Repo: metadata.Repo{
 				Branch: "master",

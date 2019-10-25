@@ -5,6 +5,9 @@ require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/fatih/color v1.7.0 // indirect
 	github.com/go-ini/ini v1.41.0 // indirect
+	github.com/go-kit/kit v0.9.0
+	github.com/go-logfmt/logfmt v0.4.0 // indirect
+	github.com/go-stack/stack v1.8.0 // indirect
 	github.com/gopherjs/gopherjs v0.0.0-20181103185306-d547d1d9531e // indirect
 	github.com/jtolds/gls v4.2.1+incompatible // indirect
 	github.com/mattn/go-colorable v0.1.4 // indirect
