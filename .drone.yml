@@ -51,6 +51,37 @@ steps:
   environment:
     CGO_ENABLED: 0
 
+- name: release-snapshot-dev
+  image: goreleaser/goreleaser:v0.109
+  commands:
+  - apk add --update make upx
+  - goreleaser release --rm-dist --snapshot
+  - echo "$(git rev-parse --abbrev-ref HEAD)-$(git rev-parse --short HEAD)" > .tags
+  environment:
+    GITHUB_TOKEN:
+      from_secret: github_token
+
+- name: release-docker-dev
+  image: plugins/docker
+  settings:
+    build_args_from_env:
+    - BUILD_DATE
+    - DOCKERFILE_PATH
+    - VCS_REF
+    - VERSION
+    dockerfile: docker/Dockerfile.linux.386
+    environment:
+    - "BUILD_DATE=$(date -u +\"%Y-%m-%dT%H:%M:%S%Z\")"
+    - "DOCKERFILE_PATH=\"/docker/Dockerfile.linux.386\""
+    - VCS_REF=$(git rev-parse --short HEAD)
+    - VERSION=$(git describe --always --tags --dirty)
+    password:
+      from_secret: docker_password
+    repo: meltwater/drone-cache
+    tags: dev
+    username:
+      from_secret: docker_username
+
 - name: rebuild-cache
   pull: true
   image: meltwater/drone-cache:dev
@@ -62,6 +93,7 @@ steps:
     region: eu-west-1
     path_style: true
     endpoint: filestorage:9000
+    exit_code: true
   environment:
     AWS_ACCESS_KEY_ID: AKIAIOSFODNN7EXAMPLE
     AWS_SECRET_ACCESS_KEY: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
@@ -78,6 +110,7 @@ steps:
     region: eu-west-1
     path_style: true
     endpoint: filestorage:9000
+    exit_code: true
   environment:
     AWS_ACCESS_KEY_ID: AKIAIOSFODNN7EXAMPLE
     AWS_SECRET_ACCESS_KEY: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
@@ -95,6 +128,7 @@ steps:
     region: eu-west-1
     path_style: true
     endpoint: filestorage:9000
+    exit_code: true
   environment:
     AWS_ACCESS_KEY_ID: AKIAIOSFODNN7EXAMPLE
     AWS_SECRET_ACCESS_KEY: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
@@ -109,6 +143,7 @@ steps:
     mount:
     - vendor
     rebuild: true
+    exit_code: true
   volumes:
   - name: cache
     path: /tmp/cache
@@ -166,6 +201,7 @@ steps:
     restore: true
     path_style: true
     endpoint: filestorage:9000
+    exit_code: true
   environment:
     AWS_ACCESS_KEY_ID: AKIAIOSFODNN7EXAMPLE
     AWS_SECRET_ACCESS_KEY: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
@@ -183,6 +219,7 @@ steps:
     restore: true
     path_style: true
     endpoint: filestorage:9000
+    exit_code: true
   environment:
     AWS_ACCESS_KEY_ID: AKIAIOSFODNN7EXAMPLE
     AWS_SECRET_ACCESS_KEY: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
@@ -197,6 +234,7 @@ steps:
     mount:
     - vendor
     restore: true
+    exit_code: true
   volumes:
   - name: cache
     path: /tmp/cache
@@ -219,6 +257,7 @@ steps:
     restore: true
     path_style: true
     endpoint: filestorage:9000
+    exit_code: true
   environment:
     AWS_ACCESS_KEY_ID: AKIAIOSFODNN7EXAMPLE
     AWS_SECRET_ACCESS_KEY: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY

@@ -234,6 +234,12 @@ func main() {
 			Usage:  "debug",
 			EnvVar: "PLUGIN_DEBUG, DEBUG",
 		},
+		cli.BoolFlag{
+			Name:   "exit-code, ex",
+			Usage:  "always exit with exit code, disable silent fails for known errors",
+			Hidden: true,
+			EnvVar: "PLUGIN_EXIT_CODE, EXIT_CODE",
+		},
 
 		// Volume specific Config args
 
@@ -319,7 +325,7 @@ func main() {
 			EnvVar: "SFTP_HOST",
 		},
 		cli.StringFlag{
-			Name:   "sftp-host",
+			Name:   "sftp-port",
 			Usage:  "sftp port",
 			EnvVar: "SFTP_PORT",
 		},
@@ -405,10 +411,21 @@ func run(c *cli.Context) error {
 	}
 
 	err := plg.Exec()
+	if err == nil {
+		return nil
+	}
+
+	if c.Bool("exit-code") {
+		// If it is exit-code enabled, always exit with error
+		log.Println("silent fails disabled, exiting with status code on error")
+		return err
+	}
+
 	if _, ok := err.(plugin.Error); ok {
 		// If it is an expected error log it, handle it gracefully
 		log.Println(err)
 		return nil
 	}
+
 	return err
 }
