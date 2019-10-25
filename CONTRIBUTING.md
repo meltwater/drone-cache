@@ -44,17 +44,16 @@ the requirements below.
 *Only concerns maintainers/code owners*
 
 0. **PLEASE DO NOT INTRODUCE BREAKING CHANGES**
-1. Execute `make release`. Increase the version numbers in any examples files and the README.md to the new version that this
+1. Execute `make README.md`. This will update [usage](README.md#usage) section of [README.md](README.md) with latest CLI options
+2. Increase the version numbers in any examples files and the README.md to the new version that this
    release would represent. The versioning scheme we use is [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/meltwater/drone-cache/tags).
 
-2. Ensure [CHANGELOG](CHANGELOG.md) is up-to-date with new version changes.
-3. Update version references.
-4. Create a tag on master. Any changes on master will trigger a release with given tag and `latest tag.
+3. Ensure [CHANGELOG](CHANGELOG.md) is up-to-date with new version changes.
+4. Update version references.
+5. Create a tag on master. Any changes on master will trigger a release with given tag and `latest tag.
 
     ```console
     $ git tag -am 'vX.X.X'
-    > ...
-    $ make release
     > ...
     $ git push --tags
     > ...
