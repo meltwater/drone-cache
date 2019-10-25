@@ -73,13 +73,13 @@ func (p *Plugin) Exec() error {
 
 	_, err := cachekey.ParseTemplate(c.CacheKey)
 	if err != nil {
-		return fmt.Errorf("could not parse <%s> as cache key template, falling back to default %w", c.CacheKey, err)
+		return fmt.Errorf("parse, <%s> as cache key template, falling back to default %w", c.CacheKey, err)
 	}
 
 	// 2. Initialize backend
 	backend, err := initializeBackend(p.Logger, c)
 	if err != nil {
-		return fmt.Errorf("could not initialize <%s> as backend %w", c.Backend, err)
+		return fmt.Errorf("initialize, <%s> as backend %w", c.Backend, err)
 	}
 
 	// 3. Initialize cache
@@ -92,13 +92,13 @@ func (p *Plugin) Exec() error {
 	// 4. Select mode
 	if c.Rebuild {
 		if err := processRebuild(p.Logger, cch, p.Config.CacheKey, p.Config.Mount, p.Metadata); err != nil {
-			return Error(fmt.Sprintf("[WARNING] could not build cache, process rebuild failed, %v\n", err))
+			return Error(fmt.Sprintf("[WARNING] build cache, process rebuild failed, %v\n", err))
 		}
 	}
 
 	if c.Restore {
 		if err := processRestore(p.Logger, cch, p.Config.CacheKey, p.Config.Mount, p.Metadata); err != nil {
-			return Error(fmt.Sprintf("[WARNING] could not restore cache, process restore failed, %v\n", err))
+			return Error(fmt.Sprintf("[WARNING] restore cache, process restore failed, %v\n", err))
 		}
 	}
 
@@ -129,12 +129,12 @@ func processRebuild(l log.Logger, c cache.Cache, cacheKeyTmpl string, mountedDir
 
 	for _, mount := range mountedDirs {
 		if _, err := os.Stat(mount); err != nil {
-			return fmt.Errorf("could not mount <%s>, make sure file or directory exists and readable %w", mount, err)
+			return fmt.Errorf("mount <%s>, make sure file or directory exists and readable %w", mount, err)
 		}
 
 		key, err := cacheKey(l, m, cacheKeyTmpl, mount, branch)
 		if err != nil {
-			return fmt.Errorf("could not generate cache key %w", err)
+			return fmt.Errorf("generate cache key %w", err)
 		}
 
 		path := filepath.Join(m.Repo.Name, key)
@@ -142,7 +142,7 @@ func processRebuild(l log.Logger, c cache.Cache, cacheKeyTmpl string, mountedDir
 		level.Info(l).Log("msg", "rebuilding cache for directory", "local", mount, "remote", path)
 
 		if err := c.Push(mount, path); err != nil {
-			return fmt.Errorf("could not upload %w", err)
+			return fmt.Errorf("upload %w", err)
 		}
 	}
 
@@ -159,14 +159,14 @@ func processRestore(l log.Logger, c cache.Cache, cacheKeyTmpl string, mountedDir
 	for _, mount := range mountedDirs {
 		key, err := cacheKey(l, m, cacheKeyTmpl, mount, branch)
 		if err != nil {
-			return fmt.Errorf("could not generate cache key %w", err)
+			return fmt.Errorf("generate cache key %w", err)
 		}
 
 		path := filepath.Join(m.Repo.Name, key)
 		level.Info(l).Log("msg", "restoring directory", "local", mount, "remote", path)
 
 		if err := c.Pull(path, mount); err != nil {
-			return fmt.Errorf("could not download %w", err)
+			return fmt.Errorf("download %w", err)
 		}
 	}
 
@@ -192,7 +192,7 @@ func cacheKey(l log.Logger, p metadata.Metadata, cacheKeyTmpl, mount, branch str
 		key, err = cachekey.Hash(mount, branch)
 
 		if err != nil {
-			return "", fmt.Errorf("could not generate hash key for mounted %w", err)
+			return "", fmt.Errorf("generate hash key for mounted %w", err)
 		}
 	}
 

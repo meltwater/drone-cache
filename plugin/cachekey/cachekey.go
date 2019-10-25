@@ -52,14 +52,14 @@ func Generate(tmpl, mount string, data metadata.Metadata) (string, error) {
 
 	t, err := ParseTemplate(tmpl)
 	if err != nil {
-		return "", fmt.Errorf("could not parse <%s> as cache key template, falling back to default %w", tmpl, err)
+		return "", fmt.Errorf("parse, <%s> as cache key template, falling back to default %w", tmpl, err)
 	}
 
 	var b strings.Builder
 
 	err = t.Execute(&b, data)
 	if err != nil {
-		return "", fmt.Errorf("could not build <%s> as cache key, falling back to default %w", tmpl, err)
+		return "", fmt.Errorf("build, <%s> as cache key, falling back to default %w", tmpl, err)
 	}
 
 	return filepath.Join(b.String(), mount), nil
@@ -88,7 +88,7 @@ func readerHasher(readers ...io.Reader) (string, error) {
 
 	for _, r := range readers {
 		if _, err := io.Copy(h, r); err != nil {
-			return "", fmt.Errorf("could not write reader as hash %w", err)
+			return "", fmt.Errorf("write reader as hash %w", err)
 		}
 	}
 

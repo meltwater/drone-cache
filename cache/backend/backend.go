@@ -80,11 +80,11 @@ func InitializeS3Backend(l log.Logger, c S3Config, debug bool) (cache.Backend, e
 // InitializeFileSystemBackend creates a filesystem backend
 func InitializeFileSystemBackend(l log.Logger, c FileSystemConfig, debug bool) (cache.Backend, error) {
 	if strings.TrimRight(path.Clean(c.CacheRoot), "/") == "" {
-		return nil, fmt.Errorf("could not use <%s> as cache root, empty or root path given", c.CacheRoot)
+		return nil, fmt.Errorf("empty or root path given, <%s> as cache root, ", c.CacheRoot)
 	}
 
 	if _, err := os.Stat(c.CacheRoot); err != nil {
-		return nil, fmt.Errorf("could not use <%s> as cache root, make sure volume is mounted %w", c.CacheRoot, err)
+		return nil, fmt.Errorf("make sure volume is mounted, <%s> as cache root %w", c.CacheRoot, err)
 	}
 
 	level.Debug(l).Log("msg", "filesystem backend", "config", fmt.Sprintf("%+v", c))

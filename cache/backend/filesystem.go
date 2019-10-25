@@ -23,7 +23,7 @@ func newFileSystem(cacheRoot string) cache.Backend {
 func (c *filesystem) Get(p string) (io.ReadCloser, error) {
 	absPath, err := filepath.Abs(filepath.Clean(filepath.Join(c.cacheRoot, p)))
 	if err != nil {
-		return nil, fmt.Errorf("could not get the object %w", err)
+		return nil, fmt.Errorf("get the object %w", err)
 	}
 
 	return os.Open(absPath)
@@ -33,22 +33,22 @@ func (c *filesystem) Get(p string) (io.ReadCloser, error) {
 func (c *filesystem) Put(p string, src io.ReadSeeker) error {
 	absPath, err := filepath.Abs(filepath.Clean(filepath.Join(c.cacheRoot, p)))
 	if err != nil {
-		return fmt.Errorf("could not build path %w", err)
+		return fmt.Errorf("build path %w", err)
 	}
 
 	dir := filepath.Dir(absPath)
 	if err := os.MkdirAll(dir, os.FileMode(0755)); err != nil {
-		return fmt.Errorf("could not create directory <%s> %w", dir, err)
+		return fmt.Errorf("create directory <%s> %w", dir, err)
 	}
 
 	dst, err := os.Create(absPath)
 	if err != nil {
-		return fmt.Errorf("could not create cache file <%s> %w", absPath, err)
+		return fmt.Errorf("create cache file <%s> %w", absPath, err)
 	}
 	defer dst.Close()
 
 	if _, err := io.Copy(dst, src); err != nil {
-		return fmt.Errorf("could not write read seeker as file %w", err)
+		return fmt.Errorf("write read seeker as file %w", err)
 	}
 
 	return nil

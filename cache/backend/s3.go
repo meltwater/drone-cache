@@ -38,7 +38,7 @@ func (c *s3Backend) Get(p string) (io.ReadCloser, error) {
 		Key:    aws.String(p),
 	})
 	if err != nil {
-		return nil, fmt.Errorf("couldn't get the object %w", err)
+		return nil, fmt.Errorf("get the object %w", err)
 	}
 
 	return out.Body, nil
@@ -57,7 +57,7 @@ func (c *s3Backend) Put(p string, src io.ReadSeeker) error {
 	}
 
 	if _, err := c.client.PutObject(in); err != nil {
-		return fmt.Errorf("couldn't put the object %w", err)
+		return fmt.Errorf("put the object %w", err)
 	}
 
 	return nil
