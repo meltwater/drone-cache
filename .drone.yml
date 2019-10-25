@@ -52,7 +52,7 @@ steps:
     CGO_ENABLED: 0
 
 - name: release-snapshot-dev
-  image: goreleaser/goreleaser:v0.109
+  image: goreleaser/goreleaser:v0.120
   commands:
   - apk add --update make upx
   - goreleaser release --rm-dist --snapshot
@@ -149,7 +149,7 @@ steps:
     path: /tmp/cache
 
 - name: release-snapshot
-  image: goreleaser/goreleaser:v0.109
+  image: goreleaser/goreleaser:v0.120
   commands:
   - apk add --update make upx
   - goreleaser release --rm-dist --snapshot
@@ -328,7 +328,7 @@ steps:
   - git fetch --tags
 
 - name: release
-  image: goreleaser/goreleaser:v0.109
+  image: goreleaser/goreleaser:v0.120
   commands:
   - apk add --update make upx
   - make release
