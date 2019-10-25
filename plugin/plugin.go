@@ -2,6 +2,7 @@
 package plugin
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -14,7 +15,6 @@ import (
 
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/log/level"
-	"github.com/pkg/errors"
 )
 
 type (
@@ -73,14 +73,13 @@ func (p *Plugin) Exec() error {
 
 	_, err := cachekey.ParseTemplate(c.CacheKey)
 	if err != nil {
-		msg := fmt.Sprintf("could not parse <%s> as cache key template, falling back to default", c.CacheKey)
-		return errors.Wrap(err, msg)
+		return fmt.Errorf("could not parse <%s> as cache key template, falling back to default %w", c.CacheKey, err)
 	}
 
 	// 2. Initialize backend
 	backend, err := initializeBackend(p.Logger, c)
 	if err != nil {
-		return errors.Wrap(err, fmt.Sprintf("could not initialize <%s> as backend", c.Backend))
+		return fmt.Errorf("could not initialize <%s> as backend %w", c.Backend, err)
 	}
 
 	// 3. Initialize cache
@@ -93,14 +92,12 @@ func (p *Plugin) Exec() error {
 	// 4. Select mode
 	if c.Rebuild {
 		if err := processRebuild(p.Logger, cch, p.Config.CacheKey, p.Config.Mount, p.Metadata); err != nil {
-			// TODO: !!! new errors
 			return Error(fmt.Sprintf("[WARNING] could not build cache, process rebuild failed, %v\n", err))
 		}
 	}
 
 	if c.Restore {
 		if err := processRestore(p.Logger, cch, p.Config.CacheKey, p.Config.Mount, p.Metadata); err != nil {
-			// TODO: !!! new errors
 			return Error(fmt.Sprintf("[WARNING] could not restore cache, process restore failed, %v\n", err))
 		}
 	}
@@ -126,54 +123,54 @@ func initializeBackend(logger log.Logger, c Config) (cache.Backend, error) {
 }
 
 // processRebuild the remote cache from the local environment
-func processRebuild(logger log.Logger, c cache.Cache, cacheKeyTmpl string, mountedDirs []string, m metadata.Metadata) error {
+func processRebuild(l log.Logger, c cache.Cache, cacheKeyTmpl string, mountedDirs []string, m metadata.Metadata) error {
 	now := time.Now()
 	branch := m.Commit.Branch
 
 	for _, mount := range mountedDirs {
 		if _, err := os.Stat(mount); err != nil {
-			return errors.Wrap(err, fmt.Sprintf("could not mount <%s>, make sure file or directory exists and readable", mount))
+			return fmt.Errorf("could not mount <%s>, make sure file or directory exists and readable %w", mount, err)
 		}
 
-		key, err := cacheKey(logger, m, cacheKeyTmpl, mount, branch)
+		key, err := cacheKey(l, m, cacheKeyTmpl, mount, branch)
 		if err != nil {
-			return errors.Wrap(err, "could not generate cache key")
+			return fmt.Errorf("could not generate cache key %w", err)
 		}
 
 		path := filepath.Join(m.Repo.Name, key)
 
-		level.Info(logger).Log("msg", "rebuilding cache for directory", "local", mount, "remote", path)
+		level.Info(l).Log("msg", "rebuilding cache for directory", "local", mount, "remote", path)
 
 		if err := c.Push(mount, path); err != nil {
-			return errors.Wrap(err, "could not upload")
+			return fmt.Errorf("could not upload %w", err)
 		}
 	}
 
-	level.Info(logger).Log("msg", "cache built", "took", time.Since(now))
+	level.Info(l).Log("msg", "cache built", "took", time.Since(now))
 
 	return nil
 }
 
 // processRestore the local environment from the remote cache
-func processRestore(logger log.Logger, c cache.Cache, cacheKeyTmpl string, mountedDirs []string, m metadata.Metadata) error {
+func processRestore(l log.Logger, c cache.Cache, cacheKeyTmpl string, mountedDirs []string, m metadata.Metadata) error {
 	now := time.Now()
 	branch := m.Commit.Branch
 
 	for _, mount := range mountedDirs {
-		key, err := cacheKey(logger, m, cacheKeyTmpl, mount, branch)
+		key, err := cacheKey(l, m, cacheKeyTmpl, mount, branch)
 		if err != nil {
-			return errors.Wrap(err, "could not generate cache key")
+			return fmt.Errorf("could not generate cache key %w", err)
 		}
 
 		path := filepath.Join(m.Repo.Name, key)
-		level.Info(logger).Log("msg", "restoring directory", "local", mount, "remote", path)
+		level.Info(l).Log("msg", "restoring directory", "local", mount, "remote", path)
 
 		if err := c.Pull(path, mount); err != nil {
-			return errors.Wrap(err, "could not download")
+			return fmt.Errorf("could not download %w", err)
 		}
 	}
 
-	level.Info(logger).Log("msg", "cache restored", "took", time.Since(now))
+	level.Info(l).Log("msg", "cache restored", "took", time.Since(now))
 
 	return nil
 }
@@ -181,8 +178,8 @@ func processRestore(logger log.Logger, c cache.Cache, cacheKeyTmpl string, mount
 // Helpers
 
 // cacheKey generates key from given template as parameter or fallbacks hash
-func cacheKey(logger log.Logger, p metadata.Metadata, cacheKeyTmpl, mount, branch string) (string, error) {
-	level.Info(logger).Log("msg", "using provided cache key template")
+func cacheKey(l log.Logger, p metadata.Metadata, cacheKeyTmpl, mount, branch string) (string, error) {
+	level.Info(l).Log("msg", "using provided cache key template")
 
 	key, err := cachekey.Generate(cacheKeyTmpl, mount, metadata.Metadata{
 		Build:  p.Build,
@@ -191,11 +188,11 @@ func cacheKey(logger log.Logger, p metadata.Metadata, cacheKeyTmpl, mount, branc
 	})
 
 	if err != nil {
-		level.Error(logger).Log("msg", "falling back to default key", "err", err)
+		level.Error(l).Log("msg", "falling back to default key", "err", err)
 		key, err = cachekey.Hash(mount, branch)
 
 		if err != nil {
-			return "", errors.Wrap(err, "could not generate hash key for mounted")
+			return "", fmt.Errorf("could not generate hash key for mounted %w", err)
 		}
 	}
 

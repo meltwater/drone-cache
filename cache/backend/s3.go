@@ -1,12 +1,12 @@
 package backend
 
 import (
+	"fmt"
 	"io"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
-	"github.com/pkg/errors"
 
 	"github.com/meltwater/drone-cache/cache"
 )
@@ -38,7 +38,7 @@ func (c *s3Backend) Get(p string) (io.ReadCloser, error) {
 		Key:    aws.String(p),
 	})
 	if err != nil {
-		return nil, errors.Wrap(err, "couldn't get the object")
+		return nil, fmt.Errorf("couldn't get the object %w", err)
 	}
 
 	return out.Body, nil
@@ -56,7 +56,9 @@ func (c *s3Backend) Put(p string, src io.ReadSeeker) error {
 		in.ServerSideEncryption = aws.String(c.encryption)
 	}
 
-	_, err := c.client.PutObject(in)
+	if _, err := c.client.PutObject(in); err != nil {
+		return fmt.Errorf("couldn't put the object %w", err)
+	}
 
-	return errors.Wrap(err, "couldn't put the object")
+	return nil
 }

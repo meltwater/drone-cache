@@ -2,6 +2,7 @@ package cachekey
 
 import (
 	"crypto/md5" // #nosec
+	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -12,8 +13,6 @@ import (
 	"strings"
 	"text/template"
 	"time"
-
-	"github.com/pkg/errors"
 
 	"github.com/meltwater/drone-cache/metadata"
 )
@@ -53,14 +52,14 @@ func Generate(tmpl, mount string, data metadata.Metadata) (string, error) {
 
 	t, err := ParseTemplate(tmpl)
 	if err != nil {
-		return "", errors.Wrap(err, fmt.Sprintf("could not parse <%s> as cache key template, falling back to default", tmpl))
+		return "", fmt.Errorf("could not parse <%s> as cache key template, falling back to default %w", tmpl, err)
 	}
 
 	var b strings.Builder
 
 	err = t.Execute(&b, data)
 	if err != nil {
-		return "", errors.Wrap(err, fmt.Sprintf("could not build <%s> as cache key, falling back to default. %+v", tmpl, err))
+		return "", fmt.Errorf("could not build <%s> as cache key, falling back to default %w", tmpl, err)
 	}
 
 	return filepath.Join(b.String(), mount), nil
@@ -89,7 +88,7 @@ func readerHasher(readers ...io.Reader) (string, error) {
 
 	for _, r := range readers {
 		if _, err := io.Copy(h, r); err != nil {
-			return "", errors.Wrap(err, "could not write reader as hash")
+			return "", fmt.Errorf("could not write reader as hash %w", err)
 		}
 	}
 

@@ -24,14 +24,14 @@ steps:
 
 - name: build
   pull: true
-  image: golang:1.11-alpine
+  image: golang:1.13-alpine
   commands:
   - apk add --update make git
   - make drone-cache
 
 - name: test
   pull: true
-  image: golang:1.11-alpine
+  image: golang:1.13-alpine
   commands:
   - go test -v -mod=vendor -cover ./...
   environment:
@@ -44,7 +44,7 @@ steps:
 
 - name: lint
   pull: true
-  image: golang:1.11-alpine
+  image: golang:1.13-alpine
   commands:
   - "wget -O - -q https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s v1.21.0"
   - ./bin/golangci-lint run -v --enable-all -D gochecknoglobals
@@ -264,14 +264,14 @@ steps:
 
 - name: build-after
   pull: true
-  image: golang:1.11-alpine
+  image: golang:1.13-alpine
   commands:
   - apk add --update make git
   - make drone-cache
 
 - name: test-after
   pull: true
-  image: golang:1.11-alpine
+  image: golang:1.13-alpine
   commands:
   - go test -v -mod=vendor -cover ./...
   environment:

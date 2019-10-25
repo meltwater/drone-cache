@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	stdlog "log"
 	"os"
 
@@ -459,7 +460,8 @@ func run(c *cli.Context) error {
 		return err
 	}
 
-	if _, ok := err.(plugin.Error); ok {
+	var e plugin.Error
+	if errors.As(err, &e) {
 		// If it is an expected error log it, handle it gracefully,
 		level.Error(logger).Log("err", err)
 

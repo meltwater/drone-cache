@@ -580,7 +580,11 @@ func removeAllObjects(minioClient *minio.Client, bucketName string) error {
 			if !open {
 				return nil
 			}
-			return fmt.Errorf("remove all objects failed, while fetching %v", err)
+			if err != nil {
+				return fmt.Errorf("remove all objects failed, while fetching %v", err)
+			}
+
+			return nil
 		}
 	}
 }
