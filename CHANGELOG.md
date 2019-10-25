@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+[#84](https://github.com/meltwater/drone-cache/pull/84) Adds compression level option.
 [#77](https://github.com/meltwater/drone-cache/pull/77) Adds a new CLI hidden flag to be used for tests.
 [#68](https://github.com/meltwater/drone-cache/pull/68) Introduces new storage backend, sFTP.
 

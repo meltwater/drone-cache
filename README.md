@@ -96,12 +96,14 @@ USAGE:
    drone-cache [global options] command [command options] [arguments...]
 
 VERSION:
-   v1.0.4-14-g899b1d6-dirty
+   v1.0.4-19-gf16b55a-dirty
 
 COMMANDS:
      help, h  Shows a list of commands or help for one command
 
 GLOBAL OPTIONS:
+   --log.level value, --ll value               log filtering level. ('error', 'warn', 'info', 'debug') (default: "info") [$PLUGIN_LOG_LEVEL, $ LOG_LEVEL]
+   --log.format value, --lf value              log format to use. ('logfmt', 'json') (default: "logfmt") [$PLUGIN_LOG_FORMAT, $ LOG_FORMAT]
    --repo.fullname value, --rf value           repository full name [$DRONE_REPO]
    --repo.namespace value, --rns value         repository namespace [$DRONE_REPO_NAMESPACE]
    --repo.owner value, --ro value              repository owner (for Drone version < 1.0) [$DRONE_REPO_OWNER]

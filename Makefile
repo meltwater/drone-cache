@@ -42,8 +42,17 @@ tmp/help.txt: clean build
 README.md: tmp/help.txt
 	embedmd -w README.md
 
+tmp/docs.txt: clean build
+	mkdir -p tmp
+	# ./drone-cache --help &> tmp/help.txt
+	@echo "IMPLEMENT ME"
+
+DOCS.md: tmp/docs.txt
+	embedmd -w DOCS.md
+
 .PHONY: vendor
 vendor:
+	@go mod tidy
 	@go mod vendor -v
 
 .PHONY: compress
