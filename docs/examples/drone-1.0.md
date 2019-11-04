@@ -27,7 +27,7 @@ steps:
         - 'vendor'
 
   - name: build
-    image: golang:1.11-alpine
+    image: golang:1.13-alpine
     pull: true
     commands:
       - apk add --update make git
@@ -74,7 +74,7 @@ steps:
       path: /tmp/cache
 
   - name: build
-    image: golang:1.11-alpine
+    image: golang:1.13-alpine
     pull: true
     commands:
       - apk add --update make git
@@ -127,7 +127,7 @@ steps:
         - 'vendor'
 
   - name: build
-    image: golang:1.11-alpine
+    image: golang:1.13-alpine
     pull: true
     commands:
       - apk add --update make git
@@ -175,7 +175,7 @@ steps:
         - 'vendor'
 
   - name: build
-    image: golang:1.11-alpine
+    image: golang:1.13-alpine
     pull: true
     commands:
       - apk add --update make git
@@ -214,7 +214,7 @@ steps:
       debug: true
 
   - name: build
-    image: golang:1.11-alpine
+    image: golang:1.13-alpine
     pull: true
     commands:
       - apk add --update make git

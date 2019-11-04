@@ -54,7 +54,7 @@ steps:
         - 'vendor'
 
   - name: build
-    image: golang:1.11-alpine
+    image: golang:1.13-alpine
     pull: true
     commands:
       - apk add --update make git
@@ -87,7 +87,8 @@ steps:
 
 ### Using executable (with CLI args)
 
-```console
+[embedmd]:# (tmp/help.txt)
+```txt
 NAME:
    Drone cache plugin - Drone cache plugin
 
@@ -95,12 +96,14 @@ USAGE:
    drone-cache [global options] command [command options] [arguments...]
 
 VERSION:
-   1.0.4
+   v1.0.4-19-gf16b55a-dirty
 
 COMMANDS:
      help, h  Shows a list of commands or help for one command
 
 GLOBAL OPTIONS:
+   --log.level value, --ll value               log filtering level. ('error', 'warn', 'info', 'debug') (default: "info") [$PLUGIN_LOG_LEVEL, $ LOG_LEVEL]
+   --log.format value, --lf value              log format to use. ('logfmt', 'json') (default: "logfmt") [$PLUGIN_LOG_FORMAT, $ LOG_FORMAT]
    --repo.fullname value, --rf value           repository full name [$DRONE_REPO]
    --repo.namespace value, --rns value         repository namespace [$DRONE_REPO_NAMESPACE]
    --repo.owner value, --ro value              repository owner (for Drone version < 1.0) [$DRONE_REPO_OWNER]
@@ -138,6 +141,8 @@ GLOBAL OPTIONS:
    --restore, --res                            restore the cache directories [$PLUGIN_RESTORE]
    --cache-key value, --chk value              cache key to use for the cache directories [$PLUGIN_CACHE_KEY]
    --archive-format value, --arcfmt value      archive format to use to store the cache directories (tar, gzip) (default: "tar") [$PLUGIN_ARCHIVE_FORMAT]
+   --compression-level value, --cpl value      compression level to use for gzip compression when archive-format specified as gzip
+                                                   (check https://godoc.org/compress/flate#pkg-constants for available options) (default: -1) [$PLUGIN_COMPRESSION_LEVEL]
    --skip-symlinks, --ss                       skip symbolic links in archive [$PLUGIN_SKIP_SYMLINKS, $ SKIP_SYMLINKS]
    --debug, -d                                 debug [$PLUGIN_DEBUG, $ DEBUG]
    --filesystem-cache-root value, --fcr value  local filesystem root directory for the filesystem cache (default: "/tmp/cache") [$PLUGIN_FILESYSTEM_CACHE_ROOT, $ FILESYSTEM_CACHE_ROOT]
@@ -148,14 +153,14 @@ GLOBAL OPTIONS:
    --region value, --reg value                 AWS bucket region. (us-east-1, eu-west-1, ...) [$PLUGIN_REGION, $S3_REGION]
    --path-style, --ps                          use path style for bucket paths. (true for minio, false for aws) [$PLUGIN_PATH_STYLE]
    --acl value                                 upload files with acl (private, public-read, ...) (default: "private") [$PLUGIN_ACL]
-   --sftp-cache-root                           sftp root directory
-   --sftp-username                             sftp username
-   --sftp-password                             sftp password
-   --sftp-public-key-file                      sftp public key file path
-   --sftp-auth-method                          sftp auth method (PASSWORD, PUBLIC_KEY_FILE), in case of password use sftp-password else use ftp-public-key-file   
-   --sftp-host                                 sftp host
-   --sftp-port                                 sftp port
    --encryption value, --enc value             server-side encryption algorithm, defaults to none. (AES256, aws:kms) [$PLUGIN_ENCRYPTION]
+   --sftp-cache-root value                     sftp root directory [$SFTP_CACHE_ROOT]
+   --sftp-username value                       sftp username [$SFTP_USERNAME]
+   --sftp-password value                       sftp password [$SFTP_PASSWORD]
+   --ftp-public-key-file value                 sftp public key file path [$SFTP_PUBLIC_KEY_FILE]
+   --sftp-auth-method value                    sftp auth method, defaults to none. (PASSWORD, PUBLIC_KEY_FILE) [$SFTP_AUTH_METHOD]
+   --sftp-host value                           sftp host [$SFTP_HOST]
+   --sftp-port value                           sftp port [$SFTP_PORT]
    --help, -h                                  show help
    --version, -v                               print the version
 ```
@@ -188,7 +193,7 @@ $ ./scripts/setup_dev_environment.sh
 ### Tests
 
 ```console
-$ ./test
+$ make test
 ```
 
 OR
@@ -211,7 +216,7 @@ $ go build .
 Build the docker image with the following commands:
 
 ```console
-$ make docker-build
+$ make container
 ```
 
 ## Releases

@@ -5,7 +5,6 @@ import (
 	"io"
 	"path/filepath"
 
-	"github.com/pkg/errors"
 	"github.com/pkg/sftp"
 )
 
@@ -21,8 +20,9 @@ func newSftpBackend(client *sftp.Client, cacheRoot string) *sftpBackend {
 func (s sftpBackend) Get(path string) (io.ReadCloser, error) {
 	absPath, err := filepath.Abs(filepath.Clean(filepath.Join(s.cacheRoot, path)))
 	if err != nil {
-		return nil, errors.Wrap(err, "could not get the object")
+		return nil, fmt.Errorf("get the object %w", err)
 	}
+
 	return s.client.Open(absPath)
 }
 
@@ -31,17 +31,17 @@ func (s sftpBackend) Put(path string, src io.ReadSeeker) error {
 
 	dir := filepath.Dir(pathJoin)
 	if err := s.client.MkdirAll(dir); err != nil {
-		return errors.Wrap(err, fmt.Sprintf("could not create directory <%s>", dir))
+		return fmt.Errorf("create directory <%s> %w", dir, err)
 	}
 
 	dst, err := s.client.Create(pathJoin)
 	if err != nil {
-		return errors.Wrap(err, fmt.Sprintf("could not create cache file <%s>", pathJoin))
+		return fmt.Errorf("create cache file <%s> %w", pathJoin, err)
 	}
 	defer dst.Close()
 
 	if _, err := io.Copy(dst, src); err != nil {
-		return errors.Wrap(err, "could not write read seeker as file")
+		return fmt.Errorf("write read seeker as file %w", err)
 	}
 
 	return nil

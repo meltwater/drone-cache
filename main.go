@@ -1,23 +1,45 @@
 package main
 
 import (
-	"log"
+	"errors"
+	stdlog "log"
 	"os"
 
-	"github.com/urfave/cli"
-
+	"github.com/meltwater/drone-cache/cache"
 	"github.com/meltwater/drone-cache/cache/backend"
+	"github.com/meltwater/drone-cache/internal"
 	"github.com/meltwater/drone-cache/metadata"
 	"github.com/meltwater/drone-cache/plugin"
+
+	"github.com/go-kit/kit/log/level"
+	"github.com/urfave/cli"
 )
 
+var version = "0.0.0"
+
+//nolint:funlen
 func main() {
 	app := cli.NewApp()
 	app.Name = "Drone cache plugin"
 	app.Usage = "Drone cache plugin"
 	app.Action = run
-	app.Version = "1.0.4"
+	app.Version = version
 	app.Flags = []cli.Flag{
+		// Logger args
+
+		cli.StringFlag{
+			Name:   "log.level, ll",
+			Usage:  "log filtering level. ('error', 'warn', 'info', 'debug')",
+			Value:  internal.LogLevelInfo,
+			EnvVar: "PLUGIN_LOG_LEVEL, LOG_LEVEL",
+		},
+		cli.StringFlag{
+			Name:   "log.format, lf",
+			Usage:  "log format to use. ('logfmt', 'json')",
+			Value:  internal.LogFormatLogfmt,
+			EnvVar: "PLUGIN_LOG_FORMAT, LOG_FORMAT",
+		},
+
 		// Repo args
 
 		cli.StringFlag{
@@ -221,8 +243,15 @@ func main() {
 		cli.StringFlag{
 			Name:   "archive-format, arcfmt",
 			Usage:  "archive format to use to store the cache directories (tar, gzip)",
-			Value:  "tar",
+			Value:  cache.DefaultArchiveFormat,
 			EnvVar: "PLUGIN_ARCHIVE_FORMAT",
+		},
+		cli.IntFlag{
+			Name: "compression-level, cpl",
+			Usage: `compression level to use for gzip compression when archive-format specified as gzip
+			(check https://godoc.org/compress/flate#pkg-constants for available options)`,
+			Value:  cache.DefaultCompressionLevel,
+			EnvVar: "PLUGIN_COMPRESSION_LEVEL",
 		},
 		cli.BoolFlag{
 			Name:   "skip-symlinks, ss",
@@ -332,12 +361,21 @@ func main() {
 	}
 
 	if err := app.Run(os.Args); err != nil {
-		log.Fatalf("%+v", err)
+		stdlog.Fatalf("%+v", err)
 	}
 }
 
+//nolint:funlen
 func run(c *cli.Context) error {
+	var logLevel = c.String("log.level")
+	if c.Bool("debug") {
+		logLevel = internal.LogLevelDebug
+	}
+
+	logger := internal.NewLogger(logLevel, c.String("log.format"), "drone-cache")
+
 	plg := plugin.Plugin{
+		Logger: logger,
 		Metadata: metadata.Metadata{
 			Repo: metadata.Repo{
 				Namespace: c.String("repo.namespace"),
@@ -374,13 +412,14 @@ func run(c *cli.Context) error {
 			},
 		},
 		Config: plugin.Config{
-			ArchiveFormat: c.String("archive-format"),
-			Backend:       c.String("backend"),
-			CacheKey:      c.String("cache-key"),
-			Debug:         c.Bool("debug"),
-			Mount:         c.StringSlice("mount"),
-			Rebuild:       c.Bool("rebuild"),
-			Restore:       c.Bool("restore"),
+			ArchiveFormat:    c.String("archive-format"),
+			Backend:          c.String("backend"),
+			CacheKey:         c.String("cache-key"),
+			CompressionLevel: c.Int("compression-level"),
+			Debug:            c.Bool("debug"),
+			Mount:            c.StringSlice("mount"),
+			Rebuild:          c.Bool("rebuild"),
+			Restore:          c.Bool("restore"),
 
 			FileSystem: backend.FileSystemConfig{
 				CacheRoot: c.String("filesystem-cache-root"),
@@ -416,14 +455,16 @@ func run(c *cli.Context) error {
 	}
 
 	if c.Bool("exit-code") {
-		// If it is exit-code enabled, always exit with error
-		log.Println("silent fails disabled, exiting with status code on error")
+		// If it is exit-code enabled, always exit with error.
+		level.Warn(logger).Log("msg", "silent fails disabled, exiting with status code on error")
 		return err
 	}
 
-	if _, ok := err.(plugin.Error); ok {
-		// If it is an expected error log it, handle it gracefully
-		log.Println(err)
+	var e plugin.Error
+	if errors.As(err, &e) {
+		// If it is an expected error log it, handle it gracefully,
+		level.Error(logger).Log("err", err)
+
 		return nil
 	}
 

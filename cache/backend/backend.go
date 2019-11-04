@@ -1,17 +1,19 @@
 package backend
 
 import (
+	"errors"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"os"
 	"path"
 	"strings"
 
+	"github.com/meltwater/drone-cache/cache"
+
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
-	"github.com/meltwater/drone-cache/cache"
-	"github.com/pkg/errors"
+	"github.com/go-kit/kit/log"
+	"github.com/go-kit/kit/log/level"
 	"github.com/pkg/sftp"
 	"golang.org/x/crypto/ssh"
 )
@@ -52,7 +54,7 @@ type FileSystemConfig struct {
 }
 
 // InitializeS3Backend creates an S3 backend
-func InitializeS3Backend(c S3Config, debug bool) (cache.Backend, error) {
+func InitializeS3Backend(l log.Logger, c S3Config, debug bool) (cache.Backend, error) {
 	awsConf := &aws.Config{
 		Region:           aws.String(c.Region),
 		Endpoint:         &c.Endpoint,
@@ -63,11 +65,12 @@ func InitializeS3Backend(c S3Config, debug bool) (cache.Backend, error) {
 	if c.Key != "" && c.Secret != "" {
 		awsConf.Credentials = credentials.NewStaticCredentials(c.Key, c.Secret, "")
 	} else {
-		log.Println("aws key and/or Secret not provided (falling back to anonymous credentials)")
+		level.Warn(l).Log("msg", "aws key and/or Secret not provided (falling back to anonymous credentials)")
 	}
 
+	level.Debug(l).Log("msg", "s3 backend", "config", fmt.Sprintf("%+v", c))
+
 	if debug {
-		log.Printf("[DEBUG] s3 backend config: %+v", c)
 		awsConf.WithLogLevel(aws.LogDebugWithHTTPBody)
 	}
 
@@ -75,19 +78,16 @@ func InitializeS3Backend(c S3Config, debug bool) (cache.Backend, error) {
 }
 
 // InitializeFileSystemBackend creates a filesystem backend
-func InitializeFileSystemBackend(c FileSystemConfig, debug bool) (cache.Backend, error) {
+func InitializeFileSystemBackend(l log.Logger, c FileSystemConfig, debug bool) (cache.Backend, error) {
 	if strings.TrimRight(path.Clean(c.CacheRoot), "/") == "" {
-		return nil, fmt.Errorf("could not use <%s> as cache root, empty or root path given", c.CacheRoot)
+		return nil, fmt.Errorf("empty or root path given, <%s> as cache root, ", c.CacheRoot)
 	}
 
 	if _, err := os.Stat(c.CacheRoot); err != nil {
-		msg := fmt.Sprintf("could not use <%s> as cache root, make sure volume is mounted", c.CacheRoot)
-		return nil, errors.Wrap(err, msg)
+		return nil, fmt.Errorf("make sure volume is mounted, <%s> as cache root %w", c.CacheRoot, err)
 	}
 
-	if debug {
-		log.Printf("[DEBUG] filesystem backend config: %+v", c)
-	}
+	level.Debug(l).Log("msg", "filesystem backend", "config", fmt.Sprintf("%+v", c))
 
 	return newFileSystem(c.CacheRoot), nil
 }
@@ -114,7 +114,7 @@ type SFTPConfig struct {
 	Auth      SSHAuth
 }
 
-func InitializeSFTPBackend(c SFTPConfig, debug bool) (cache.Backend, error) {
+func InitializeSFTPBackend(l log.Logger, c SFTPConfig, debug bool) (cache.Backend, error) {
 	sshClient, err := getSSHClient(c)
 	if err != nil {
 		return nil, err
@@ -122,12 +122,10 @@ func InitializeSFTPBackend(c SFTPConfig, debug bool) (cache.Backend, error) {
 
 	sftpClient, err := sftp.NewClient(sshClient)
 	if err != nil {
-		return nil, errors.Wrap(err, "unable to connect to ssh with sftp protocol")
+		return nil, fmt.Errorf("unable to connect to ssh with sftp protocol %w", err)
 	}
 
-	if debug {
-		log.Printf("[DEBUG] sftp backend config: %+v", c)
-	}
+	level.Debug(l).Log("msg", "sftp backend", "config", fmt.Sprintf("%+v", c))
 
 	return newSftpBackend(sftpClient, c.CacheRoot), nil
 }
@@ -135,7 +133,7 @@ func InitializeSFTPBackend(c SFTPConfig, debug bool) (cache.Backend, error) {
 func getSSHClient(c SFTPConfig) (*ssh.Client, error) {
 	authMethod, err := getAuthMethod(c)
 	if err != nil {
-		return nil, errors.Wrap(err, " unable to get ssh auth method")
+		return nil, fmt.Errorf("unable to get ssh auth method %w", err)
 	}
 
 	/* #nosec */
@@ -145,7 +143,7 @@ func getSSHClient(c SFTPConfig) (*ssh.Client, error) {
 		HostKeyCallback: ssh.InsecureIgnoreHostKey(), // #nosec just a workaround for now, will fix
 	})
 	if err != nil {
-		return nil, errors.Wrap(err, "unable to connect to ssh")
+		return nil, fmt.Errorf("unable to connect to ssh %w", err)
 	}
 
 	return client, nil
@@ -162,18 +160,20 @@ func getAuthMethod(c SFTPConfig) ([]ssh.AuthMethod, error) {
 			pkAuthMethod,
 		}, err
 	}
+
 	return nil, errors.New("ssh method auth is not recognized, should be PASSWORD or PUBLIC_KEY_FILE")
 }
 
 func readPublicKeyFile(file string) (ssh.AuthMethod, error) {
 	buffer, err := ioutil.ReadFile(file)
 	if err != nil {
-		return nil, errors.Wrap(err, fmt.Sprintf("unable to read file <%s>", file))
+		return nil, fmt.Errorf("unable to read file <%s> %w", file, err)
 	}
 
 	key, err := ssh.ParsePrivateKey(buffer)
 	if err != nil {
-		return nil, errors.Wrap(err, fmt.Sprintf("unable to parse private key"))
+		return nil, fmt.Errorf("unable to parse private key %w", err)
 	}
+
 	return ssh.PublicKeys(key), nil
 }

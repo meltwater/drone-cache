@@ -5,6 +5,8 @@ import (
 	"io/ioutil"
 	"os"
 	"testing"
+
+	"github.com/go-kit/kit/log"
 )
 
 const defaultSFTPHost = "127.0.0.1"
@@ -14,16 +16,17 @@ var host = getEnv("TEST_SFTP_HOST", defaultSFTPHost)
 var port = getEnv("TEST_SFTP_PORT", defaultSFTPPort)
 
 func TestSFTPTruth(t *testing.T) {
-	cli, err := InitializeSFTPBackend(SFTPConfig{
-		CacheRoot: "/upload",
-		Username:  "foo",
-		Auth: SSHAuth{
-			Password: "pass",
-			Method:   SSHAuthMethodPassword,
-		},
-		Host: host,
-		Port: port,
-	}, true)
+	cli, err := InitializeSFTPBackend(log.NewNopLogger(),
+		SFTPConfig{
+			CacheRoot: "/upload",
+			Username:  "foo",
+			Auth: SSHAuth{
+				Password: "pass",
+				Method:   SSHAuthMethodPassword,
+			},
+			Host: host,
+			Port: port,
+		}, true)
 	if err != nil {
 		t.Fatal(err)
 	}

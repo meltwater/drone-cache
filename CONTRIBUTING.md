@@ -15,13 +15,14 @@ the requirements below.
 ## Pull Request Process
 
 0. Check out [Pull Request Checklist](#pull-request-checklist), ensure you have fulfilled each step.
-1. Ensure any install or build dependencies are removed before the end of the layer when doing a
+1. Check out [Uber Style Guide](https://github.com/uber-go/guide/blob/master/style.md), project tries to follow it, ensure you have fulfilled it as much as possible.
+2. Ensure any install or build dependencies are removed before the end of the layer when doing a
    build.
-2. Please ensure the [README](README.md) and [DOCS](./DOCS.md) are up-to-date with details of changes to the command-line interface,
+3. Please ensure the [README](README.md) and [DOCS](./DOCS.md) are up-to-date with details of changes to the command-line interface,
     this includes new environment variables, exposed ports, useful file locations and container parameters.
-3. **PLEASE ENSURE YOU DO NOT INTRODUCE BREAKING CHANGES.**
-4. **PLEASE ENSURE BUG FIXES AND NEW FEATURES INCLUDE TESTS.**
-5. You may merge the Pull Request in once you have the sign-off of one other maintainer/code owner,
+4. **PLEASE ENSURE YOU DO NOT INTRODUCE BREAKING CHANGES.**
+5. **PLEASE ENSURE BUG FIXES AND NEW FEATURES INCLUDE TESTS.**
+6. You may merge the Pull Request in once you have the sign-off of one other maintainer/code owner,
    or if you do not have permission to do that, you may request the second reviewer to merge it for you.
 
 ## Pull Request Checklist
@@ -43,12 +44,13 @@ the requirements below.
 *Only concerns maintainers/code owners*
 
 0. **PLEASE DO NOT INTRODUCE BREAKING CHANGES**
-1. Increase the version numbers in any examples files and the README.md to the new version that this
+1. Execute `make README.md`. This will update [usage](README.md#usage) section of [README.md](README.md) with latest CLI options
+2. Increase the version numbers in any examples files and the README.md to the new version that this
    release would represent. The versioning scheme we use is [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/meltwater/drone-cache/tags).
 
-2. Ensure [CHANGELOG](CHANGELOG.md) is up-to-date with new version changes.
-3. Update version references.
-4. Create a tag on master. Any changes on master will trigger a release with given tag and `latest tag.
+3. Ensure [CHANGELOG](CHANGELOG.md) is up-to-date with new version changes.
+4. Update version references.
+5. Create a tag on master. Any changes on master will trigger a release with given tag and `latest tag.
 
     ```console
     $ git tag -am 'vX.X.X'
