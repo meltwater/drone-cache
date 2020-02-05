@@ -2,7 +2,7 @@
 date: 2019-03-19T00:00:00+00:00
 title: Drone Cache
 author: meltwater
-tags: [ cache, amazon, aws, s3, volume ]
+tags: [ cache, amazon, aws, s3, azure, volume ]
 logo: drone_cache.svg
 repo: meltwater/drone-cache
 image: meltwater/drone-cache
@@ -14,7 +14,7 @@ This plugin requires Volume configuration if you enable `filesystem` backend wit
 
 A Drone plugin for caching current workspace files between builds to reduce your build times. `drone-cache` is a small CLI program, written in Go without any external OS dependencies (such as tar, etc).
 
-With `drone-cache`, you can provide your **own cache key templates**, specify **archive format** (tar, tar.gz, etc) and you can use **an S3 bucket or a mounted volume** as storage for your cached files, even better you can implement **your own storage backend** to cover your use case.
+With `drone-cache`, you can provide your **own cache key templates**, specify **archive format** (tar, tar.gz, etc) and you can use **an S3 bucket, Azure Storage or a mounted volume** as storage for your cached files, even better you can implement **your own storage backend** to cover your use case.
 
 **How does it work**
 
@@ -353,6 +353,15 @@ bucket
 
 region
 : AWS bucket region. (`us-east-1`, `eu-west-1`, ...)
+
+account_name
+: Azure Storage account name
+
+account_key
+: Azure Storage account key
+
+container
+: Azure Storage container
 
 path-style
 : use path style for bucket paths. (true for `minio`, false for `aws`)

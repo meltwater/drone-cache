@@ -4,16 +4,17 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
+	"net/url"
 	"os"
 	"path"
 	"strings"
 
-	"github.com/meltwater/drone-cache/cache"
-
+	"github.com/Azure/azure-storage-blob-go/azblob"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/log/level"
+	"github.com/meltwater/drone-cache/cache"
 	"github.com/pkg/sftp"
 	"golang.org/x/crypto/ssh"
 )
@@ -48,6 +49,15 @@ type S3Config struct {
 	PathStyle bool // Use path style instead of domain style. Should be true for minio and false for AWS
 }
 
+// AzureConfig is a structure to store Azure backend configuration
+type AzureConfig struct {
+	AccountName    string
+	AccountKey     string
+	ContainerName  string
+	BlobStorageURL string
+	Azurite        bool
+}
+
 // FileSystemConfig is a structure to store filesystem backend configuration
 type FileSystemConfig struct {
 	CacheRoot string
@@ -75,6 +85,36 @@ func InitializeS3Backend(l log.Logger, c S3Config, debug bool) (cache.Backend, e
 	}
 
 	return newS3(c.Bucket, c.ACL, c.Encryption, awsConf), nil
+}
+
+// InitializeAzureBackend creates an AzureBlob backend
+func InitializeAzureBackend(l log.Logger, c AzureConfig, debug bool) (cache.Backend, error) {
+
+	// From the Azure portal, get your storage account name and key and set environment variables.
+	accountName, accountKey := c.AccountName, c.AccountKey
+	if len(accountName) == 0 || len(accountKey) == 0 {
+		return nil, fmt.Errorf("Either the AZURE_ACCOUNT_NAME or AZURE_ACCOUNT_KEY environment variable is not set")
+	}
+
+	// Create a default request pipeline using your storage account name and account key.
+	credential, err := azblob.NewSharedKeyCredential(accountName, accountKey)
+	if err != nil {
+		level.Error(l).Log("msg", "Invalid credentials with error: "+err.Error())
+	}
+
+	var azureBlobURL *url.URL
+
+	// Azurite has different URL pattern than production Azure Blob Storage
+	if c.Azurite {
+		azureBlobURL, err = url.Parse(fmt.Sprintf("http://%s/%s/%s", c.BlobStorageURL, c.AccountName, c.ContainerName))
+	} else {
+		azureBlobURL, err = url.Parse(fmt.Sprintf("https://%s.%s/%s", c.AccountName, c.BlobStorageURL, c.ContainerName))
+	}
+	if err != nil {
+		level.Error(l).Log("msg", "Can't create url with : "+err.Error())
+	}
+
+	return newAzure(credential, azureBlobURL, &c), nil
 }
 
 // InitializeFileSystemBackend creates a filesystem backend

@@ -6,7 +6,7 @@
 
 A Drone plugin for caching current workspace files between builds to reduce your build times. `drone-cache` is a small CLI program, written in Go without any external OS dependencies (such as tar, etc).
 
-With `drone-cache`, you can provide your **own cache key templates**, specify **archive format** (tar, tar.gz, etc) and you can use **an S3 bucket or a mounted volume** as storage for your cached files, even better you can implement **your own storage backend** to cover your use case.
+With `drone-cache`, you can provide your **own cache key templates**, specify **archive format** (tar, tar.gz, etc) and you can use **an S3 bucket, Azure Storage or a mounted volume** as storage for your cached files, even better you can implement **your own storage backend** to cover your use case.
 
 For detailed usage information and a list of available options please take a look at [usage](#usage) and [examples](#example-usage-of-drone-cache). If you want to learn more about custom cache keys, see [cache key templates](docs/cache_key_templates.md).
 
@@ -154,6 +154,10 @@ GLOBAL OPTIONS:
    --path-style, --ps                          use path style for bucket paths. (true for minio, false for aws) [$PLUGIN_PATH_STYLE]
    --acl value                                 upload files with acl (private, public-read, ...) (default: "private") [$PLUGIN_ACL]
    --encryption value, --enc value             server-side encryption algorithm, defaults to none. (AES256, aws:kms) [$PLUGIN_ENCRYPTION]
+   --azure-account-name value                  Azure Blob Storage Account Name [$PLUGIN_ACCOUNT_NAME, $AZURE_ACCOUNT_NAME]
+   --azure-account-key value                   Azure Blob Storage Account Key [$PLUGIN_ACCOUNT_KEY, $AZURE_ACCOUNT_KEY]
+   --azure-container-name value                Azure Blob Storage container name [$PLUGIN_CONTAINER, $AZURE_CONTAINER_NAME]
+   --azure-blob-storage-url value              Azure Blob Storage URL (default: "blob.core.windows.net") [$AZURE_BLOB_STORAGE_URL]
    --sftp-cache-root value                     sftp root directory [$SFTP_CACHE_ROOT]
    --sftp-username value                       sftp username [$SFTP_USERNAME]
    --sftp-password value                       sftp password [$SFTP_PASSWORD]
