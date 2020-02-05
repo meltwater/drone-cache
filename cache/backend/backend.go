@@ -1,6 +1,7 @@
 package backend
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"io/ioutil"
@@ -89,17 +90,16 @@ func InitializeS3Backend(l log.Logger, c S3Config, debug bool) (cache.Backend, e
 
 // InitializeAzureBackend creates an AzureBlob backend
 func InitializeAzureBackend(l log.Logger, c AzureConfig, debug bool) (cache.Backend, error) {
-
 	// From the Azure portal, get your storage account name and key and set environment variables.
 	accountName, accountKey := c.AccountName, c.AccountKey
 	if len(accountName) == 0 || len(accountKey) == 0 {
-		return nil, fmt.Errorf("Either the AZURE_ACCOUNT_NAME or AZURE_ACCOUNT_KEY environment variable is not set")
+		return nil, fmt.Errorf("either the AZURE_ACCOUNT_NAME or AZURE_ACCOUNT_KEY environment variable is not set")
 	}
 
 	// Create a default request pipeline using your storage account name and account key.
 	credential, err := azblob.NewSharedKeyCredential(accountName, accountKey)
 	if err != nil {
-		level.Error(l).Log("msg", "Invalid credentials with error: "+err.Error())
+		level.Error(l).Log("msg", "invalid credentials with error: "+err.Error())
 	}
 
 	var azureBlobURL *url.URL
@@ -110,11 +110,22 @@ func InitializeAzureBackend(l log.Logger, c AzureConfig, debug bool) (cache.Back
 	} else {
 		azureBlobURL, err = url.Parse(fmt.Sprintf("https://%s.%s/%s", c.AccountName, c.BlobStorageURL, c.ContainerName))
 	}
+
 	if err != nil {
 		level.Error(l).Log("msg", "Can't create url with : "+err.Error())
 	}
 
-	return newAzure(credential, azureBlobURL, &c), nil
+	pipeline := azblob.NewPipeline(credential, azblob.PipelineOptions{})
+	containerURL := azblob.NewContainerURL(*azureBlobURL, pipeline)
+	ctx := context.Background()
+
+	// Always creating new container, it will throw error if it already exists
+	_, err = containerURL.Create(ctx, azblob.Metadata{}, azblob.PublicAccessNone)
+	if err != nil {
+		level.Error(l).Log("msg", "Can't create url with : "+err.Error())
+	}
+
+	return newAzure(ctx, containerURL), nil
 }
 
 // InitializeFileSystemBackend creates a filesystem backend
