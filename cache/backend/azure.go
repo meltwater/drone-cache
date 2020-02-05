@@ -29,7 +29,7 @@ func (c *azureBackend) Get(p string) (io.ReadCloser, error) {
 		return nil, fmt.Errorf("get the object %w", err)
 	}
 
-	//nolint  // NOTE: automatically retries are performed if the connection fails, not magic number
+	//nolint:mnd // NOTE: automatically retries are performed if the connection fails, not magic number
 	bodyStream := downloadResponse.Body(azblob.RetryReaderOptions{MaxRetryRequests: 4})
 
 	return bodyStream, nil
