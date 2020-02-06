@@ -112,7 +112,7 @@ func InitializeAzureBackend(l log.Logger, c AzureConfig, debug bool) (cache.Back
 	}
 
 	if err != nil {
-		level.Error(l).Log("msg", "Can't create url with : "+err.Error())
+		level.Error(l).Log("msg", "can't create url with : "+err.Error())
 	}
 
 	pipeline := azblob.NewPipeline(credential, azblob.PipelineOptions{})
@@ -122,7 +122,7 @@ func InitializeAzureBackend(l log.Logger, c AzureConfig, debug bool) (cache.Back
 	// Always creating new container, it will throw error if it already exists
 	_, err = containerURL.Create(ctx, azblob.Metadata{}, azblob.PublicAccessNone)
 	if err != nil {
-		level.Error(l).Log("msg", "Can't create url with : "+err.Error())
+		level.Debug(l).Log("msg", "container already exists:"+err.Error())
 	}
 
 	return newAzure(ctx, containerURL), nil
