@@ -240,8 +240,8 @@ type CloudStorageConfig struct {
 	APIKey     string
 }
 
-// InitializeCloudStorageBackend creates a Cloud Storage backend
-func InitializeCloudStorageBackend(l log.Logger, c CloudStorageConfig, debug bool) (cache.Backend, error) {
+// InitializeGCSBackend creates a Cloud Storage backend
+func InitializeGCSBackend(l log.Logger, c CloudStorageConfig, debug bool) (cache.Backend, error) {
 	var opts []option.ClientOption
 	if c.APIKey != "" {
 		opts = append(opts, option.WithAPIKey(c.APIKey))
@@ -252,8 +252,8 @@ func InitializeCloudStorageBackend(l log.Logger, c CloudStorageConfig, debug boo
 	}
 
 	if debug {
-		level.Debug(l).Log("msg", "gcp storage backend", "config", fmt.Sprintf("%+v", c))
+		level.Debug(l).Log("msg", "gc storage backend", "config", fmt.Sprintf("%+v", c))
 	}
 
-	return newCloudStorage(c.Bucket, c.ACL, c.Encryption, opts...)
+	return newGCS(c.Bucket, c.ACL, c.Encryption, opts...)
 }

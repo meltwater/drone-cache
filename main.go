@@ -482,7 +482,6 @@ func run(c *cli.Context) error {
 				},
 			},
 
-			// TODO: Think about naming of variables, reusing can be confusing, prefixing?
 			CloudStorage: backend.CloudStorageConfig{
 				Bucket:     c.String("bucket"),
 				Encryption: c.String("encryption"),

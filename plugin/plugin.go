@@ -117,8 +117,8 @@ func initializeBackend(logger log.Logger, c Config) (cache.Backend, error) {
 		level.Warn(logger).Log("msg", "using aws s3 as backend")
 		return backend.InitializeS3Backend(logger, c.S3, c.Debug)
 	case "cloudstorage":
-		level.Warn(logger).Log("msg", "using gcp storage as backend")
-		return backend.InitializeCloudStorageBackend(logger, c.CloudStorage, c.Debug)
+		level.Warn(logger).Log("msg", "using gc storage as backend")
+		return backend.InitializeGCSBackend(logger, c.CloudStorage, c.Debug)
 	case "filesystem":
 		level.Warn(logger).Log("msg", "using filesystem as backend")
 		return backend.InitializeFileSystemBackend(logger, c.FileSystem, c.Debug)
