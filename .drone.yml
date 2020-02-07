@@ -23,14 +23,12 @@ steps:
     - mc mb --region=eu-west-1 minio/drone-cache-bucket
 
 - name: build
-  pull: true
   image: golang:1.13-alpine
   commands:
   - apk add --update make git
   - make drone-cache
 
 - name: test
-  pull: true
   image: golang:1.13-alpine
   commands:
   - go test -v -mod=vendor -cover ./...
@@ -43,7 +41,6 @@ steps:
     path: /drone/src/testcache/cache
 
 - name: lint
-  pull: true
   image: golang:1.13-alpine
   commands:
   - "wget -O - -q https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s v1.21.0"
@@ -83,8 +80,8 @@ steps:
       from_secret: docker_username
 
 - name: rebuild-cache
-  pull: true
   image: meltwater/drone-cache:dev
+  pull: always
   settings:
     bucket: drone-cache-bucket
     mount:
@@ -99,8 +96,8 @@ steps:
     AWS_SECRET_ACCESS_KEY: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
 
 - name: rebuild-cache-with-key
-  pull: true
   image: meltwater/drone-cache:dev
+  pull: always
   settings:
     bucket: drone-cache-bucket
     cache_key: "{{ .Repo.Name }}_{{ checksum \"go.mod\" }}_{{ checksum \"go.sum\" }}_{{ arch }}_{{ os }}"
@@ -116,8 +113,8 @@ steps:
     AWS_SECRET_ACCESS_KEY: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
 
 - name: rebuild-cache-with-gzip
-  pull: true
   image: meltwater/drone-cache:dev
+  pull: always
   settings:
     archive_format: gzip
     bucket: drone-cache-bucket
@@ -134,8 +131,8 @@ steps:
     AWS_SECRET_ACCESS_KEY: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
 
 - name: rebuild-cache-with-filesystem
-  pull: true
   image: meltwater/drone-cache:dev
+  pull: always
   settings:
     archive_format: gzip
     backend: filesystem
@@ -191,13 +188,14 @@ steps:
 
 - name: restore-cache-with-key
   image: meltwater/drone-cache:dev
+  pull: always
   settings:
     bucket: drone-cache-bucket
     cache_key: "{{ .Repo.Name }}_{{ checksum \"go.mod\" }}_{{ checksum \"go.sum\" }}_{{ arch }}_{{ os }}"
     mount:
     - vendor
-    pull: true
     region: eu-west-1
+    pull: always
     restore: true
     path_style: true
     endpoint: filestorage:9000
@@ -207,8 +205,8 @@ steps:
     AWS_SECRET_ACCESS_KEY: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
 
 - name: restore-cache-with-gzip
-  pull: true
   image: meltwater/drone-cache:dev
+  pull: always
   settings:
     archive_format: gzip
     bucket: drone-cache-bucket
@@ -225,8 +223,8 @@ steps:
     AWS_SECRET_ACCESS_KEY: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
 
 - name: restore-cache-with-filesystem
-  pull: true
   image: meltwater/drone-cache:dev
+  pull: always
   settings:
     archive_format: gzip
     backend: filesystem
@@ -241,14 +239,15 @@ steps:
 
 - name: restore-cache-debug
   image: meltwater/drone-cache:dev
+  pull: always
   settings:
     debug: true
-    pull: true
     restore: true
+    pull: always
 
 - name: restore-cache
-  pull: true
   image: meltwater/drone-cache:dev
+  pull: always
   settings:
     bucket: drone-cache-bucket
     mount:
@@ -263,14 +262,12 @@ steps:
     AWS_SECRET_ACCESS_KEY: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
 
 - name: build-after
-  pull: true
   image: golang:1.13-alpine
   commands:
   - apk add --update make git
   - make drone-cache
 
 - name: test-after
-  pull: true
   image: golang:1.13-alpine
   commands:
   - go test -v -mod=vendor -cover ./...
