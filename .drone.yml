@@ -36,6 +36,7 @@ steps:
     CGO_ENABLED: 0
     TEST_ENDPOINT: filestorage:9000
     TEST_SFTP_HOST: sftp
+    TEST_AZURITE_URL: azurite:10000
   volumes:
   - name: testcache
     path: /drone/src/testcache/cache
@@ -275,6 +276,7 @@ steps:
     CGO_ENABLED: 0
     TEST_ENDPOINT: filestorage:9000
     TEST_SFTP_HOST: sftp
+    TEST_AZURITE_URL: azurite:10000
   volumes:
   - name: testcache
     path: /drone/src/testcache/cache
@@ -296,6 +298,12 @@ services:
   - 22
   commands:
   - /entrypoint foo:pass:::upload
+- name: azurite
+  image: mcr.microsoft.com/azure-storage/azurite
+  commands:
+  - azurite-blob --blobHost 0.0.0.0
+  ports:
+  - 10000
 
 volumes:
 - name: cache

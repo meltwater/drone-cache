@@ -36,6 +36,7 @@ type (
 		S3         backend.S3Config
 		FileSystem backend.FileSystemConfig
 		SFTP       backend.SFTPConfig
+		Azure      backend.AzureConfig
 	}
 
 	// Plugin stores metadata about current plugin.
@@ -108,6 +109,9 @@ func (p *Plugin) Exec() error {
 // initializeBackend initializes backend using given configuration
 func initializeBackend(logger log.Logger, c Config) (cache.Backend, error) {
 	switch c.Backend {
+	case "azure":
+		level.Warn(logger).Log("msg", "using azure blob as backend")
+		return backend.InitializeAzureBackend(logger, c.Azure, c.Debug)
 	case "s3":
 		level.Warn(logger).Log("msg", "using aws s3 as backend")
 		return backend.InitializeS3Backend(logger, c.S3, c.Debug)

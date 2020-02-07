@@ -323,6 +323,32 @@ func main() {
 			EnvVar: "PLUGIN_ENCRYPTION",
 		},
 
+		// Azure specific Config flags
+
+		cli.StringFlag{
+			Name:   "azure-account-name",
+			Usage:  "Azure Blob Storage Account Name",
+			EnvVar: "PLUGIN_ACCOUNT_NAME,AZURE_ACCOUNT_NAME",
+		},
+		cli.StringFlag{
+			Name:   "azure-account-key",
+			Usage:  "Azure Blob Storage Account Key",
+			EnvVar: "PLUGIN_ACCOUNT_KEY,AZURE_ACCOUNT_KEY",
+		},
+		cli.StringFlag{
+			Name:   "azure-container-name",
+			Usage:  "Azure Blob Storage container name",
+			EnvVar: "PLUGIN_CONTAINER,AZURE_CONTAINER_NAME",
+		},
+		cli.StringFlag{
+			Name:   "azure-blob-storage-url",
+			Usage:  "Azure Blob Storage URL",
+			Value:  "blob.core.windows.net",
+			EnvVar: "AZURE_BLOB_STORAGE_URL",
+		},
+
+		// SFTP specific Config flags
+
 		cli.StringFlag{
 			Name:   "sftp-cache-root",
 			Usage:  "sftp root directory",
@@ -434,6 +460,13 @@ func run(c *cli.Context) error {
 				Region:     c.String("region"),
 				Secret:     c.String("secret-key"),
 			},
+			Azure: backend.AzureConfig{
+				AccountName:    c.String("azure-account-name"),
+				AccountKey:     c.String("azure-account-key"),
+				ContainerName:  c.String("azure-container-name"),
+				BlobStorageURL: c.String("azure-blob-storage-url"),
+				Azurite:        false,
+			},
 			SFTP: backend.SFTPConfig{
 				CacheRoot: c.String("sftp-cache-root"),
 				Username:  c.String("sftp-username"),
@@ -445,6 +478,7 @@ func run(c *cli.Context) error {
 					Method:        backend.SSHAuthMethod(c.String("sftp-auth-method")),
 				},
 			},
+
 			SkipSymlinks: c.Bool("skip-symlinks"),
 		},
 	}

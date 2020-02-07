@@ -37,7 +37,7 @@ func (c *filesystem) Put(p string, src io.ReadSeeker) error {
 	}
 
 	dir := filepath.Dir(absPath)
-	if err := os.MkdirAll(dir, os.FileMode(0755)); err != nil {
+	if err := os.MkdirAll(dir, os.FileMode(0755)); err != nil { //nolint:mnd 755 is not a magic number
 		return fmt.Errorf("create directory <%s> %w", dir, err)
 	}
 
