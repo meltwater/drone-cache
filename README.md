@@ -6,7 +6,7 @@
 
 A Drone plugin for caching current workspace files between builds to reduce your build times. `drone-cache` is a small CLI program, written in Go without any external OS dependencies (such as tar, etc).
 
-With `drone-cache`, you can provide your **own cache key templates**, specify **archive format** (tar, tar.gz, etc) and you can use **an S3 bucket, Azure Storage or a mounted volume** as storage for your cached files, even better you can implement **your own storage backend** to cover your use case.
+With `drone-cache`, you can provide your **own cache key templates**, specify **archive format** (tar, tar.gz, etc) and you can use **an S3 bucket, Azure Storage, Google Cloud Storage or a mounted volume** as storage for your cached files, even better you can implement **your own storage backend** to cover your use case.
 
 For detailed usage information and a list of available options please take a look at [usage](#usage) and [examples](#example-usage-of-drone-cache). If you want to learn more about custom cache keys, see [cache key templates](docs/cache_key_templates.md).
 
@@ -96,7 +96,7 @@ USAGE:
    drone-cache [global options] command [command options] [arguments...]
 
 VERSION:
-   v1.0.4-19-gf16b55a-dirty
+   v1.0.4-18-g99c5e76-dirty
 
 COMMANDS:
      help, h  Shows a list of commands or help for one command
@@ -146,10 +146,10 @@ GLOBAL OPTIONS:
    --skip-symlinks, --ss                       skip symbolic links in archive [$PLUGIN_SKIP_SYMLINKS, $ SKIP_SYMLINKS]
    --debug, -d                                 debug [$PLUGIN_DEBUG, $ DEBUG]
    --filesystem-cache-root value, --fcr value  local filesystem root directory for the filesystem cache (default: "/tmp/cache") [$PLUGIN_FILESYSTEM_CACHE_ROOT, $ FILESYSTEM_CACHE_ROOT]
-   --endpoint value, -e value                  endpoint for the s3 connection [$PLUGIN_ENDPOINT, $S3_ENDPOINT]
+   --endpoint value, -e value                  endpoint for the s3/cloud storage connection [$PLUGIN_ENDPOINT, $S3_ENDPOINT, $CLOUD_STORAGE_ENDPOINT]
    --access-key value, --akey value            AWS access key [$PLUGIN_ACCESS_KEY, $AWS_ACCESS_KEY_ID, $CACHE_AWS_ACCESS_KEY_ID]
-   --secret-key value, --skey value            AWS secret key [$PLUGIN_SECRET_KEY, $AWS_SECRET_ACCESS_KEY, $CACHE_AWS_SECRET_ACCESS_KEY]
-   --bucket value, --bckt value                AWS bucket name [$PLUGIN_BUCKET, $S3_BUCKET]
+   --secret-key value, --skey value            AWS/GCP secret key [$PLUGIN_SECRET_KEY, $AWS_SECRET_ACCESS_KEY, $CACHE_AWS_SECRET_ACCESS_KEY, $GCP_API_KEY]
+   --bucket value, --bckt value                AWS bucket name [$PLUGIN_BUCKET, $S3_BUCKET, $CLOUD_STORAGE_BUCKET]
    --region value, --reg value                 AWS bucket region. (us-east-1, eu-west-1, ...) [$PLUGIN_REGION, $S3_REGION]
    --path-style, --ps                          use path style for bucket paths. (true for minio, false for aws) [$PLUGIN_PATH_STYLE]
    --acl value                                 upload files with acl (private, public-read, ...) (default: "private") [$PLUGIN_ACL]

@@ -33,10 +33,11 @@ type (
 
 		Mount []string
 
-		S3         backend.S3Config
-		FileSystem backend.FileSystemConfig
-		SFTP       backend.SFTPConfig
-		Azure      backend.AzureConfig
+		S3           backend.S3Config
+		FileSystem   backend.FileSystemConfig
+		SFTP         backend.SFTPConfig
+		Azure        backend.AzureConfig
+		CloudStorage backend.CloudStorageConfig
 	}
 
 	// Plugin stores metadata about current plugin.
@@ -115,6 +116,9 @@ func initializeBackend(logger log.Logger, c Config) (cache.Backend, error) {
 	case "s3":
 		level.Warn(logger).Log("msg", "using aws s3 as backend")
 		return backend.InitializeS3Backend(logger, c.S3, c.Debug)
+	case "cloudstorage":
+		level.Warn(logger).Log("msg", "using gc storage as backend")
+		return backend.InitializeGCSBackend(logger, c.CloudStorage, c.Debug)
 	case "filesystem":
 		level.Warn(logger).Log("msg", "using filesystem as backend")
 		return backend.InitializeFileSystemBackend(logger, c.FileSystem, c.Debug)

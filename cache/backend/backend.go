@@ -10,14 +10,16 @@ import (
 	"path"
 	"strings"
 
+	"github.com/meltwater/drone-cache/cache"
+
 	"github.com/Azure/azure-storage-blob-go/azblob"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/log/level"
-	"github.com/meltwater/drone-cache/cache"
 	"github.com/pkg/sftp"
 	"golang.org/x/crypto/ssh"
+	"google.golang.org/api/option"
 )
 
 // S3Config is a structure to store S3  backend configuration
@@ -227,4 +229,31 @@ func readPublicKeyFile(file string) (ssh.AuthMethod, error) {
 	}
 
 	return ssh.PublicKeys(key), nil
+}
+
+// CloudStorageConfig is a structure to store Cloud Storage backend configuration
+type CloudStorageConfig struct {
+	Bucket     string
+	ACL        string
+	Encryption string
+	Endpoint   string
+	APIKey     string
+}
+
+// InitializeGCSBackend creates a Cloud Storage backend
+func InitializeGCSBackend(l log.Logger, c CloudStorageConfig, debug bool) (cache.Backend, error) {
+	var opts []option.ClientOption
+	if c.APIKey != "" {
+		opts = append(opts, option.WithAPIKey(c.APIKey))
+	}
+
+	if c.Endpoint != "" {
+		opts = append(opts, option.WithEndpoint(c.Endpoint))
+	}
+
+	if debug {
+		level.Debug(l).Log("msg", "gc storage backend", "config", fmt.Sprintf("%+v", c))
+	}
+
+	return newGCS(c.Bucket, c.ACL, c.Encryption, opts...)
 }
