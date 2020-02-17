@@ -89,7 +89,7 @@ pipeline:
 
 ### With custom cache key template
 
-See [cache key templates](#cache-key-templates) section for further information and to learn about syntax.
+See [cache key templates](../cache_key_templates.md#cache-key-templates) section for further information and to learn about syntax.
 
 ```yaml
 pipeline:
