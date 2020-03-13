@@ -106,7 +106,7 @@ func initializeBackend(c Config) (cache.Backend, error) {
 	case "filesystem":
 		log.Println("[IMPORTANT] using filesystem as backend")
 		return backend.InitializeFileSystemBackend(c.FileSystem, c.Debug)
-	case "oss":
+	case "alibaba":
 		log.Println("[IMPORTANT] using alibaba oss as backend")
 		return backend.InitializeOSSBackend(c.AlibabaOSS, c.Debug)
 	default:

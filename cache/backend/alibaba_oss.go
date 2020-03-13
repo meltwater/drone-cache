@@ -34,8 +34,13 @@ func (c alibabaOSSBackend) Get(p string) (io.ReadCloser, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, "couldn't get the object")
 	}
-	return bucket.GetObject(p)
+	reader, err := bucket.GetObject(p)
+	if err != nil {
+		return nil, errors.Wrap(err, "couldn't get the object")
+	}
+	return reader, nil
 }
+
 func (c alibabaOSSBackend) Put(p string, src io.ReadSeeker) error {
 	bucket, err := c.client.Bucket(c.bucket)
 	if err != nil {
@@ -45,7 +50,8 @@ func (c alibabaOSSBackend) Put(p string, src io.ReadSeeker) error {
 	options := []oss.Option{}
 
 	if c.encryption != "" {
-		// TODO
+		option := oss.ServerSideEncryption(c.encryption)
+		options = append(options, option)
 	}
 
 	if c.acl != "" {
@@ -53,6 +59,8 @@ func (c alibabaOSSBackend) Put(p string, src io.ReadSeeker) error {
 		options = append(options, option)
 
 	}
-	bucket.PutObject(p, src, options...)
+	if err := bucket.PutObject(p, src, options...); err != nil {
+		return errors.Wrap(err, "couldn't put the object")
+	}
 	return nil
 }
