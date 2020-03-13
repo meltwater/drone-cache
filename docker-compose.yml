@@ -9,6 +9,16 @@ services:
     ports:
       - 9000:9000
     command: server /data
+  sftp:
+    image: atmoz/sftp
+    ports:
+    - "22:22"
+    command: foo:pass:::upload
+  azurite:
+    image: mcr.microsoft.com/azure-storage/azurite
+    ports:
+    - "10000:10000"
+    command: azurite-blob --blobHost 0.0.0.0
   configure-buckets:
     image: minio/mc:RELEASE.2018-09-26T00-42-43Z
     entrypoint: sh

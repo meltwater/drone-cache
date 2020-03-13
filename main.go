@@ -1,23 +1,45 @@
 package main
 
 import (
-	"log"
+	"errors"
+	stdlog "log"
 	"os"
 
-	"github.com/urfave/cli"
-
+	"github.com/meltwater/drone-cache/cache"
 	"github.com/meltwater/drone-cache/cache/backend"
+	"github.com/meltwater/drone-cache/internal"
 	"github.com/meltwater/drone-cache/metadata"
 	"github.com/meltwater/drone-cache/plugin"
+
+	"github.com/go-kit/kit/log/level"
+	"github.com/urfave/cli"
 )
 
+var version = "0.0.0"
+
+//nolint:funlen
 func main() {
 	app := cli.NewApp()
 	app.Name = "Drone cache plugin"
 	app.Usage = "Drone cache plugin"
 	app.Action = run
-	app.Version = "1.0.4"
+	app.Version = version
 	app.Flags = []cli.Flag{
+		// Logger args
+
+		cli.StringFlag{
+			Name:   "log.level, ll",
+			Usage:  "log filtering level. ('error', 'warn', 'info', 'debug')",
+			Value:  internal.LogLevelInfo,
+			EnvVar: "PLUGIN_LOG_LEVEL, LOG_LEVEL",
+		},
+		cli.StringFlag{
+			Name:   "log.format, lf",
+			Usage:  "log format to use. ('logfmt', 'json')",
+			Value:  internal.LogFormatLogfmt,
+			EnvVar: "PLUGIN_LOG_FORMAT, LOG_FORMAT",
+		},
+
 		// Repo args
 
 		cli.StringFlag{
@@ -221,8 +243,15 @@ func main() {
 		cli.StringFlag{
 			Name:   "archive-format, arcfmt",
 			Usage:  "archive format to use to store the cache directories (tar, gzip)",
-			Value:  "tar",
+			Value:  cache.DefaultArchiveFormat,
 			EnvVar: "PLUGIN_ARCHIVE_FORMAT",
+		},
+		cli.IntFlag{
+			Name: "compression-level, cpl",
+			Usage: `compression level to use for gzip compression when archive-format specified as gzip
+			(check https://godoc.org/compress/flate#pkg-constants for available options)`,
+			Value:  cache.DefaultCompressionLevel,
+			EnvVar: "PLUGIN_COMPRESSION_LEVEL",
 		},
 		cli.BoolFlag{
 			Name:   "skip-symlinks, ss",
@@ -233,6 +262,12 @@ func main() {
 			Name:   "debug, d",
 			Usage:  "debug",
 			EnvVar: "PLUGIN_DEBUG, DEBUG",
+		},
+		cli.BoolFlag{
+			Name:   "exit-code, ex",
+			Usage:  "always exit with exit code, disable silent fails for known errors",
+			Hidden: true,
+			EnvVar: "PLUGIN_EXIT_CODE, EXIT_CODE",
 		},
 
 		// Volume specific Config args
@@ -248,8 +283,8 @@ func main() {
 
 		cli.StringFlag{
 			Name:   "endpoint, e",
-			Usage:  "endpoint for the s3 connection",
-			EnvVar: "PLUGIN_ENDPOINT,S3_ENDPOINT",
+			Usage:  "endpoint for the s3/cloud storage connection",
+			EnvVar: "PLUGIN_ENDPOINT,S3_ENDPOINT,CLOUD_STORAGE_ENDPOINT",
 		},
 		cli.StringFlag{
 			Name:   "access-key, akey",
@@ -258,13 +293,13 @@ func main() {
 		},
 		cli.StringFlag{
 			Name:   "secret-key, skey",
-			Usage:  "AWS secret key",
-			EnvVar: "PLUGIN_SECRET_KEY,AWS_SECRET_ACCESS_KEY,CACHE_AWS_SECRET_ACCESS_KEY",
+			Usage:  "AWS/GCP secret key",
+			EnvVar: "PLUGIN_SECRET_KEY,AWS_SECRET_ACCESS_KEY,CACHE_AWS_SECRET_ACCESS_KEY,GCP_API_KEY",
 		},
 		cli.StringFlag{
 			Name:   "bucket, bckt",
 			Usage:  "AWS bucket name",
-			EnvVar: "PLUGIN_BUCKET,S3_BUCKET",
+			EnvVar: "PLUGIN_BUCKET,S3_BUCKET,CLOUD_STORAGE_BUCKET",
 		},
 		cli.StringFlag{
 			Name:   "region, reg",
@@ -287,15 +322,86 @@ func main() {
 			Usage:  "server-side encryption algorithm, defaults to none. (AES256, aws:kms)",
 			EnvVar: "PLUGIN_ENCRYPTION",
 		},
+
+		// Azure specific Config flags
+
+		cli.StringFlag{
+			Name:   "azure-account-name",
+			Usage:  "Azure Blob Storage Account Name",
+			EnvVar: "PLUGIN_ACCOUNT_NAME,AZURE_ACCOUNT_NAME",
+		},
+		cli.StringFlag{
+			Name:   "azure-account-key",
+			Usage:  "Azure Blob Storage Account Key",
+			EnvVar: "PLUGIN_ACCOUNT_KEY,AZURE_ACCOUNT_KEY",
+		},
+		cli.StringFlag{
+			Name:   "azure-container-name",
+			Usage:  "Azure Blob Storage container name",
+			EnvVar: "PLUGIN_CONTAINER,AZURE_CONTAINER_NAME",
+		},
+		cli.StringFlag{
+			Name:   "azure-blob-storage-url",
+			Usage:  "Azure Blob Storage URL",
+			Value:  "blob.core.windows.net",
+			EnvVar: "AZURE_BLOB_STORAGE_URL",
+		},
+
+		// SFTP specific Config flags
+
+		cli.StringFlag{
+			Name:   "sftp-cache-root",
+			Usage:  "sftp root directory",
+			EnvVar: "SFTP_CACHE_ROOT",
+		},
+		cli.StringFlag{
+			Name:   "sftp-username",
+			Usage:  "sftp username",
+			EnvVar: "SFTP_USERNAME",
+		},
+		cli.StringFlag{
+			Name:   "sftp-password",
+			Usage:  "sftp password",
+			EnvVar: "SFTP_PASSWORD",
+		},
+		cli.StringFlag{
+			Name:   "ftp-public-key-file",
+			Usage:  "sftp public key file path",
+			EnvVar: "SFTP_PUBLIC_KEY_FILE",
+		},
+		cli.StringFlag{
+			Name:   "sftp-auth-method",
+			Usage:  "sftp auth method, defaults to none. (PASSWORD, PUBLIC_KEY_FILE)",
+			EnvVar: "SFTP_AUTH_METHOD",
+		},
+		cli.StringFlag{
+			Name:   "sftp-host",
+			Usage:  "sftp host",
+			EnvVar: "SFTP_HOST",
+		},
+		cli.StringFlag{
+			Name:   "sftp-port",
+			Usage:  "sftp port",
+			EnvVar: "SFTP_PORT",
+		},
 	}
 
 	if err := app.Run(os.Args); err != nil {
-		log.Fatalf("%+v", err)
+		stdlog.Fatalf("%+v", err)
 	}
 }
 
+//nolint:funlen
 func run(c *cli.Context) error {
+	var logLevel = c.String("log.level")
+	if c.Bool("debug") {
+		logLevel = internal.LogLevelDebug
+	}
+
+	logger := internal.NewLogger(logLevel, c.String("log.format"), "drone-cache")
+
 	plg := plugin.Plugin{
+		Logger: logger,
 		Metadata: metadata.Metadata{
 			Repo: metadata.Repo{
 				Namespace: c.String("repo.namespace"),
@@ -332,17 +438,19 @@ func run(c *cli.Context) error {
 			},
 		},
 		Config: plugin.Config{
-			ArchiveFormat: c.String("archive-format"),
-			Backend:       c.String("backend"),
-			CacheKey:      c.String("cache-key"),
-			Debug:         c.Bool("debug"),
-			Mount:         c.StringSlice("mount"),
-			Rebuild:       c.Bool("rebuild"),
-			Restore:       c.Bool("restore"),
+			ArchiveFormat:    c.String("archive-format"),
+			Backend:          c.String("backend"),
+			CacheKey:         c.String("cache-key"),
+			CompressionLevel: c.Int("compression-level"),
+			Debug:            c.Bool("debug"),
+			Mount:            c.StringSlice("mount"),
+			Rebuild:          c.Bool("rebuild"),
+			Restore:          c.Bool("restore"),
 
 			FileSystem: backend.FileSystemConfig{
 				CacheRoot: c.String("filesystem-cache-root"),
 			},
+
 			S3: backend.S3Config{
 				ACL:        c.String("acl"),
 				Bucket:     c.String("bucket"),
@@ -353,15 +461,56 @@ func run(c *cli.Context) error {
 				Region:     c.String("region"),
 				Secret:     c.String("secret-key"),
 			},
+
+			Azure: backend.AzureConfig{
+				AccountName:    c.String("azure-account-name"),
+				AccountKey:     c.String("azure-account-key"),
+				ContainerName:  c.String("azure-container-name"),
+				BlobStorageURL: c.String("azure-blob-storage-url"),
+				Azurite:        false,
+			},
+
+			SFTP: backend.SFTPConfig{
+				CacheRoot: c.String("sftp-cache-root"),
+				Username:  c.String("sftp-username"),
+				Host:      c.String("sftp-host"),
+				Port:      c.String("sftp-port"),
+				Auth: backend.SSHAuth{
+					Password:      c.String("sftp-password"),
+					PublicKeyFile: c.String("sftp-public-key-file"),
+					Method:        backend.SSHAuthMethod(c.String("sftp-auth-method")),
+				},
+			},
+
+			CloudStorage: backend.CloudStorageConfig{
+				Bucket:     c.String("bucket"),
+				Encryption: c.String("encryption"),
+				Endpoint:   c.String("endpoint"),
+				APIKey:     c.String("secret-key"),
+			},
+
 			SkipSymlinks: c.Bool("skip-symlinks"),
 		},
 	}
 
 	err := plg.Exec()
-	if _, ok := err.(plugin.Error); ok {
-		// If it is an expected error log it, handle it gracefully
-		log.Println(err)
+	if err == nil {
 		return nil
 	}
+
+	if c.Bool("exit-code") {
+		// If it is exit-code enabled, always exit with error.
+		level.Warn(logger).Log("msg", "silent fails disabled, exiting with status code on error")
+		return err
+	}
+
+	var e plugin.Error
+	if errors.As(err, &e) {
+		// If it is an expected error log it, handle it gracefully,
+		level.Error(logger).Log("err", err)
+
+		return nil
+	}
+
 	return err
 }

@@ -1,7 +1,7 @@
 before:
   hooks:
     - make clean
-    - make fetch-dependencies
+    - make vendor
 dist: target/dist
 builds:
 - env:
