@@ -6,11 +6,12 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/meltwater/drone-cache/cache"
 	"github.com/meltwater/drone-cache/cache/backend"
-
-	"github.com/minio/minio-go"
-
 	"github.com/meltwater/drone-cache/metadata"
+
+	"github.com/go-kit/kit/log"
+	"github.com/minio/minio-go"
 )
 
 const (
@@ -475,6 +476,7 @@ func TestRestoreWithFilesystem(t *testing.T) {
 
 func newTestPlugin(bck string, rebuild, restore bool, mount []string, cacheKey, archiveFmt string) Plugin {
 	return Plugin{
+		Logger: log.NewNopLogger(),
 		Metadata: metadata.Metadata{
 			Repo: metadata.Repo{
 				Branch: "master",
@@ -485,12 +487,13 @@ func newTestPlugin(bck string, rebuild, restore bool, mount []string, cacheKey, 
 			},
 		},
 		Config: Config{
-			ArchiveFormat: archiveFmt,
-			Backend:       bck,
-			CacheKey:      cacheKey,
-			Mount:         mount,
-			Rebuild:       rebuild,
-			Restore:       restore,
+			ArchiveFormat:    archiveFmt,
+			CompressionLevel: cache.DefaultCompressionLevel,
+			Backend:          bck,
+			CacheKey:         cacheKey,
+			Mount:            mount,
+			Rebuild:          rebuild,
+			Restore:          restore,
 
 			FileSystem: backend.FileSystemConfig{
 				CacheRoot: "../testcache/cache",
@@ -577,7 +580,11 @@ func removeAllObjects(minioClient *minio.Client, bucketName string) error {
 			if !open {
 				return nil
 			}
-			return fmt.Errorf("remove all objects failed, while fetching %v", err)
+			if err != nil {
+				return fmt.Errorf("remove all objects failed, while fetching %v", err)
+			}
+
+			return nil
 		}
 	}
 }

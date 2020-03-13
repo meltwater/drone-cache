@@ -1,12 +1,12 @@
 package backend
 
 import (
+	"fmt"
 	"io"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
-	"github.com/pkg/errors"
 
 	"github.com/meltwater/drone-cache/cache"
 )
@@ -22,6 +22,7 @@ type s3Backend struct {
 // newS3 returns a new S3 remote Backend implemented
 func newS3(bucket, acl, encryption string, conf *aws.Config) cache.Backend {
 	client := s3.New(session.Must(session.NewSessionWithOptions(session.Options{})), conf)
+
 	return &s3Backend{
 		bucket:     bucket,
 		acl:        acl,
@@ -37,7 +38,7 @@ func (c *s3Backend) Get(p string) (io.ReadCloser, error) {
 		Key:    aws.String(p),
 	})
 	if err != nil {
-		return nil, errors.Wrap(err, "couldn't get the object")
+		return nil, fmt.Errorf("get the object %w", err)
 	}
 
 	return out.Body, nil
@@ -54,6 +55,10 @@ func (c *s3Backend) Put(p string, src io.ReadSeeker) error {
 	if c.encryption != "" {
 		in.ServerSideEncryption = aws.String(c.encryption)
 	}
-	_, err := c.client.PutObject(in)
-	return errors.Wrap(err, "couldn't put the object")
+
+	if _, err := c.client.PutObject(in); err != nil {
+		return fmt.Errorf("put the object %w", err)
+	}
+
+	return nil
 }

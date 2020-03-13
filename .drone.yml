@@ -23,110 +23,43 @@ steps:
     - mc mb --region=eu-west-1 minio/drone-cache-bucket
 
 - name: build
-  pull: true
-  image: golang:1.11-alpine
+  image: golang:1.13-alpine
   commands:
   - apk add --update make git
   - make drone-cache
 
 - name: test
-  pull: true
-  image: golang:1.11-alpine
+  image: golang:1.13-alpine
   commands:
   - go test -v -mod=vendor -cover ./...
   environment:
     CGO_ENABLED: 0
     TEST_ENDPOINT: filestorage:9000
+    TEST_SFTP_HOST: sftp
+    TEST_AZURITE_URL: azurite:10000
   volumes:
   - name: testcache
     path: /drone/src/testcache/cache
 
-- name: analyze
-  pull: true
-  image: golang:1.11-alpine
+- name: lint
+  image: golang:1.13-alpine
   commands:
-  - "wget -O - -q https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s v1.14.0"
+  - "wget -O - -q https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s v1.21.0"
   - ./bin/golangci-lint run -v --enable-all -D gochecknoglobals
   environment:
     CGO_ENABLED: 0
 
-- name: rebuild-cache
-  pull: true
-  image: meltwater/drone-cache:dev
-  settings:
-    bucket: drone-cache-bucket
-    mount:
-    - vendor
-    rebuild: true
-    region: eu-west-1
-    path_style: true
-    endpoint: filestorage:9000
-  environment:
-    AWS_ACCESS_KEY_ID: AKIAIOSFODNN7EXAMPLE
-    AWS_SECRET_ACCESS_KEY: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
-
-- name: rebuild-cache-with-key
-  pull: true
-  image: meltwater/drone-cache:dev
-  settings:
-    bucket: drone-cache-bucket
-    cache_key: "{{ .Repo.Name }}_{{ checksum \"go.mod\" }}_{{ checksum \"go.sum\" }}_{{ arch }}_{{ os }}"
-    mount:
-    - vendor
-    rebuild: true
-    region: eu-west-1
-    path_style: true
-    endpoint: filestorage:9000
-  environment:
-    AWS_ACCESS_KEY_ID: AKIAIOSFODNN7EXAMPLE
-    AWS_SECRET_ACCESS_KEY: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
-
-- name: rebuild-cache-with-gzip
-  pull: true
-  image: meltwater/drone-cache:dev
-  settings:
-    archive_format: gzip
-    bucket: drone-cache-bucket
-    cache_key: gzip
-    mount:
-    - vendor
-    rebuild: true
-    region: eu-west-1
-    path_style: true
-    endpoint: filestorage:9000
-  environment:
-    AWS_ACCESS_KEY_ID: AKIAIOSFODNN7EXAMPLE
-    AWS_SECRET_ACCESS_KEY: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
-
-- name: rebuild-cache-with-filesystem
-  pull: true
-  image: meltwater/drone-cache:dev
-  settings:
-    archive_format: gzip
-    backend: filesystem
-    cache_key: volume
-    mount:
-    - vendor
-    rebuild: true
-  volumes:
-  - name: cache
-    path: /tmp/cache
-
-- name: release-snapshot
-  image: goreleaser/goreleaser:v0.109
+- name: release-snapshot-dev
+  image: goreleaser/goreleaser:v0.120
   commands:
   - apk add --update make upx
   - goreleaser release --rm-dist --snapshot
+  - echo "$(git rev-parse --abbrev-ref HEAD)-$(git rev-parse --short HEAD)" > .tags
   environment:
     GITHUB_TOKEN:
       from_secret: github_token
-  when:
-    branch:
-    - master
-    event:
-    - push
 
-- name: release-docker-latest
+- name: release-docker-dev
   image: plugins/docker
   settings:
     build_args_from_env:
@@ -143,7 +76,109 @@ steps:
     password:
       from_secret: docker_password
     repo: meltwater/drone-cache
-    tags: latest
+    tags: dev
+    username:
+      from_secret: docker_username
+
+- name: rebuild-cache
+  image: meltwater/drone-cache:dev
+  pull: always
+  settings:
+    bucket: drone-cache-bucket
+    mount:
+    - vendor
+    rebuild: true
+    region: eu-west-1
+    path_style: true
+    endpoint: filestorage:9000
+    exit_code: true
+  environment:
+    AWS_ACCESS_KEY_ID: AKIAIOSFODNN7EXAMPLE
+    AWS_SECRET_ACCESS_KEY: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+
+- name: rebuild-cache-with-key
+  image: meltwater/drone-cache:dev
+  pull: always
+  settings:
+    bucket: drone-cache-bucket
+    cache_key: "{{ .Repo.Name }}_{{ checksum \"go.mod\" }}_{{ checksum \"go.sum\" }}_{{ arch }}_{{ os }}"
+    mount:
+    - vendor
+    rebuild: true
+    region: eu-west-1
+    path_style: true
+    endpoint: filestorage:9000
+    exit_code: true
+  environment:
+    AWS_ACCESS_KEY_ID: AKIAIOSFODNN7EXAMPLE
+    AWS_SECRET_ACCESS_KEY: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+
+- name: rebuild-cache-with-gzip
+  image: meltwater/drone-cache:dev
+  pull: always
+  settings:
+    archive_format: gzip
+    bucket: drone-cache-bucket
+    cache_key: gzip
+    mount:
+    - vendor
+    rebuild: true
+    region: eu-west-1
+    path_style: true
+    endpoint: filestorage:9000
+    exit_code: true
+  environment:
+    AWS_ACCESS_KEY_ID: AKIAIOSFODNN7EXAMPLE
+    AWS_SECRET_ACCESS_KEY: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+
+- name: rebuild-cache-with-filesystem
+  image: meltwater/drone-cache:dev
+  pull: always
+  settings:
+    archive_format: gzip
+    backend: filesystem
+    cache_key: volume
+    mount:
+    - vendor
+    rebuild: true
+    exit_code: true
+  volumes:
+  - name: cache
+    path: /tmp/cache
+
+- name: release-snapshot
+  image: goreleaser/goreleaser:v0.120
+  commands:
+  - apk add --update make upx
+  - goreleaser release --rm-dist --snapshot
+  - echo "$(git rev-parse --abbrev-ref HEAD)-$(git rev-parse --short HEAD)" > .tags
+  environment:
+    GITHUB_TOKEN:
+      from_secret: github_token
+  when:
+    branch:
+    - master
+    event:
+    - push
+
+- name: release-docker-vsc-ref
+  image: plugins/docker
+  settings:
+    build_args_from_env:
+    - BUILD_DATE
+    - DOCKERFILE_PATH
+    - VCS_REF
+    - VERSION
+    dockerfile: docker/Dockerfile.linux.386
+    environment:
+    - "BUILD_DATE=$(date -u +\"%Y-%m-%dT%H:%M:%S%Z\")"
+    - "DOCKERFILE_PATH=\"/docker/Dockerfile.linux.386\""
+    - VCS_REF=$(git rev-parse --short HEAD)
+    - VERSION=$(git describe --always --tags --dirty)
+    password:
+      from_secret: docker_password
+    repo: meltwater/drone-cache
+    # tags: this releases with tags in .tags
     username:
       from_secret: docker_username
   when:
@@ -154,23 +189,25 @@ steps:
 
 - name: restore-cache-with-key
   image: meltwater/drone-cache:dev
+  pull: always
   settings:
     bucket: drone-cache-bucket
     cache_key: "{{ .Repo.Name }}_{{ checksum \"go.mod\" }}_{{ checksum \"go.sum\" }}_{{ arch }}_{{ os }}"
     mount:
     - vendor
-    pull: true
     region: eu-west-1
+    pull: always
     restore: true
     path_style: true
     endpoint: filestorage:9000
+    exit_code: true
   environment:
     AWS_ACCESS_KEY_ID: AKIAIOSFODNN7EXAMPLE
     AWS_SECRET_ACCESS_KEY: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
 
 - name: restore-cache-with-gzip
-  pull: true
   image: meltwater/drone-cache:dev
+  pull: always
   settings:
     archive_format: gzip
     bucket: drone-cache-bucket
@@ -181,13 +218,14 @@ steps:
     restore: true
     path_style: true
     endpoint: filestorage:9000
+    exit_code: true
   environment:
     AWS_ACCESS_KEY_ID: AKIAIOSFODNN7EXAMPLE
     AWS_SECRET_ACCESS_KEY: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
 
 - name: restore-cache-with-filesystem
-  pull: true
   image: meltwater/drone-cache:dev
+  pull: always
   settings:
     archive_format: gzip
     backend: filesystem
@@ -195,20 +233,22 @@ steps:
     mount:
     - vendor
     restore: true
+    exit_code: true
   volumes:
   - name: cache
     path: /tmp/cache
 
 - name: restore-cache-debug
   image: meltwater/drone-cache:dev
+  pull: always
   settings:
     debug: true
-    pull: true
     restore: true
+    pull: always
 
 - name: restore-cache
-  pull: true
   image: meltwater/drone-cache:dev
+  pull: always
   settings:
     bucket: drone-cache-bucket
     mount:
@@ -217,25 +257,26 @@ steps:
     restore: true
     path_style: true
     endpoint: filestorage:9000
+    exit_code: true
   environment:
     AWS_ACCESS_KEY_ID: AKIAIOSFODNN7EXAMPLE
     AWS_SECRET_ACCESS_KEY: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
 
 - name: build-after
-  pull: true
-  image: golang:1.11-alpine
+  image: golang:1.13-alpine
   commands:
   - apk add --update make git
   - make drone-cache
 
 - name: test-after
-  pull: true
-  image: golang:1.11-alpine
+  image: golang:1.13-alpine
   commands:
   - go test -v -mod=vendor -cover ./...
   environment:
     CGO_ENABLED: 0
     TEST_ENDPOINT: filestorage:9000
+    TEST_SFTP_HOST: sftp
+    TEST_AZURITE_URL: azurite:10000
   volumes:
   - name: testcache
     path: /drone/src/testcache/cache
@@ -251,6 +292,18 @@ services:
     MINIO_SECRET_KEY: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
   ports:
   - 9000
+- name: sftp
+  image: atmoz/sftp
+  ports:
+  - 22
+  commands:
+  - /entrypoint foo:pass:::upload
+- name: azurite
+  image: mcr.microsoft.com/azure-storage/azurite
+  commands:
+  - azurite-blob --blobHost 0.0.0.0
+  ports:
+  - 10000
 
 volumes:
 - name: cache
@@ -280,13 +333,39 @@ steps:
   - git fetch --tags
 
 - name: release
-  image: goreleaser/goreleaser:v0.109
+  image: goreleaser/goreleaser:v0.120
   commands:
   - apk add --update make upx
-  - goreleaser release
+  - make release
   environment:
     GITHUB_TOKEN:
       from_secret: github_token
+
+- name: release-docker-latest
+  image: plugins/docker
+  settings:
+    build_args_from_env:
+    - BUILD_DATE
+    - DOCKERFILE_PATH
+    - VCS_REF
+    - VERSION
+    dockerfile: docker/Dockerfile.linux.386
+    environment:
+    - "BUILD_DATE=$(date -u +\"%Y-%m-%dT%H:%M:%S%Z\")"
+    - "DOCKERFILE_PATH=\"/docker/Dockerfile.linux.386\""
+    - VCS_REF=$(git rev-parse --short HEAD)
+    - VERSION=$(git describe --always --tags --dirty)
+    password:
+      from_secret: docker_password
+    repo: meltwater/drone-cache
+    tags: latest
+    username:
+      from_secret: docker_username
+  when:
+    branch:
+    - master
+    event:
+    - push
 
 - name: release-docker
   image: plugins/docker

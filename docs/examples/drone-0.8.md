@@ -31,7 +31,7 @@ pipeline:
       - mix deps.get
       - mix dialyzer --halt-exit-status
 
-rebuild-deps-cache:
+  rebuild-deps-cache:
     image: meltwater/drone-cache
     pull: true
     # backend: "s3" (default)
@@ -73,7 +73,7 @@ pipeline:
       - mix deps.get
       - mix dialyzer --halt-exit-status
 
-rebuild-deps-cache:
+  rebuild-deps-cache:
     image: meltwater/drone-cache
     pull: true
     backend: "filesystem" # (default: s3)
@@ -89,7 +89,7 @@ rebuild-deps-cache:
 
 ### With custom cache key template
 
-See [cache key templates](#cache-key-templates) section for further information and to learn about syntax.
+See [cache key templates](../cache_key_templates.md#cache-key-templates) section for further information and to learn about syntax.
 
 ```yaml
 pipeline:
@@ -105,7 +105,7 @@ pipeline:
       - 'deps'
       - '_dialyzer'
 
-deps:
+  deps:
     image: elixir:1.6.5
     pull: true
     commands:
@@ -114,7 +114,7 @@ deps:
       - mix deps.get
       - mix dialyzer --halt-exit-status
 
-rebuild-deps-cache:
+  rebuild-deps-cache:
     image: meltwater/drone-cache
     pull: true
     rebuild: true
@@ -143,7 +143,7 @@ pipeline:
       - 'deps'
       - '_dialyzer'
 
-deps:
+  deps:
     image: elixir:1.6.5
     pull: true
     commands:
@@ -152,7 +152,7 @@ deps:
       - mix deps.get
       - mix dialyzer --halt-exit-status
 
-rebuild-deps-cache:
+  rebuild-deps-cache:
     image: meltwater/drone-cache
     pull: true
     rebuild: true
@@ -181,7 +181,7 @@ pipeline:
       - 'deps'
       - '_dialyzer'
 
-deps:
+  deps:
     image: elixir:1.6.5
     pull: true
     commands:
@@ -190,7 +190,7 @@ deps:
       - mix deps.get
       - mix dialyzer --halt-exit-status
 
-rebuild-deps-cache:
+  rebuild-deps-cache:
     image: meltwater/drone-cache
     pull: true
     rebuild: true

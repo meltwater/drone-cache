@@ -6,7 +6,7 @@
 
 A Drone plugin for caching current workspace files between builds to reduce your build times. `drone-cache` is a small CLI program, written in Go without any external OS dependencies (such as tar, etc).
 
-With `drone-cache`, you can provide your **own cache key templates**, specify **archive format** (tar, tar.gz, etc) and you can use **an S3 bucket or a mounted volume** as storage for your cached files, even better you can implement **your own storage backend** to cover your use case.
+With `drone-cache`, you can provide your **own cache key templates**, specify **archive format** (tar, tar.gz, etc) and you can use **an S3 bucket, Azure Storage, Google Cloud Storage or a mounted volume** as storage for your cached files, even better you can implement **your own storage backend** to cover your use case.
 
 For detailed usage information and a list of available options please take a look at [usage](#usage) and [examples](#example-usage-of-drone-cache). If you want to learn more about custom cache keys, see [cache key templates](docs/cache_key_templates.md).
 
@@ -54,7 +54,7 @@ steps:
         - 'vendor'
 
   - name: build
-    image: golang:1.11-alpine
+    image: golang:1.13-alpine
     pull: true
     commands:
       - apk add --update make git
@@ -87,7 +87,8 @@ steps:
 
 ### Using executable (with CLI args)
 
-```console
+[embedmd]:# (tmp/help.txt)
+```txt
 NAME:
    Drone cache plugin - Drone cache plugin
 
@@ -95,12 +96,14 @@ USAGE:
    drone-cache [global options] command [command options] [arguments...]
 
 VERSION:
-   1.0.4
+   v1.0.4-18-g99c5e76-dirty
 
 COMMANDS:
      help, h  Shows a list of commands or help for one command
 
 GLOBAL OPTIONS:
+   --log.level value, --ll value               log filtering level. ('error', 'warn', 'info', 'debug') (default: "info") [$PLUGIN_LOG_LEVEL, $ LOG_LEVEL]
+   --log.format value, --lf value              log format to use. ('logfmt', 'json') (default: "logfmt") [$PLUGIN_LOG_FORMAT, $ LOG_FORMAT]
    --repo.fullname value, --rf value           repository full name [$DRONE_REPO]
    --repo.namespace value, --rns value         repository namespace [$DRONE_REPO_NAMESPACE]
    --repo.owner value, --ro value              repository owner (for Drone version < 1.0) [$DRONE_REPO_OWNER]
@@ -138,17 +141,30 @@ GLOBAL OPTIONS:
    --restore, --res                            restore the cache directories [$PLUGIN_RESTORE]
    --cache-key value, --chk value              cache key to use for the cache directories [$PLUGIN_CACHE_KEY]
    --archive-format value, --arcfmt value      archive format to use to store the cache directories (tar, gzip) (default: "tar") [$PLUGIN_ARCHIVE_FORMAT]
+   --compression-level value, --cpl value      compression level to use for gzip compression when archive-format specified as gzip
+                                                   (check https://godoc.org/compress/flate#pkg-constants for available options) (default: -1) [$PLUGIN_COMPRESSION_LEVEL]
    --skip-symlinks, --ss                       skip symbolic links in archive [$PLUGIN_SKIP_SYMLINKS, $ SKIP_SYMLINKS]
    --debug, -d                                 debug [$PLUGIN_DEBUG, $ DEBUG]
    --filesystem-cache-root value, --fcr value  local filesystem root directory for the filesystem cache (default: "/tmp/cache") [$PLUGIN_FILESYSTEM_CACHE_ROOT, $ FILESYSTEM_CACHE_ROOT]
-   --endpoint value, -e value                  endpoint for the s3 connection [$PLUGIN_ENDPOINT, $S3_ENDPOINT]
+   --endpoint value, -e value                  endpoint for the s3/cloud storage connection [$PLUGIN_ENDPOINT, $S3_ENDPOINT, $CLOUD_STORAGE_ENDPOINT]
    --access-key value, --akey value            AWS access key [$PLUGIN_ACCESS_KEY, $AWS_ACCESS_KEY_ID, $CACHE_AWS_ACCESS_KEY_ID]
-   --secret-key value, --skey value            AWS secret key [$PLUGIN_SECRET_KEY, $AWS_SECRET_ACCESS_KEY, $CACHE_AWS_SECRET_ACCESS_KEY]
-   --bucket value, --bckt value                AWS bucket name [$PLUGIN_BUCKET, $S3_BUCKET]
+   --secret-key value, --skey value            AWS/GCP secret key [$PLUGIN_SECRET_KEY, $AWS_SECRET_ACCESS_KEY, $CACHE_AWS_SECRET_ACCESS_KEY, $GCP_API_KEY]
+   --bucket value, --bckt value                AWS bucket name [$PLUGIN_BUCKET, $S3_BUCKET, $CLOUD_STORAGE_BUCKET]
    --region value, --reg value                 AWS bucket region. (us-east-1, eu-west-1, ...) [$PLUGIN_REGION, $S3_REGION]
    --path-style, --ps                          use path style for bucket paths. (true for minio, false for aws) [$PLUGIN_PATH_STYLE]
    --acl value                                 upload files with acl (private, public-read, ...) (default: "private") [$PLUGIN_ACL]
    --encryption value, --enc value             server-side encryption algorithm, defaults to none. (AES256, aws:kms) [$PLUGIN_ENCRYPTION]
+   --azure-account-name value                  Azure Blob Storage Account Name [$PLUGIN_ACCOUNT_NAME, $AZURE_ACCOUNT_NAME]
+   --azure-account-key value                   Azure Blob Storage Account Key [$PLUGIN_ACCOUNT_KEY, $AZURE_ACCOUNT_KEY]
+   --azure-container-name value                Azure Blob Storage container name [$PLUGIN_CONTAINER, $AZURE_CONTAINER_NAME]
+   --azure-blob-storage-url value              Azure Blob Storage URL (default: "blob.core.windows.net") [$AZURE_BLOB_STORAGE_URL]
+   --sftp-cache-root value                     sftp root directory [$SFTP_CACHE_ROOT]
+   --sftp-username value                       sftp username [$SFTP_USERNAME]
+   --sftp-password value                       sftp password [$SFTP_PASSWORD]
+   --ftp-public-key-file value                 sftp public key file path [$SFTP_PUBLIC_KEY_FILE]
+   --sftp-auth-method value                    sftp auth method, defaults to none. (PASSWORD, PUBLIC_KEY_FILE) [$SFTP_AUTH_METHOD]
+   --sftp-host value                           sftp host [$SFTP_HOST]
+   --sftp-port value                           sftp port [$SFTP_PORT]
    --help, -h                                  show help
    --version, -v                               print the version
 ```
@@ -181,7 +197,7 @@ $ ./scripts/setup_dev_environment.sh
 ### Tests
 
 ```console
-$ ./test
+$ make test
 ```
 
 OR
@@ -204,7 +220,7 @@ $ go build .
 Build the docker image with the following commands:
 
 ```console
-$ make docker-build
+$ make container
 ```
 
 ## Releases
