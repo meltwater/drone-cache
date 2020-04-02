@@ -1,4 +1,4 @@
-FROM golang:1.13-alpine AS builder
+FROM golang:1.14.1-alpine3.11 AS builder
 RUN apk add --update --no-cache ca-certificates tzdata && update-ca-certificates
 
 RUN echo "[WARNING] Make sure you have run 'goreleaser release', before 'docker build'!"
