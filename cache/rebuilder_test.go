@@ -2,7 +2,7 @@ package cache
 
 import "testing"
 
-func TestCache(t *testing.T) {
+func TestRebuild(t *testing.T) {
 	// Implement me!
 	t.Skip("skipping unimplemented test.")
 }
