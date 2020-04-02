@@ -1,7 +1,7 @@
 package metadata
 
 type (
-	// Repo stores information about repository that is built
+	// Repo stores information about repository that is built.
 	Repo struct {
 		Avatar    string
 		Branch    string
@@ -13,7 +13,7 @@ type (
 		Trusted   bool
 	}
 
-	// Build stores information about current build
+	// Build stores information about current build.
 	Build struct {
 		Created  int64
 		Deploy   string
@@ -25,7 +25,7 @@ type (
 		Status   string
 	}
 
-	// Commit stores information about current commit
+	// Commit stores information about current commit.
 	Commit struct {
 		Author  Author
 		Branch  string
@@ -36,13 +36,14 @@ type (
 		Sha     string
 	}
 
-	// Author stores information about current commit's author
+	// Author stores information about current commit's author.
 	Author struct {
 		Avatar string
 		Email  string
 		Name   string
 	}
 
+	// Metadata stores information about current pipeline run.
 	Metadata struct {
 		Build  Build
 		Commit Commit
