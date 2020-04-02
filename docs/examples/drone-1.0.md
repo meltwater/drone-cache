@@ -27,7 +27,7 @@ steps:
         - 'vendor'
 
   - name: build
-    image: golang:1.13-alpine
+    image: golang:1.14-alpine
     pull: true
     commands:
       - apk add --update make git
@@ -51,7 +51,7 @@ steps:
 
 ### Simple (Filesystem/Volume)
 
-NOTE: This will only be effective if your pipeline runs on the same agent each time (for example, if you are running drone in single-machine mode).
+NOTE: This will only be effective if your pipeline runs on the same agent each time (for example, if you are running the drone in single-machine mode).
 
 ```yaml
 kind: pipeline
@@ -74,7 +74,7 @@ steps:
       path: /tmp/cache
 
   - name: build
-    image: golang:1.13-alpine
+    image: golang:1.14-alpine
     pull: true
     commands:
       - apk add --update make git
@@ -127,7 +127,7 @@ steps:
         - 'vendor'
 
   - name: build
-    image: golang:1.13-alpine
+    image: golang:1.14-alpine
     pull: true
     commands:
       - apk add --update make git
@@ -175,7 +175,7 @@ steps:
         - 'vendor'
 
   - name: build
-    image: golang:1.13-alpine
+    image: golang:1.14-alpine
     pull: true
     commands:
       - apk add --update make git
@@ -214,7 +214,7 @@ steps:
       debug: true
 
   - name: build
-    image: golang:1.13-alpine
+    image: golang:1.14-alpine
     pull: true
     commands:
       - apk add --update make git
