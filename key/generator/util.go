@@ -13,7 +13,7 @@ func readerHasher(readers ...io.Reader) (string, error) {
 
 	for _, r := range readers {
 		if _, err := io.Copy(h, r); err != nil {
-			return "", fmt.Errorf("write reader as hash %w", err)
+			return "", fmt.Errorf("write reader as hash, %w", err)
 		}
 	}
 

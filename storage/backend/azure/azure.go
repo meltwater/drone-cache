@@ -38,7 +38,7 @@ func New(l log.Logger, c Config) (*Backend, error) {
 	// 2. Create a default request pipeline using your storage account name and account key.
 	credential, err := azblob.NewSharedKeyCredential(c.AccountName, c.AccountKey)
 	if err != nil {
-		return nil, fmt.Errorf("azure, invalid credentials %w", err)
+		return nil, fmt.Errorf("azure, invalid credentials, %w", err)
 	}
 
 	// 3. Azurite has different URL pattern than production Azure Blob Storage.
@@ -64,7 +64,7 @@ func New(l log.Logger, c Config) (*Backend, error) {
 	if err != nil {
 		ret, ok := err.(azblob.StorageError)
 		if !ok {
-			return nil, fmt.Errorf("azure, unexpected error %w", err)
+			return nil, fmt.Errorf("azure, unexpected error, %w", err)
 		}
 
 		if ret.ServiceCode() == "ContainerAlreadyExists" {
@@ -86,7 +86,7 @@ func (b *Backend) Get(ctx context.Context, p string, w io.Writer) (err error) {
 
 		resp, err := blobURL.Download(ctx, 0, azblob.CountToEnd, azblob.BlobAccessConditions{}, false)
 		if err != nil {
-			errCh <- fmt.Errorf("get the object %w", err)
+			errCh <- fmt.Errorf("get the object, %w", err)
 			return
 		}
 
@@ -95,7 +95,7 @@ func (b *Backend) Get(ctx context.Context, p string, w io.Writer) (err error) {
 
 		_, err = io.Copy(w, rc)
 		if err != nil {
-			errCh <- fmt.Errorf("copy the object %w", err)
+			errCh <- fmt.Errorf("copy the object, %w", err)
 		}
 	}()
 
@@ -118,7 +118,7 @@ func (b *Backend) Put(ctx context.Context, p string, r io.Reader) error {
 			MaxBuffers: defaultMaxBuffers,
 		},
 	); err != nil {
-		return fmt.Errorf("put the object %w", err)
+		return fmt.Errorf("put the object, %w", err)
 	}
 
 	return nil

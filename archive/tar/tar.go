@@ -45,11 +45,11 @@ func (a *Archive) Create(srcs []string, w io.Writer) (int64, error) {
 	for _, src := range srcs {
 		_, err := os.Lstat(src)
 		if err != nil {
-			return written, fmt.Errorf("make sure file or directory readable <%s>: %v, %w", src, err, ErrSourceNotReachable)
+			return written, fmt.Errorf("make sure file or directory readable <%s>: %v,, %w", src, err, ErrSourceNotReachable)
 		}
 
 		if err := filepath.Walk(src, writeToArchive(tw, a.root, a.skipSymlinks, &written)); err != nil {
-			return written, fmt.Errorf("walk, add all files to archive %w", err)
+			return written, fmt.Errorf("walk, add all files to archive, %w", err)
 		}
 	}
 
@@ -70,7 +70,7 @@ func writeToArchive(tw *tar.Writer, root string, skipSymlinks bool, written *int
 		// Create header for Regular files and Directories
 		h, err := tar.FileInfoHeader(fi, fi.Name())
 		if err != nil {
-			return fmt.Errorf("create header for <%s> %w", path, err)
+			return fmt.Errorf("create header for <%s>, %w", path, err)
 		}
 
 		if fi.Mode()&os.ModeSymlink != 0 { // isSymbolic
@@ -80,19 +80,19 @@ func writeToArchive(tw *tar.Writer, root string, skipSymlinks bool, written *int
 
 			var err error
 			if h, err = createSymlinkHeader(fi, path); err != nil {
-				return fmt.Errorf("create header for symbolic link %w", err)
+				return fmt.Errorf("create header for symbolic link, %w", err)
 			}
 		}
 
 		name, err := relative(root, path)
 		if err != nil {
-			return fmt.Errorf("relative name <%s>: <%s> %w", path, root, err)
+			return fmt.Errorf("relative name <%s>: <%s>, %w", path, root, err)
 		}
 
 		h.Name = name
 
 		if err := tw.WriteHeader(h); err != nil {
-			return fmt.Errorf("write header for <%s> %w", path, err)
+			return fmt.Errorf("write header for <%s>, %w", path, err)
 		}
 
 		if !fi.Mode().IsRegular() {
@@ -101,7 +101,7 @@ func writeToArchive(tw *tar.Writer, root string, skipSymlinks bool, written *int
 
 		n, err := writeFileToArchive(tw, path)
 		if err != nil {
-			return fmt.Errorf("write file to archive %w", err)
+			return fmt.Errorf("write file to archive, %w", err)
 		}
 
 		*written += n
@@ -118,7 +118,7 @@ func relative(parent string, path string) (string, error) {
 
 	rel, err := filepath.Rel(parent, filepath.Dir(path))
 	if err != nil {
-		return "", fmt.Errorf("relative path <%s>, base <%s> %w", rel, name, err)
+		return "", fmt.Errorf("relative path <%s>, base <%s>, %w", rel, name, err)
 	}
 
 	// NOTICE: filepath.Rel puts "../" when given path is not under parent.
@@ -130,12 +130,12 @@ func relative(parent string, path string) (string, error) {
 func createSymlinkHeader(fi os.FileInfo, path string) (*tar.Header, error) {
 	lnk, err := os.Readlink(path)
 	if err != nil {
-		return nil, fmt.Errorf("read link <%s> %w", path, err)
+		return nil, fmt.Errorf("read link <%s>, %w", path, err)
 	}
 
 	h, err := tar.FileInfoHeader(fi, lnk)
 	if err != nil {
-		return nil, fmt.Errorf("create symlink header for <%s> %w", path, err)
+		return nil, fmt.Errorf("create symlink header for <%s>, %w", path, err)
 	}
 
 	return h, nil
@@ -144,14 +144,14 @@ func createSymlinkHeader(fi os.FileInfo, path string) (*tar.Header, error) {
 func writeFileToArchive(tw io.Writer, path string) (n int64, err error) {
 	f, err := os.Open(path)
 	if err != nil {
-		return 0, fmt.Errorf("open file <%s> %w", path, err)
+		return 0, fmt.Errorf("open file <%s>, %w", path, err)
 	}
 
 	defer internal.CloseWithErrCapturef(&err, f, "write file to archive <%s>", path)
 
 	written, err := io.Copy(tw, f)
 	if err != nil {
-		return written, fmt.Errorf("copy the file <%s> data to the tarball %w", path, err)
+		return written, fmt.Errorf("copy the file <%s> data to the tarball, %w", path, err)
 	}
 
 	return written, nil
@@ -182,14 +182,14 @@ func (a *Archive) Extract(dst string, r io.Reader) (int64, error) {
 		} else {
 			name, err := relative(dst, h.Name)
 			if err != nil {
-				return 0, fmt.Errorf("relative name %w", err)
+				return 0, fmt.Errorf("relative name, %w", err)
 			}
 
 			target = filepath.Join(dst, name)
 		}
 
 		if err := os.MkdirAll(filepath.Dir(target), defaultDirPermission); err != nil {
-			return 0, fmt.Errorf("ensure directory <%s> %w", target, err)
+			return 0, fmt.Errorf("ensure directory <%s>, %w", target, err)
 		}
 
 		switch h.Typeflag {
@@ -204,19 +204,19 @@ func (a *Archive) Extract(dst string, r io.Reader) (int64, error) {
 			written += n
 
 			if err != nil {
-				return written, fmt.Errorf("extract regular file %w", err)
+				return written, fmt.Errorf("extract regular file, %w", err)
 			}
 
 			continue
 		case tar.TypeSymlink:
 			if err := extractSymlink(h, target); err != nil {
-				return written, fmt.Errorf("extract symbolic link %w", err)
+				return written, fmt.Errorf("extract symbolic link, %w", err)
 			}
 
 			continue
 		case tar.TypeLink:
 			if err := extractLink(h, target); err != nil {
-				return written, fmt.Errorf("extract link %w", err)
+				return written, fmt.Errorf("extract link, %w", err)
 			}
 
 			continue
@@ -230,7 +230,7 @@ func (a *Archive) Extract(dst string, r io.Reader) (int64, error) {
 
 func extractDir(h *tar.Header, target string) error {
 	if err := os.MkdirAll(target, os.FileMode(h.Mode)); err != nil {
-		return fmt.Errorf("create directory <%s> %w", target, err)
+		return fmt.Errorf("create directory <%s>, %w", target, err)
 	}
 
 	return nil
@@ -239,14 +239,14 @@ func extractDir(h *tar.Header, target string) error {
 func extractRegular(h *tar.Header, tr io.Reader, target string) (n int64, err error) {
 	f, err := os.OpenFile(target, os.O_CREATE|os.O_RDWR, os.FileMode(h.Mode))
 	if err != nil {
-		return 0, fmt.Errorf("open extracted file for writing <%s> %w", target, err)
+		return 0, fmt.Errorf("open extracted file for writing <%s>, %w", target, err)
 	}
 
 	defer internal.CloseWithErrCapturef(&err, f, "extract regular <%s>", target)
 
 	written, err := io.Copy(f, tr)
 	if err != nil {
-		return written, fmt.Errorf("copy extracted file for writing <%s> %w", target, err)
+		return written, fmt.Errorf("copy extracted file for writing <%s>, %w", target, err)
 	}
 
 	return written, nil
@@ -254,11 +254,11 @@ func extractRegular(h *tar.Header, tr io.Reader, target string) (n int64, err er
 
 func extractSymlink(h *tar.Header, target string) error {
 	if err := unlink(target); err != nil {
-		return fmt.Errorf("unlink <%s> %w", target, err)
+		return fmt.Errorf("unlink <%s>, %w", target, err)
 	}
 
 	if err := os.Symlink(h.Linkname, target); err != nil {
-		return fmt.Errorf("create symbolic link <%s> %w", target, err)
+		return fmt.Errorf("create symbolic link <%s>, %w", target, err)
 	}
 
 	return nil
@@ -266,11 +266,11 @@ func extractSymlink(h *tar.Header, target string) error {
 
 func extractLink(h *tar.Header, target string) error {
 	if err := unlink(target); err != nil {
-		return fmt.Errorf("unlink <%s> %w", target, err)
+		return fmt.Errorf("unlink <%s>, %w", target, err)
 	}
 
 	if err := os.Link(h.Linkname, target); err != nil {
-		return fmt.Errorf("create hard link <%s> %w", h.Linkname, err)
+		return fmt.Errorf("create hard link <%s>, %w", h.Linkname, err)
 	}
 
 	return nil

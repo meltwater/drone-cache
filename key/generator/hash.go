@@ -20,7 +20,7 @@ func NewHash(defaultParts ...string) *Hash {
 func (h *Hash) Generate(parts ...string) (string, error) {
 	key, err := hash(append(parts, h.defaultParts...)...)
 	if err != nil {
-		return "", fmt.Errorf("generate hash key for mounted %w", err)
+		return "", fmt.Errorf("generate hash key for mounted, %w", err)
 	}
 
 	return key, nil

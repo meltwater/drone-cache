@@ -82,7 +82,7 @@ func FromConfig(l log.Logger, backedType string, cfg Config) (Backend, error) {
 	}
 
 	if err != nil {
-		return nil, fmt.Errorf("initialize backend %w", err)
+		return nil, fmt.Errorf("initialize backend, %w", err)
 	}
 
 	return b, nil

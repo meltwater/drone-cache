@@ -42,7 +42,7 @@ func (r rebuilder) Rebuild(srcs []string) error {
 
 	key, err := r.generateKey()
 	if err != nil {
-		return fmt.Errorf("generate key %w", err)
+		return fmt.Errorf("generate key, %w", err)
 	}
 
 	var (
@@ -53,7 +53,7 @@ func (r rebuilder) Rebuild(srcs []string) error {
 
 	for _, src := range srcs {
 		if _, err := os.Lstat(src); err != nil {
-			return fmt.Errorf("source <%s>, make sure file or directory exists and readable %w", src, err)
+			return fmt.Errorf("source <%s>, make sure file or directory exists and readable, %w", src, err)
 		}
 
 		dst := filepath.Join(namespace, key, src)
@@ -66,7 +66,7 @@ func (r rebuilder) Rebuild(srcs []string) error {
 			defer wg.Done()
 
 			if err := r.rebuild(src, dst); err != nil {
-				errs.Add(fmt.Errorf("upload from <%s> to <%s> %w", src, dst, err))
+				errs.Add(fmt.Errorf("upload from <%s> to <%s>, %w", src, dst, err))
 			}
 		}(dst, src)
 	}
@@ -74,7 +74,7 @@ func (r rebuilder) Rebuild(srcs []string) error {
 	wg.Wait()
 
 	if errs.Err() != nil {
-		return fmt.Errorf("rebuild failed %w", errs)
+		return fmt.Errorf("rebuild failed, %w", errs)
 	}
 
 	level.Info(r.logger).Log("msg", "cache built", "took", time.Since(now))
@@ -86,7 +86,7 @@ func (r rebuilder) Rebuild(srcs []string) error {
 func (r rebuilder) rebuild(src, dst string) (err error) {
 	src, err = filepath.Abs(filepath.Clean(src))
 	if err != nil {
-		return fmt.Errorf("clean source path %w", err)
+		return fmt.Errorf("clean source path, %w", err)
 	}
 
 	pr, pw := io.Pipe()
@@ -101,7 +101,7 @@ func (r rebuilder) rebuild(src, dst string) (err error) {
 
 		written, err := r.a.Create([]string{src}, pw)
 		if err != nil {
-			if err := pw.CloseWithError(fmt.Errorf("archive write, pipe writer failed %w", err)); err != nil {
+			if err := pw.CloseWithError(fmt.Errorf("archive write, pipe writer failed, %w", err)); err != nil {
 				level.Error(r.logger).Log("msg", "pw close", "err", err)
 			}
 		}
@@ -115,7 +115,7 @@ func (r rebuilder) rebuild(src, dst string) (err error) {
 	tr := io.TeeReader(pr, sw)
 
 	if err := r.s.Put(dst, tr); err != nil {
-		err = fmt.Errorf("upload file, pipe reader failed %w", err)
+		err = fmt.Errorf("upload file, pipe reader failed, %w", err)
 		if err := pr.CloseWithError(err); err != nil {
 			level.Error(r.logger).Log("msg", "pr close", "err", err)
 		}

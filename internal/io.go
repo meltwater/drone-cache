@@ -21,7 +21,7 @@ func CloseWithErrLogf(logger log.Logger, closer io.Closer, format string, a ...i
 		logger = log.NewLogfmtLogger(os.Stderr)
 	}
 
-	level.Warn(logger).Log("msg", "detected close error", "err", fmt.Errorf(format+" %w", append(a, err)...))
+	level.Warn(logger).Log("msg", "detected close error", "err", fmt.Errorf(format+", %w", append(a, err)...))
 }
 
 // CloseWithErrCapturef runs function and on error return error by argument including the given error..
@@ -34,7 +34,7 @@ func CloseWithErrCapturef(err *error, closer io.Closer, format string, a ...inte
 
 		mErr := MultiError{}
 		mErr.Add(*err)
-		mErr.Add(fmt.Errorf(format+" %w", append(a, cErr)...))
+		mErr.Add(fmt.Errorf(format+", %w", append(a, cErr)...))
 		*err = mErr.Err()
 
 		return

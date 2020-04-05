@@ -30,14 +30,14 @@ func (f flusher) Flush(srcs []string) error {
 
 		files, err := f.store.List(src)
 		if err != nil {
-			return fmt.Errorf("flusher list %w", err)
+			return fmt.Errorf("flusher list, %w", err)
 		}
 
 		for _, file := range files {
 			if f.dirty(file) {
 				err := f.store.Delete(file.Path)
 				if err != nil {
-					return fmt.Errorf("flusher delete %w", err)
+					return fmt.Errorf("flusher delete, %w", err)
 				}
 			}
 		}

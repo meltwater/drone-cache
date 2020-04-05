@@ -29,7 +29,7 @@ func New(logger log.Logger, root string, skipSymlinks bool, compressionLevel int
 func (a *Archive) Create(srcs []string, w io.Writer) (int64, error) {
 	gw, err := gzip.NewWriterLevel(w, a.compressionLevel)
 	if err != nil {
-		return 0, fmt.Errorf("create archive writer %w", err)
+		return 0, fmt.Errorf("create archive writer, %w", err)
 	}
 
 	defer internal.CloseWithErrLogf(a.logger, gw, "gzip writer")

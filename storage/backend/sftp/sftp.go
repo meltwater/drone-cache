@@ -28,7 +28,7 @@ type Backend struct {
 func New(l log.Logger, c Config) (*Backend, error) {
 	authMethod, err := authMethod(c)
 	if err != nil {
-		return nil, fmt.Errorf("unable to get ssh auth method %w", err)
+		return nil, fmt.Errorf("unable to get ssh auth method, %w", err)
 	}
 
 	/* #nosec */
@@ -39,18 +39,18 @@ func New(l log.Logger, c Config) (*Backend, error) {
 		Timeout:         c.Timeout,
 	})
 	if err != nil {
-		return nil, fmt.Errorf("unable to connect to ssh %w", err)
+		return nil, fmt.Errorf("unable to connect to ssh, %w", err)
 	}
 
 	client, err := sftp.NewClient(sshClient)
 	if err != nil {
 		sshClient.Close()
-		return nil, fmt.Errorf("unable to connect to ssh with sftp protocol %w", err)
+		return nil, fmt.Errorf("unable to connect to ssh with sftp protocol, %w", err)
 	}
 
 	//nolint: TODO(kakkoyun): Should it be created?
 	if _, err := client.Stat(c.CacheRoot); err != nil {
-		return nil, fmt.Errorf("make sure cache root <%s> created,  %w", c.CacheRoot, err)
+		return nil, fmt.Errorf("make sure cache root <%s> created, %w", c.CacheRoot, err)
 	}
 
 	level.Debug(l).Log("msg", "sftp backend", "config", fmt.Sprintf("%#v", c))
@@ -62,7 +62,7 @@ func New(l log.Logger, c Config) (*Backend, error) {
 func (b *Backend) Get(ctx context.Context, p string, w io.Writer) error {
 	path, err := filepath.Abs(filepath.Clean(filepath.Join(b.cacheRoot, p)))
 	if err != nil {
-		return fmt.Errorf("generate absolute path %w", err)
+		return fmt.Errorf("generate absolute path, %w", err)
 	}
 
 	errCh := make(chan error)
@@ -72,7 +72,7 @@ func (b *Backend) Get(ctx context.Context, p string, w io.Writer) error {
 
 		rc, err := b.client.Open(path)
 		if err != nil {
-			errCh <- fmt.Errorf("get the object %w", err)
+			errCh <- fmt.Errorf("get the object, %w", err)
 			return
 		}
 
@@ -80,7 +80,7 @@ func (b *Backend) Get(ctx context.Context, p string, w io.Writer) error {
 
 		_, err = io.Copy(w, rc)
 		if err != nil {
-			errCh <- fmt.Errorf("copy the object %w", err)
+			errCh <- fmt.Errorf("copy the object, %w", err)
 		}
 	}()
 
@@ -96,31 +96,30 @@ func (b *Backend) Get(ctx context.Context, p string, w io.Writer) error {
 func (b *Backend) Put(ctx context.Context, p string, r io.Reader) error {
 	errCh := make(chan error)
 
+	path := filepath.Clean(filepath.Join(b.cacheRoot, p))
+
+	dir := filepath.Dir(path)
+	if err := b.client.MkdirAll(dir); err != nil {
+		return fmt.Errorf("create directory, %w", err)
+	}
+
 	go func() {
 		defer close(errCh)
 
-		path := filepath.Clean(filepath.Join(b.cacheRoot, p))
-
-		dir := filepath.Dir(path)
-		if err := b.client.MkdirAll(dir); err != nil {
-			errCh <- fmt.Errorf("create directory %w", err)
-			return
-		}
-
 		w, err := b.client.Create(path)
 		if err != nil {
-			errCh <- fmt.Errorf("create cache file %w", err)
+			errCh <- fmt.Errorf("create cache file, %w", err)
 			return
 		}
 
 		defer internal.CloseWithErrLogf(b.logger, w, "writer close defer")
 
 		if _, err := io.Copy(w, r); err != nil {
-			errCh <- fmt.Errorf("write contents of reader to a file %w", err)
+			errCh <- fmt.Errorf("write contents of reader to a file, %w", err)
 		}
 
 		if err := w.Close(); err != nil {
-			errCh <- fmt.Errorf("close the object %w", err)
+			errCh <- fmt.Errorf("close the object, %w", err)
 		}
 	}()
 
@@ -149,12 +148,12 @@ func authMethod(c Config) ([]ssh.AuthMethod, error) {
 func readPublicKeyFile(file string) (ssh.AuthMethod, error) {
 	buffer, err := ioutil.ReadFile(file)
 	if err != nil {
-		return nil, fmt.Errorf("unable to read file %w", err)
+		return nil, fmt.Errorf("unable to read file, %w", err)
 	}
 
 	key, err := ssh.ParsePrivateKey(buffer)
 	if err != nil {
-		return nil, fmt.Errorf("unable to parse private key %w", err)
+		return nil, fmt.Errorf("unable to parse private key, %w", err)
 	}
 
 	return ssh.PublicKeys(key), nil

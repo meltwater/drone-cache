@@ -31,7 +31,7 @@ func New(l log.Logger, c Config) (*Backend, error) {
 
 	//nolint: TODO(kakkoyun): Should it be created?
 	if _, err := os.Stat(c.CacheRoot); err != nil {
-		return nil, fmt.Errorf("make sure volume is mounted, <%s> as cache root %w", c.CacheRoot, err)
+		return nil, fmt.Errorf("make sure volume is mounted, <%s> as cache root, %w", c.CacheRoot, err)
 	}
 
 	level.Debug(l).Log("msg", "Filesystem backend", "config", fmt.Sprintf("%#v", c))
@@ -43,7 +43,7 @@ func New(l log.Logger, c Config) (*Backend, error) {
 func (b *Backend) Get(ctx context.Context, p string, w io.Writer) error {
 	path, err := filepath.Abs(filepath.Clean(filepath.Join(b.cacheRoot, p)))
 	if err != nil {
-		return fmt.Errorf("absolute path %w", err)
+		return fmt.Errorf("absolute path, %w", err)
 	}
 
 	errCh := make(chan error)
@@ -53,7 +53,7 @@ func (b *Backend) Get(ctx context.Context, p string, w io.Writer) error {
 
 		rc, err := os.Open(path)
 		if err != nil {
-			errCh <- fmt.Errorf("get the object %w", err)
+			errCh <- fmt.Errorf("get the object, %w", err)
 			return
 		}
 
@@ -61,7 +61,7 @@ func (b *Backend) Get(ctx context.Context, p string, w io.Writer) error {
 
 		_, err = io.Copy(w, rc)
 		if err != nil {
-			errCh <- fmt.Errorf("copy the object %w", err)
+			errCh <- fmt.Errorf("copy the object, %w", err)
 		}
 	}()
 

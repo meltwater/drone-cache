@@ -235,7 +235,7 @@ func newPlugin(c *Config) Plugin {
 		Metadata: metadata.Metadata{
 			Repo: metadata.Repo{
 				Branch: "master",
-				Name:   "drone-cache",
+				Name:   repoName,
 			},
 			Commit: metadata.Commit{
 				Branch: "master",

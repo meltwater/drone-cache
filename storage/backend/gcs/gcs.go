@@ -51,7 +51,7 @@ func New(l log.Logger, c Config) (*Backend, error) {
 
 	client, err := gcstorage.NewClient(ctx, opts...)
 	if err != nil {
-		return nil, fmt.Errorf("gcs client initialization %w", err)
+		return nil, fmt.Errorf("gcs client initialization, %w", err)
 	}
 
 	return &Backend{
@@ -79,7 +79,7 @@ func (b *Backend) Get(ctx context.Context, p string, w io.Writer) error {
 
 		r, err := obj.NewReader(ctx)
 		if err != nil {
-			errCh <- fmt.Errorf("get the object %w", err)
+			errCh <- fmt.Errorf("get the object, %w", err)
 			return
 		}
 
@@ -87,7 +87,7 @@ func (b *Backend) Get(ctx context.Context, p string, w io.Writer) error {
 
 		_, err = io.Copy(w, r)
 		if err != nil {
-			errCh <- fmt.Errorf("copy the object %w", err)
+			errCh <- fmt.Errorf("copy the object, %w", err)
 		}
 	}()
 
@@ -118,16 +118,16 @@ func (b *Backend) Put(ctx context.Context, p string, r io.Reader) error {
 
 		_, err := io.Copy(w, r)
 		if err != nil {
-			errCh <- fmt.Errorf("copy the object %w", err)
+			errCh <- fmt.Errorf("copy the object, %w", err)
 		}
 
 		if err := w.Close(); err != nil {
-			errCh <- fmt.Errorf("close the object %w", err)
+			errCh <- fmt.Errorf("close the object, %w", err)
 		}
 
 		if b.acl != "" {
 			if err := obj.ACL().Set(ctx, gcstorage.AllAuthenticatedUsers, gcstorage.ACLRole(b.acl)); err != nil {
-				errCh <- fmt.Errorf("set ACL of the object %w", err)
+				errCh <- fmt.Errorf("set ACL of the object, %w", err)
 			}
 		}
 	}()

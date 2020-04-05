@@ -72,7 +72,7 @@ func (b *Backend) Get(ctx context.Context, p string, w io.Writer) error {
 
 		out, err := b.client.GetObjectWithContext(ctx, in)
 		if err != nil {
-			errCh <- fmt.Errorf("get the object %w", err)
+			errCh <- fmt.Errorf("get the object, %w", err)
 			return
 		}
 
@@ -80,7 +80,7 @@ func (b *Backend) Get(ctx context.Context, p string, w io.Writer) error {
 
 		_, err = io.Copy(w, out.Body)
 		if err != nil {
-			errCh <- fmt.Errorf("copy the object %w", err)
+			errCh <- fmt.Errorf("copy the object, %w", err)
 		}
 	}()
 
@@ -109,7 +109,7 @@ func (b *Backend) Put(ctx context.Context, p string, r io.Reader) error {
 	}
 
 	if _, err := uploader.UploadWithContext(ctx, in); err != nil {
-		return fmt.Errorf("put the object %w", err)
+		return fmt.Errorf("put the object, %w", err)
 	}
 
 	return nil

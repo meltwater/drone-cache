@@ -69,7 +69,7 @@ func (p *Plugin) Exec() error {
 	} else {
 		workspace, err := os.Getwd()
 		if err != nil {
-			return fmt.Errorf("get working directory %w", err)
+			return fmt.Errorf("get working directory, %w", err)
 		}
 
 		localRoot = workspace
@@ -86,7 +86,7 @@ func (p *Plugin) Exec() error {
 	if cfg.CacheKeyTemplate != "" {
 		generator = keygen.NewMetadata(p.logger, cfg.CacheKeyTemplate, p.Metadata)
 		if err := generator.Check(); err != nil {
-			return fmt.Errorf("parse failed, falling back to default %w", err)
+			return fmt.Errorf("parse failed, falling back to default, %w", err)
 		}
 
 		options = append(options, cache.WithFallbackGenerator(keygen.NewHash(p.Metadata.Commit.Branch)))
@@ -105,7 +105,7 @@ func (p *Plugin) Exec() error {
 		SFTP:       cfg.SFTP,
 	})
 	if err != nil {
-		return fmt.Errorf("initialize backend <%s> %w", cfg.Backend, err)
+		return fmt.Errorf("initialize backend <%s>, %w", cfg.Backend, err)
 	}
 
 	// 3. Initialize cache.

@@ -53,14 +53,14 @@ func (g *Metadata) Generate(_ ...string) (string, error) {
 
 	t, err := g.parseTemplate()
 	if err != nil {
-		return "", fmt.Errorf("parse, <%s> as cache key template, falling back to default %w", g.tmpl, err)
+		return "", fmt.Errorf("parse, <%s> as cache key template, falling back to default, %w", g.tmpl, err)
 	}
 
 	var b strings.Builder
 
 	err = t.Execute(&b, g.data)
 	if err != nil {
-		return "", fmt.Errorf("build, <%s> as cache key, falling back to default %w", g.tmpl, err)
+		return "", fmt.Errorf("build, <%s> as cache key, falling back to default, %w", g.tmpl, err)
 	}
 
 	return b.String(), nil

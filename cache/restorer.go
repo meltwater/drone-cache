@@ -39,7 +39,7 @@ func (r restorer) Restore(dsts []string) error {
 
 	key, err := r.generateKey()
 	if err != nil {
-		return fmt.Errorf("generate key %w", err)
+		return fmt.Errorf("generate key, %w", err)
 	}
 
 	var (
@@ -59,7 +59,7 @@ func (r restorer) Restore(dsts []string) error {
 			defer wg.Done()
 
 			if err := r.restore(src, dst); err != nil {
-				errs.Add(fmt.Errorf("download from <%s> to <%s> %w", src, dst, err))
+				errs.Add(fmt.Errorf("download from <%s> to <%s>, %w", src, dst, err))
 			}
 		}(src, dst)
 	}
@@ -67,7 +67,7 @@ func (r restorer) Restore(dsts []string) error {
 	wg.Wait()
 
 	if errs.Err() != nil {
-		return fmt.Errorf("restore failed %w", errs)
+		return fmt.Errorf("restore failed, %w", errs)
 	}
 
 	level.Info(r.logger).Log("msg", "cache restored", "took", time.Since(now))
@@ -86,7 +86,7 @@ func (r restorer) restore(src, dst string) (err error) {
 		level.Info(r.logger).Log("msg", "downloading archived directory", "remote", src, "local", dst)
 
 		if err := r.s.Get(src, pw); err != nil {
-			if err := pw.CloseWithError(fmt.Errorf("get file from storage backend, pipe writer failed %w", err)); err != nil {
+			if err := pw.CloseWithError(fmt.Errorf("get file from storage backend, pipe writer failed, %w", err)); err != nil {
 				level.Error(r.logger).Log("msg", "pw close", "err", err)
 			}
 		}
@@ -96,7 +96,7 @@ func (r restorer) restore(src, dst string) (err error) {
 
 	written, err := r.a.Extract(dst, pr)
 	if err != nil {
-		err = fmt.Errorf("extract files from downloaded archive, pipe reader failed %w", err)
+		err = fmt.Errorf("extract files from downloaded archive, pipe reader failed, %w", err)
 		if err := pr.CloseWithError(err); err != nil {
 			level.Error(r.logger).Log("msg", "pr close", "err", err)
 		}
