@@ -41,7 +41,7 @@ steps:
 - name: test
   image: golang:1.14.1-alpine3.11
   commands:
-  - go test -mod=vendor -short -cover -tags=integration ./...
+  - go test -mod=vendor -short -cover -failfast -tags=integration ./...
   environment:
     CGO_ENABLED: 0
     TEST_S3_ENDPOINT: minio:9000
@@ -290,11 +290,11 @@ services:
   commands:
   - fake-gcs-server -public-host fakegcs -scheme http
 - name: sftp
-  image: atmoz/sftp
+  image: atmoz/sftp:alpine
   ports:
   - 22
   commands:
-  - /entrypoint foo:pass:::upload
+  - /entrypoint foo:pass:::sftp_test bar:pass:::plugin_test
 - name: azurite
   image: mcr.microsoft.com/azure-storage/azurite
   commands:

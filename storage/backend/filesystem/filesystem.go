@@ -26,15 +26,15 @@ type Backend struct {
 // New creates a Backend backend.
 func New(l log.Logger, c Config) (*Backend, error) {
 	if strings.TrimRight(path.Clean(c.CacheRoot), "/") == "" {
-		return nil, fmt.Errorf("empty or root path given, <%s> as cache root, ", c.CacheRoot)
+		return nil, fmt.Errorf("empty or root path given, <%s> as cache root", c.CacheRoot)
 	}
+
+	level.Debug(l).Log("msg", "Filesystem backend", "config", fmt.Sprintf("%#v", c))
 
 	//nolint: TODO(kakkoyun): Should it be created?
 	if _, err := os.Stat(c.CacheRoot); err != nil {
 		return nil, fmt.Errorf("make sure volume is mounted, <%s> as cache root, %w", c.CacheRoot, err)
 	}
-
-	level.Debug(l).Log("msg", "Filesystem backend", "config", fmt.Sprintf("%#v", c))
 
 	return &Backend{logger: l, cacheRoot: c.CacheRoot}, nil
 }
@@ -62,6 +62,7 @@ func (b *Backend) Get(ctx context.Context, p string, w io.Writer) error {
 		_, err = io.Copy(w, rc)
 		if err != nil {
 			errCh <- fmt.Errorf("copy the object, %w", err)
+			return
 		}
 	}()
 
@@ -77,7 +78,7 @@ func (b *Backend) Get(ctx context.Context, p string, w io.Writer) error {
 func (b *Backend) Put(ctx context.Context, p string, r io.Reader) error {
 	path, err := filepath.Abs(filepath.Clean(filepath.Join(b.cacheRoot, p)))
 	if err != nil {
-		return fmt.Errorf("build path %w", err)
+		return fmt.Errorf("build path, %w", err)
 	}
 
 	errCh := make(chan error)
@@ -87,24 +88,23 @@ func (b *Backend) Put(ctx context.Context, p string, r io.Reader) error {
 
 		dir := filepath.Dir(path)
 		if err := os.MkdirAll(dir, os.FileMode(defaultFileMode)); err != nil {
-			errCh <- fmt.Errorf("create directory %w", err)
-			return
+			errCh <- fmt.Errorf("create directory, %w", err)
 		}
 
 		w, err := os.Create(path)
 		if err != nil {
-			errCh <- fmt.Errorf("create cache file %w", err)
+			errCh <- fmt.Errorf("create cache file, %w", err)
 			return
 		}
 
 		defer internal.CloseWithErrLogf(b.logger, w, "file writer, close defer")
 
 		if _, err := io.Copy(w, r); err != nil {
-			errCh <- fmt.Errorf("write contents of reader to a file %w", err)
+			errCh <- fmt.Errorf("write contents of reader to a file, %w", err)
 		}
 
 		if err := w.Close(); err != nil {
-			errCh <- fmt.Errorf("close the object %w", err)
+			errCh <- fmt.Errorf("close the object, %w", err)
 		}
 	}()
 

@@ -41,6 +41,7 @@ const (
 	testRootMoved                  = "testdata/moved"
 	defaultStorageOperationTimeout = 5 * time.Second
 	defaultPublicHost              = "localhost:4443"
+	repoName                       = "drone-cache"
 )
 
 var publicHost = getEnv("TEST_STORAGE_EMULATOR_HOST", defaultPublicHost)
@@ -423,9 +424,9 @@ func setupSFTP(t *testing.T, c *Config, name string) {
 	const (
 		defaultSFTPHost  = "127.0.0.1"
 		defaultSFTPPort  = "22"
-		defaultUsername  = "foo"
+		defaultUsername  = "bar"
 		defaultPassword  = "pass"
-		defaultCacheRoot = "/upload"
+		defaultCacheRoot = "/plugin_test"
 	)
 
 	var (
@@ -447,8 +448,7 @@ func setupSFTP(t *testing.T, c *Config, name string) {
 	client, err := pkgsftp.NewClient(sshClient)
 	test.Ok(t, err)
 
-	test.Ok(t, client.MkdirAll(cacheRoot))
-	t.Cleanup(func() { client.RemoveDirectory(cacheRoot) })
+	test.Ok(t, client.MkdirAll(filepath.Join(cacheRoot, repoName)))
 
 	c.Backend = backend.SFTP
 	c.SFTP = sftp.Config{

@@ -20,7 +20,7 @@ const (
 	defaultSFTPPort  = "22"
 	defaultUsername  = "foo"
 	defaultPassword  = "pass"
-	defaultCacheRoot = "/upload"
+	defaultCacheRoot = "/sftp_test"
 )
 
 var (

@@ -15,10 +15,13 @@ services:
       - 4443:4443
     command: -public-host localhost -scheme http
   sftp:
-    image: atmoz/sftp
+    image: atmoz/sftp:alpine
     ports:
     - "22:22"
-    command: foo:pass:::upload
+    volumes:
+        - ./testdata/sftp_test:/home/foo/sftp_test
+        - ./testdata/plugin_test:/home/bar/plugin_test
+    command: foo:pass:::sftp_test bar:pass:::plugin_test
   azurite:
     image: mcr.microsoft.com/azure-storage/azurite
     ports:

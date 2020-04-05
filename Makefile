@@ -97,7 +97,7 @@ container-push-dev: container-dev
 .PHONY: test
 test: $(GOTEST_BIN)
 	docker-compose up -d && sleep 1
-	-$(GOTEST_BIN) -failfast -race -short -tags=integration ./...
+	-$(GOTEST_BIN) -race -short -cover -failfast -tags=integration ./...
 	docker-compose down -v
 
 .PHONY: test-integration

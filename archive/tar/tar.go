@@ -171,7 +171,7 @@ func (a *Archive) Extract(dst string, r io.Reader) (int64, error) {
 		case err == io.EOF: // if no more files are found return
 			return written, nil
 		case err != nil: // return any other error
-			return written, fmt.Errorf("tar reader %v: %w", err, ErrArchiveNotReadable)
+			return written, fmt.Errorf("tar reader <%v>, %w", err, ErrArchiveNotReadable)
 		case h == nil: // if the header is nil, skip it
 			continue
 		}

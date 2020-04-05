@@ -96,15 +96,16 @@ func (b *Backend) Get(ctx context.Context, p string, w io.Writer) error {
 func (b *Backend) Put(ctx context.Context, p string, r io.Reader) error {
 	errCh := make(chan error)
 
-	path := filepath.Clean(filepath.Join(b.cacheRoot, p))
-
-	dir := filepath.Dir(path)
-	if err := b.client.MkdirAll(dir); err != nil {
-		return fmt.Errorf("create directory, %w", err)
-	}
-
 	go func() {
 		defer close(errCh)
+
+		path := filepath.Clean(filepath.Join(b.cacheRoot, p))
+
+		dir := filepath.Dir(path)
+		if err := b.client.MkdirAll(dir); err != nil {
+			errCh <- fmt.Errorf("create directory, %w", err)
+			return
+		}
 
 		w, err := b.client.Create(path)
 		if err != nil {
