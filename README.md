@@ -115,7 +115,7 @@ USAGE:
    drone-cache [global options] command [command options] [arguments...]
 
 VERSION:
-   v1.0.4-76-gfa866ce
+   v1.0.4-36-g97fce2d
 
 COMMANDS:
    help, h  Shows a list of commands or help for one command
@@ -159,11 +159,13 @@ GLOBAL OPTIONS:
    --rebuild                             rebuild the cache directories (default: false) [$PLUGIN_REBUILD]
    --restore                             restore the cache directories (default: false) [$PLUGIN_RESTORE]
    --cache-key value                     cache key to use for the cache directories [$PLUGIN_CACHE_KEY]
+   --remote-root value                   remote root directory to contain all the cache files created (default repo.name) [$PLUGIN_REMOTE_ROOT]
+   --local-root value                    local root directory to base given mount paths (default pwd [present working directory]) [$PLUGIN_LOCAL_ROOT]
    --archive-format value                archive format to use to store the cache directories (tar, gzip) (default: "tar") [$PLUGIN_ARCHIVE_FORMAT]
    --compression-level value             compression level to use for gzip compression when archive-format specified as gzip
                                              (check https://godoc.org/compress/flate#pkg-constants for available options) (default: -1) [$PLUGIN_COMPRESSION_LEVEL]
    --skip-symlinks                       skip symbolic links in archive (default: false) [$PLUGIN_SKIP_SYMLINKS, $SKIP_SYMLINKS]
-   --debug                               debug (default: false) [$PLUGIN_DEBUG, DEBUG]
+   --debug                               debug (default: false) [$PLUGIN_DEBUG, $DEBUG]
    --backend.operation-timeout value     timeout value to use for each storage operations (default: 3m0s) [$PLUGIN_BACKEND_OPERATION_TIMEOUT, $BACKEND_OPERATION_TIMEOUT]
    --endpoint value                      endpoint for the s3/cloud storage connection [$PLUGIN_ENDPOINT, $S3_ENDPOINT, $GCS_ENDPOINT]
    --bucket value                        AWS bucket name [$PLUGIN_BUCKET, $S3_BUCKET, $GCS_BUCKET]
