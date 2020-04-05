@@ -62,6 +62,11 @@ func (p *Plugin) Exec() error {
 		return errors.New("rebuild and restore are mutually exclusive, please set only one of them")
 	}
 
+	workspace, err := os.Getwd()
+	if err != nil {
+		return fmt.Errorf("get working directory %w", err)
+	}
+
 	var options []cache.Option
 	options = append(options, cache.WithNamespace(p.Metadata.Repo.Name))
 
@@ -94,7 +99,7 @@ func (p *Plugin) Exec() error {
 	// 3. Initialize cache.
 	c := cache.New(p.logger,
 		storage.New(p.logger, b, cfg.StorageOperationTimeout),
-		archive.FromFormat(p.logger, cfg.ArchiveFormat,
+		archive.FromFormat(p.logger, workspace, cfg.ArchiveFormat,
 			archive.WithSkipSymlinks(cfg.SkipSymlinks),
 			archive.WithCompressionLevel(cfg.CompressionLevel),
 		),

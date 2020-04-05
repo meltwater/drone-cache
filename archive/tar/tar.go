@@ -13,6 +13,8 @@ import (
 	"github.com/meltwater/drone-cache/internal"
 )
 
+const defaultDirPermission = 0755
+
 var (
 	// ErrSourceNotReachable TODO
 	ErrSourceNotReachable = errors.New("source not reachable")
@@ -24,12 +26,13 @@ var (
 type Archive struct {
 	logger log.Logger
 
+	root         string
 	skipSymlinks bool
 }
 
 // New creates an archive that uses the .tar file format.
-func New(logger log.Logger, skipSymlinks bool) *Archive {
-	return &Archive{logger, skipSymlinks}
+func New(logger log.Logger, root string, skipSymlinks bool) *Archive {
+	return &Archive{logger, root, skipSymlinks}
 }
 
 // Create writes content of the given source to an archive, returns written bytes.
@@ -40,19 +43,13 @@ func (a *Archive) Create(srcs []string, w io.Writer) (int64, error) {
 	var written int64
 
 	for _, src := range srcs {
-		info, err := os.Lstat(src)
+		_, err := os.Lstat(src)
 		if err != nil {
 			return written, fmt.Errorf("make sure file or directory readable <%s>: %v, %w", src, err, ErrSourceNotReachable)
 		}
 
-		if info.IsDir() {
-			if err := filepath.Walk(src, writeToArchive(tw, src, a.skipSymlinks, &written)); err != nil {
-				return written, fmt.Errorf("walk, add all files to archive %w", err)
-			}
-		} else {
-			if err := writeToArchive(tw, src, a.skipSymlinks, &written)(src, info, nil); err != nil {
-				return written, fmt.Errorf("add file to archive %w", err)
-			}
+		if err := filepath.Walk(src, writeToArchive(tw, a.root, a.skipSymlinks, &written)); err != nil {
+			return written, fmt.Errorf("walk, add all files to archive %w", err)
 		}
 	}
 
@@ -87,9 +84,9 @@ func writeToArchive(tw *tar.Writer, root string, skipSymlinks bool, written *int
 			}
 		}
 
-		name, err := relativeName(root, path)
+		name, err := relative(root, path)
 		if err != nil {
-			return fmt.Errorf("relative name %w", err)
+			return fmt.Errorf("relative name <%s>: <%s> %w", path, root, err)
 		}
 
 		h.Name = name
@@ -116,24 +113,18 @@ func writeToArchive(tw *tar.Writer, root string, skipSymlinks bool, written *int
 	}
 }
 
-func relativeName(src, path string) (string, error) {
-	info, err := os.Lstat(src)
-	if err != nil {
-		return "", fmt.Errorf("%s: stat %w", src, err)
-	}
-
+func relative(parent string, path string) (string, error) {
 	name := filepath.Base(path)
 
-	if info.IsDir() {
-		dir, err := filepath.Rel(filepath.Dir(src), filepath.Dir(path))
-		if err != nil {
-			return "", fmt.Errorf("relative path %q: %q %v", path, dir, err)
-		}
-
-		name = filepath.Join(filepath.ToSlash(dir), name)
+	rel, err := filepath.Rel(parent, filepath.Dir(path))
+	if err != nil {
+		return "", fmt.Errorf("relative path <%s>, base <%s> %w", rel, name, err)
 	}
 
-	return strings.TrimPrefix(filepath.ToSlash(name), "/"), nil
+	// NOTICE: filepath.Rel puts "../" when given path is not under parent.
+	rel = strings.TrimLeft(rel, "../")
+	rel = filepath.ToSlash(rel)
+	return strings.TrimPrefix(filepath.Join(rel, name), "/"), nil
 }
 
 func createSymlinkHeader(fi os.FileInfo, path string) (*tar.Header, error) {
@@ -186,14 +177,19 @@ func (a *Archive) Extract(dst string, r io.Reader) (int64, error) {
 		}
 
 		var target string
-		// NOTICE: It's been done like this to be compatible with normal behavior of a tar extract.
-		switch {
-		case filepath.Base(dst) == filepath.Dir(h.Name):
-			target = filepath.Join(filepath.Dir(dst), h.Name)
-		case filepath.Base(dst) == filepath.Base(h.Name):
-			target = filepath.Join(filepath.Dir(dst), h.Name)
-		default:
-			target = filepath.Join(dst, h.Name)
+		if dst == h.Name {
+			target = h.Name
+		} else {
+			name, err := relative(dst, h.Name)
+			if err != nil {
+				return 0, fmt.Errorf("relative name %w", err)
+			}
+
+			target = filepath.Join(dst, name)
+		}
+
+		if err := os.MkdirAll(filepath.Dir(target), defaultDirPermission); err != nil {
+			return 0, fmt.Errorf("ensure directory <%s> %w", target, err)
 		}
 
 		switch h.Typeflag {

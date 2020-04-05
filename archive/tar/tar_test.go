@@ -32,14 +32,14 @@ func TestCreate(t *testing.T) {
 	}{
 		{
 			name:    "empty mount paths",
-			ta:      New(log.NewNopLogger(), true),
+			ta:      New(log.NewNopLogger(), testRootMounted, true),
 			srcs:    []string{},
 			written: 0,
 			err:     nil,
 		},
 		{
 			name: "non-existing mount paths",
-			ta:   New(log.NewNopLogger(), true),
+			ta:   New(log.NewNopLogger(), testRootMounted, true),
 			srcs: []string{
 				"idonotexist",
 				"metoo",
@@ -49,14 +49,21 @@ func TestCreate(t *testing.T) {
 		},
 		{
 			name:    "existing mount paths",
-			ta:      New(log.NewNopLogger(), true),
+			ta:      New(log.NewNopLogger(), testRootMounted, true),
 			srcs:    exampleFileTree(t, "tar_create"),
 			written: 43, // 3 x tmpfile in dir, 1 tmpfile
 			err:     nil,
 		},
 		{
+			name:    "existing mount nested paths",
+			ta:      New(log.NewNopLogger(), testRootMounted, true),
+			srcs:    exampleNestedFileTree(t, "tar_create"),
+			written: 56, // 4 x tmpfile in dir, 1 tmpfile
+			err:     nil,
+		},
+		{
 			name:    "existing mount paths with symbolic links",
-			ta:      New(log.NewNopLogger(), false),
+			ta:      New(log.NewNopLogger(), testRootMounted, false),
 			srcs:    exampleFileTreeWithSymlinks(t, "tar_create_symlink"),
 			written: 43,
 			err:     nil,
@@ -98,15 +105,19 @@ func TestExtract(t *testing.T) {
 	t.Cleanup(func() { os.RemoveAll(testRoot) })
 
 	// Setup
-	ta := New(log.NewNopLogger(), false)
+	ta := New(log.NewNopLogger(), testRootMounted, false)
 
 	arcDir, arcDirClean := test.CreateTempDir(t, "tar_extract_archives", testRootMounted)
 	t.Cleanup(arcDirClean)
 
 	files := exampleFileTree(t, "tar_extract")
-
 	archivePath := filepath.Join(arcDir, "test.tar")
 	_, err := create(ta, files, archivePath)
+	test.Ok(t, err)
+
+	nestedFiles := exampleNestedFileTree(t, "tar_extract_nested")
+	nestedArchivePath := filepath.Join(arcDir, "nested_test.tar")
+	_, err = create(ta, nestedFiles, nestedArchivePath)
 	test.Ok(t, err)
 
 	filesWithSymlink := exampleFileTreeWithSymlinks(t, "tar_extract_symlink")
@@ -131,7 +142,7 @@ func TestExtract(t *testing.T) {
 	}{
 		{
 			name:        "non-existing archive",
-			ta:          ta,
+			ta:          New(log.NewNopLogger(), testRootMounted, false),
 			archivePath: "idonotexist",
 			srcs:        []string{},
 			written:     0,
@@ -139,7 +150,7 @@ func TestExtract(t *testing.T) {
 		},
 		{
 			name:        "non-existing root destination",
-			ta:          ta,
+			ta:          New(log.NewNopLogger(), testRootMounted, false),
 			archivePath: emptyArchivePath,
 			srcs:        []string{},
 			written:     0,
@@ -147,7 +158,7 @@ func TestExtract(t *testing.T) {
 		},
 		{
 			name:        "empty archive",
-			ta:          ta,
+			ta:          New(log.NewNopLogger(), testRootMounted, false),
 			archivePath: emptyArchivePath,
 			srcs:        []string{},
 			written:     0,
@@ -155,7 +166,7 @@ func TestExtract(t *testing.T) {
 		},
 		{
 			name:        "bad archives",
-			ta:          ta,
+			ta:          New(log.NewNopLogger(), testRootMounted, false),
 			archivePath: badArchivePath,
 			srcs:        []string{},
 			written:     0,
@@ -163,15 +174,23 @@ func TestExtract(t *testing.T) {
 		},
 		{
 			name:        "existing archive",
-			ta:          ta,
+			ta:          New(log.NewNopLogger(), testRootMounted, false),
 			archivePath: archivePath,
 			srcs:        files,
 			written:     43,
 			err:         nil,
 		},
 		{
+			name:        "existing archive with nested files",
+			ta:          New(log.NewNopLogger(), testRootMounted, false),
+			archivePath: nestedArchivePath,
+			srcs:        nestedFiles,
+			written:     56,
+			err:         nil,
+		},
+		{
 			name:        "existing archive with symbolic links",
-			ta:          New(log.NewNopLogger(), false),
+			ta:          New(log.NewNopLogger(), testRootMounted, false),
 			archivePath: archiveWithSymlinkPath,
 			srcs:        filesWithSymlink,
 			written:     43,
@@ -262,6 +281,28 @@ func exampleFileTree(t *testing.T, name string) []string {
 	t.Cleanup(dirClean)
 
 	return []string{file, dir}
+}
+
+func exampleNestedFileTree(t *testing.T, name string) []string {
+	dir, cleanup := test.CreateTempDir(t, name, testRootMounted)
+	t.Cleanup(cleanup)
+
+	nestedFile, nestedFileClean := test.CreateTempFile(t, name, []byte("hello\ndrone!\n"), dir) // 13 bytes
+	t.Cleanup(nestedFileClean)
+
+	nestedDir, nestedDirClean := test.CreateTempFilesInDir(t, name, []byte("hello\ngo!\n"), dir) // 10 bytes
+	t.Cleanup(nestedDirClean)
+
+	nestedDir1, nestedDirClean1 := test.CreateTempDir(t, name, dir)
+	t.Cleanup(nestedDirClean1)
+
+	nestedDir2, nestedDirClean2 := test.CreateTempDir(t, name, nestedDir1)
+	t.Cleanup(nestedDirClean2)
+
+	nestedFile1, nestedFileClean1 := test.CreateTempFile(t, name, []byte("hello\ndrone!\n"), nestedDir2) // 13 bytes
+	t.Cleanup(nestedFileClean1)
+
+	return []string{nestedDir, nestedFile, nestedFile1}
 }
 
 func exampleFileTreeWithSymlinks(t *testing.T, name string) []string {

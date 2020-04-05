@@ -31,7 +31,7 @@ type Archive interface {
 }
 
 // FromFormat determines which archive to use from given archive format.
-func FromFormat(logger log.Logger, format string, opts ...Option) Archive {
+func FromFormat(logger log.Logger, root string, format string, opts ...Option) Archive {
 	options := options{
 		compressionLevel: DefaultCompressionLevel,
 	}
@@ -42,11 +42,11 @@ func FromFormat(logger log.Logger, format string, opts ...Option) Archive {
 
 	switch format {
 	case Gzip:
-		return gzip.New(logger, options.skipSymlinks, options.compressionLevel)
+		return gzip.New(logger, root, options.skipSymlinks, options.compressionLevel)
 	case Tar:
-		return tar.New(logger, options.skipSymlinks)
+		return tar.New(logger, root, options.skipSymlinks)
 	default:
 		level.Error(logger).Log("msg", "unknown archive format", "format", format)
-		return tar.New(logger, options.skipSymlinks) // DefaultArchiveFormat
+		return tar.New(logger, root, options.skipSymlinks) // DefaultArchiveFormat
 	}
 }

@@ -16,16 +16,16 @@ func (f optionFunc) apply(o *options) {
 	f(o)
 }
 
-// WithSkipSymlinks sets skip symlink option.
-func WithSkipSymlinks(b bool) Option {
-	return optionFunc(func(o *options) {
-		o.skipSymlinks = b
-	})
-}
-
 // WithCompressionLevel sets compression level option.
 func WithCompressionLevel(i int) Option {
 	return optionFunc(func(o *options) {
 		o.compressionLevel = i
+	})
+}
+
+// WithSkipSymlinks sets skip symlink option.
+func WithSkipSymlinks(b bool) Option {
+	return optionFunc(func(o *options) {
+		o.skipSymlinks = b
 	})
 }

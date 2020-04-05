@@ -98,6 +98,13 @@ func TestPlugin(t *testing.T) {
 			success: true,
 		},
 		{
+			name: "existing mount with nested files",
+			mount: func(name string) []string {
+				return exampleNestedFileTree(t, name, make([]byte, 1*1024))
+			},
+			success: true,
+		},
+		{
 			name: "existing mount with cache key",
 			mount: func(name string) []string {
 				return exampleFileTree(t, name, make([]byte, 1*1024))
@@ -124,9 +131,9 @@ func TestPlugin(t *testing.T) {
 
 	for i, tc := range cases {
 		i, tc := i, tc // NOTICE: https://github.com/golang/go/wiki/CommonMistakes#using-goroutines-on-loop-iterator-variables.
-		for _, fmt := range formats {
+		for _, f := range formats {
 			for b, setup := range backends {
-				name := strings.Join([]string{strconv.Itoa(i), tc.name, b, fmt}, "-")
+				name := strings.Join([]string{strconv.Itoa(i), tc.name, b, f}, "-")
 				t.Run(name, func(t *testing.T) {
 					// Setup
 					c := defaultConfig()
@@ -134,7 +141,7 @@ func TestPlugin(t *testing.T) {
 					paths := tc.mount(tc.name)
 					mount(c, paths...)
 					cacheKey(c, tc.cacheKey)
-					format(c, fmt)
+					format(c, f)
 
 					// Rebuild run
 					{
@@ -148,13 +155,13 @@ func TestPlugin(t *testing.T) {
 					}
 
 					// Move source to compare later
-					dir, cleanup := test.CreateTempDir(t, sanitize(name), testRootMoved)
+					restoreRoot, cleanup := test.CreateTempDir(t, sanitize(name), testRootMoved)
 					t.Cleanup(cleanup)
 
 					for _, p := range paths {
 						rel, err := filepath.Rel(testRootMounted, p)
 						test.Ok(t, err)
-						dst := filepath.Join(dir, rel)
+						dst := filepath.Join(restoreRoot, rel)
 						test.Ok(t, os.MkdirAll(filepath.Dir(dst), 0755))
 						test.Ok(t, os.Rename(p, dst))
 					}
@@ -172,7 +179,7 @@ func TestPlugin(t *testing.T) {
 					}
 
 					// Compare
-					test.EqualDirs(t, dir, testRootMounted, paths)
+					test.EqualDirs(t, restoreRoot, testRootMounted, paths)
 				})
 			}
 		}
@@ -259,6 +266,27 @@ func exampleFileTree(t *testing.T, name string, content []byte) []string {
 	t.Cleanup(dirClean)
 
 	return []string{file, dir}
+}
+
+func exampleNestedFileTree(t *testing.T, name string, content []byte) []string {
+	name = sanitize(name)
+
+	dir, cleanup := test.CreateTempDir(t, name, testRootMounted)
+	t.Cleanup(cleanup)
+
+	nestedFile, nestedFileClean := test.CreateTempFile(t, name, content, dir)
+	t.Cleanup(nestedFileClean)
+
+	nestedDir, nestedDirClean := test.CreateTempFilesInDir(t, name, content, dir)
+	t.Cleanup(nestedDirClean)
+
+	nestedDir1, nestedDirClean1 := test.CreateTempDir(t, name, dir)
+	t.Cleanup(nestedDirClean1)
+
+	nestedFile1, nestedFileClean1 := test.CreateTempFile(t, name, content, nestedDir1)
+	t.Cleanup(nestedFileClean1)
+
+	return []string{nestedDir, nestedFile, nestedFile1}
 }
 
 func exampleFileTreeWithSymlinks(t *testing.T, name string, content []byte) []string {

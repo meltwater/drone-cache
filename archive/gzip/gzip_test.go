@@ -35,14 +35,14 @@ func TestCreate(t *testing.T) {
 	}{
 		{
 			name:    "empty mount paths",
-			tgz:     New(log.NewNopLogger(), true, flate.DefaultCompression),
+			tgz:     New(log.NewNopLogger(), testRootMounted, true, flate.DefaultCompression),
 			srcs:    []string{},
 			written: 0,
 			err:     nil,
 		},
 		{
 			name: "non-existing mount paths",
-			tgz:  New(log.NewNopLogger(), true, flate.DefaultCompression),
+			tgz:  New(log.NewNopLogger(), testRootMounted, true, flate.DefaultCompression),
 			srcs: []string{
 				"iamnotexists",
 				"metoo",
@@ -52,14 +52,21 @@ func TestCreate(t *testing.T) {
 		},
 		{
 			name:    "existing mount paths",
-			tgz:     New(log.NewNopLogger(), true, flate.DefaultCompression),
+			tgz:     New(log.NewNopLogger(), testRootMounted, true, flate.DefaultCompression),
 			srcs:    exampleFileTree(t, "gzip_create"),
 			written: 43, // 3 x tmpfile in dir, 1 tmpfile
 			err:     nil,
 		},
 		{
+			name:    "existing mount nested paths",
+			tgz:     New(log.NewNopLogger(), testRootMounted, true, flate.DefaultCompression),
+			srcs:    exampleNestedFileTree(t, "tar_create"),
+			written: 56, // 4 x tmpfile in dir, 1 tmpfile
+			err:     nil,
+		},
+		{
 			name:    "existing mount paths with symbolic links",
-			tgz:     New(log.NewNopLogger(), false, flate.DefaultCompression),
+			tgz:     New(log.NewNopLogger(), testRootMounted, false, flate.DefaultCompression),
 			srcs:    exampleFileTreeWithSymlinks(t, "gzip_create_symlink"),
 			written: 43,
 			err:     nil,
@@ -100,15 +107,19 @@ func TestExtract(t *testing.T) {
 	t.Cleanup(func() { os.RemoveAll(testRoot) })
 
 	// Setup
-	tgz := New(log.NewNopLogger(), false, flate.DefaultCompression)
+	tgz := New(log.NewNopLogger(), testRootMounted, false, flate.DefaultCompression)
 
 	arcDir, arcDirClean := test.CreateTempDir(t, "gzip_extract_archive")
 	t.Cleanup(arcDirClean)
 
 	files := exampleFileTree(t, "gzip_extract")
-
 	archivePath := filepath.Join(arcDir, "test.tar.gz")
 	_, err := create(tgz, files, archivePath)
+	test.Ok(t, err)
+
+	nestedFiles := exampleNestedFileTree(t, "gzip_extract_nested")
+	nestedArchivePath := filepath.Join(arcDir, "nested_test.tar.gz")
+	_, err = create(tgz, nestedFiles, nestedArchivePath)
 	test.Ok(t, err)
 
 	filesWithSymlink := exampleFileTreeWithSymlinks(t, "gzip_extract_symlink")
@@ -133,7 +144,7 @@ func TestExtract(t *testing.T) {
 	}{
 		{
 			name:        "non-existing archive",
-			tgz:         New(log.NewNopLogger(), true, flate.DefaultCompression),
+			tgz:         New(log.NewNopLogger(), testRootMounted, true, flate.DefaultCompression),
 			archivePath: "iamnotexists",
 			srcs:        []string{},
 			written:     0,
@@ -141,7 +152,7 @@ func TestExtract(t *testing.T) {
 		},
 		{
 			name:        "non-existing root destination",
-			tgz:         New(log.NewNopLogger(), true, flate.DefaultCompression),
+			tgz:         New(log.NewNopLogger(), testRootMounted, true, flate.DefaultCompression),
 			archivePath: emptyArchivePath,
 			srcs:        []string{},
 			written:     0,
@@ -149,7 +160,7 @@ func TestExtract(t *testing.T) {
 		},
 		{
 			name:        "empty archive",
-			tgz:         New(log.NewNopLogger(), true, flate.DefaultCompression),
+			tgz:         New(log.NewNopLogger(), testRootMounted, true, flate.DefaultCompression),
 			archivePath: emptyArchivePath,
 			srcs:        []string{},
 			written:     0,
@@ -157,7 +168,7 @@ func TestExtract(t *testing.T) {
 		},
 		{
 			name:        "bad archives",
-			tgz:         New(log.NewNopLogger(), true, flate.DefaultCompression),
+			tgz:         New(log.NewNopLogger(), testRootMounted, true, flate.DefaultCompression),
 			archivePath: badArchivePath,
 			srcs:        []string{},
 			written:     0,
@@ -165,15 +176,23 @@ func TestExtract(t *testing.T) {
 		},
 		{
 			name:        "existing archive",
-			tgz:         New(log.NewNopLogger(), true, flate.DefaultCompression),
+			tgz:         New(log.NewNopLogger(), testRootMounted, true, flate.DefaultCompression),
 			archivePath: archivePath,
 			srcs:        files,
 			written:     43,
 			err:         nil,
 		},
 		{
+			name:        "existing archive with nested files",
+			tgz:         New(log.NewNopLogger(), testRootMounted, true, flate.DefaultCompression),
+			archivePath: nestedArchivePath,
+			srcs:        nestedFiles,
+			written:     56,
+			err:         nil,
+		},
+		{
 			name:        "existing archive with symbolic links",
-			tgz:         New(log.NewNopLogger(), false, flate.DefaultCompression),
+			tgz:         New(log.NewNopLogger(), testRootMounted, false, flate.DefaultCompression),
 			archivePath: archiveWithSymlinkPath,
 			srcs:        filesWithSymlink,
 			written:     43,
@@ -261,6 +280,28 @@ func exampleFileTree(t *testing.T, name string) []string {
 	t.Cleanup(dirClean)
 
 	return []string{file, dir}
+}
+
+func exampleNestedFileTree(t *testing.T, name string) []string {
+	dir, cleanup := test.CreateTempDir(t, name, testRootMounted)
+	t.Cleanup(cleanup)
+
+	nestedFile, nestedFileClean := test.CreateTempFile(t, name, []byte("hello\ndrone!\n"), dir) // 13 bytes
+	t.Cleanup(nestedFileClean)
+
+	nestedDir, nestedDirClean := test.CreateTempFilesInDir(t, name, []byte("hello\ngo!\n"), dir) // 10 bytes
+	t.Cleanup(nestedDirClean)
+
+	nestedDir1, nestedDirClean1 := test.CreateTempDir(t, name, dir)
+	t.Cleanup(nestedDirClean1)
+
+	nestedDir2, nestedDirClean2 := test.CreateTempDir(t, name, nestedDir1)
+	t.Cleanup(nestedDirClean2)
+
+	nestedFile1, nestedFileClean1 := test.CreateTempFile(t, name, []byte("hello\ndrone!\n"), nestedDir2) // 13 bytes
+	t.Cleanup(nestedFileClean1)
+
+	return []string{nestedDir, nestedFile, nestedFile1}
 }
 
 func exampleFileTreeWithSymlinks(t *testing.T, name string) []string {
