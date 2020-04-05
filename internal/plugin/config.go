@@ -15,6 +15,8 @@ type Config struct {
 	ArchiveFormat    string
 	Backend          string
 	CacheKeyTemplate string
+	RemoteRoot       string
+	LocalRoot        string
 
 	// Modes
 	Debug   bool

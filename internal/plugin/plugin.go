@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"path/filepath"
 
 	"github.com/meltwater/drone-cache/archive"
 	"github.com/meltwater/drone-cache/cache"
@@ -62,13 +63,24 @@ func (p *Plugin) Exec() error {
 		return errors.New("rebuild and restore are mutually exclusive, please set only one of them")
 	}
 
-	workspace, err := os.Getwd()
-	if err != nil {
-		return fmt.Errorf("get working directory %w", err)
+	var localRoot string
+	if p.Config.LocalRoot != "" {
+		localRoot = filepath.Clean(p.Config.LocalRoot)
+	} else {
+		workspace, err := os.Getwd()
+		if err != nil {
+			return fmt.Errorf("get working directory %w", err)
+		}
+
+		localRoot = workspace
 	}
 
 	var options []cache.Option
-	options = append(options, cache.WithNamespace(p.Metadata.Repo.Name))
+	if p.Config.RemoteRoot != "" {
+		options = append(options, cache.WithNamespace(p.Config.RemoteRoot))
+	} else {
+		options = append(options, cache.WithNamespace(p.Metadata.Repo.Name))
+	}
 
 	var generator key.Generator
 	if cfg.CacheKeyTemplate != "" {
@@ -99,7 +111,7 @@ func (p *Plugin) Exec() error {
 	// 3. Initialize cache.
 	c := cache.New(p.logger,
 		storage.New(p.logger, b, cfg.StorageOperationTimeout),
-		archive.FromFormat(p.logger, workspace, cfg.ArchiveFormat,
+		archive.FromFormat(p.logger, localRoot, cfg.ArchiveFormat,
 			archive.WithSkipSymlinks(cfg.SkipSymlinks),
 			archive.WithCompressionLevel(cfg.CompressionLevel),
 		),

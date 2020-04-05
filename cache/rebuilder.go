@@ -46,8 +46,9 @@ func (r rebuilder) Rebuild(srcs []string) error {
 	}
 
 	var (
-		wg   sync.WaitGroup
-		errs = &internal.MultiError{}
+		wg        sync.WaitGroup
+		errs      = &internal.MultiError{}
+		namespace = filepath.ToSlash(filepath.Clean(r.namespace))
 	)
 
 	for _, src := range srcs {
@@ -55,7 +56,7 @@ func (r rebuilder) Rebuild(srcs []string) error {
 			return fmt.Errorf("source <%s>, make sure file or directory exists and readable %w", src, err)
 		}
 
-		dst := filepath.Join(r.namespace, key, src)
+		dst := filepath.Join(namespace, key, src)
 
 		level.Info(r.logger).Log("msg", "rebuilding cache for directory", "local", src, "remote", dst)
 

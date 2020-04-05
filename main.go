@@ -241,11 +241,20 @@ func main() {
 			Usage:   "restore the cache directories",
 			EnvVars: []string{"PLUGIN_RESTORE"},
 		},
-		// RESTORE
 		&cli.StringFlag{
 			Name:    "cache-key, chk",
 			Usage:   "cache key to use for the cache directories",
 			EnvVars: []string{"PLUGIN_CACHE_KEY"},
+		},
+		&cli.StringFlag{
+			Name:    "remote-root, rr",
+			Usage:   "remote root directory to contain all the cache files created (default repo.name)",
+			EnvVars: []string{"PLUGIN_REMOTE_ROOT"},
+		},
+		&cli.StringFlag{
+			Name:    "local-root, lr",
+			Usage:   "local root directory to base given mount paths (default pwd [present working directory])",
+			EnvVars: []string{"PLUGIN_LOCAL_ROOT"},
 		},
 		// CACHE-KEYS
 		// REBUILD-KEYS
@@ -498,6 +507,8 @@ func run(c *cli.Context) error {
 		Mount:            c.StringSlice("mount"),
 		Rebuild:          c.Bool("rebuild"),
 		Restore:          c.Bool("restore"),
+		RemoteRoot:       c.String("remote-root"),
+		LocalRoot:        c.String("local-root"),
 
 		StorageOperationTimeout: c.Duration("backend.operation-timeout"),
 		FileSystem: filesystem.Config{

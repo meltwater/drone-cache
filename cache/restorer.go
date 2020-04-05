@@ -43,12 +43,13 @@ func (r restorer) Restore(dsts []string) error {
 	}
 
 	var (
-		wg   sync.WaitGroup
-		errs = &internal.MultiError{}
+		wg        sync.WaitGroup
+		errs      = &internal.MultiError{}
+		namespace = filepath.ToSlash(filepath.Clean(r.namespace))
 	)
 
 	for _, dst := range dsts {
-		src := filepath.Join(r.namespace, key, dst)
+		src := filepath.Join(namespace, key, dst)
 
 		level.Info(r.logger).Log("msg", "restoring directory", "local", dst, "remote", src)
 
