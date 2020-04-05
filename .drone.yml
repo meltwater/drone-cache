@@ -54,7 +54,7 @@ steps:
     path: /drone/src/tmp/testdata/cache
 
 - name: release-snapshot-dev
-  image: goreleaser/goreleaser:v0.120
+  image: goreleaser/goreleaser:v0.131.1
   commands:
   - apk add --update make upx
   - goreleaser release --rm-dist --snapshot
@@ -151,7 +151,7 @@ steps:
     path: /tmp/cache
 
 - name: release-snapshot
-  image: goreleaser/goreleaser:v0.120
+  image: goreleaser/goreleaser:v0.131.1
   commands:
   - apk add --update make upx
   - goreleaser release --rm-dist --snapshot
@@ -330,7 +330,7 @@ steps:
   - git fetch --tags
 
 - name: release
-  image: goreleaser/goreleaser:v0.120
+  image: goreleaser/goreleaser:v0.131.1
   commands:
   - apk add --update make upx
   - make release

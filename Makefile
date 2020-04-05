@@ -10,7 +10,7 @@ GOLANGCI_LINT_VERSION=v1.21.0
 GOLANGCI_LINT_BIN=$(GOPATH)/bin/golangci-lint
 EMBEDMD_BIN=$(GOPATH)/bin/embedmd
 GOTEST_BIN=$(GOPATH)/bin/gotest
-GORELEASER_VERSION=v0.120
+GORELEASER_VERSION=v0.131.1
 GORELEASER_BIN=$(GOPATH)/bin/goreleaser
 LICHE_BIN=$(GOPATH)/bin/liche
 
@@ -142,7 +142,7 @@ $(GOLANGCI_LINT_BIN):
 
 $(GORELEASER_BIN):
 	curl -sfL https://install.goreleaser.com/github.com/goreleaser/goreleaser.sh \
-		| VERSION=${GORELEASER_VERSION} sh -s -- -b $(GOPATH)/bin $(GORELEASER_BIN)
+		| VERSION=${GORELEASER_VERSION} sh -s -- -b $(GOPATH)/bin ${GORELEASER_VERSION}
 
 ${LICHE_BIN}:
 	GO111MODULE=on go get -u github.com/raviqqe/liche
