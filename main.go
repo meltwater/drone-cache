@@ -280,7 +280,7 @@ func main() {
 		&cli.BoolFlag{
 			Name:    "debug, d",
 			Usage:   "debug",
-			EnvVars: []string{"PLUGIN_DEBUG, DEBUG"},
+			EnvVars: []string{"PLUGIN_DEBUG", "DEBUG"},
 		},
 		&cli.BoolFlag{
 			Name:    "exit-code, ex",
@@ -512,7 +512,7 @@ func run(c *cli.Context) error {
 
 		StorageOperationTimeout: c.Duration("backend.operation-timeout"),
 		FileSystem: filesystem.Config{
-			CacheRoot: c.String("filesystem-cache-root"),
+			CacheRoot: c.String("filesystem.cache-root"),
 		},
 		S3: s3.Config{
 			ACL:        c.String("acl"),
