@@ -5,6 +5,7 @@ run:
   deadline: 1m
   tests: false
   modules-download-mode: vendor
+  timeout: 5m
 
 linters:
   enable-all: true
@@ -16,3 +17,7 @@ linters-settings:
     exclude: .errcheck_excludes
   lll:
     line-length: 120
+  funlen:
+    lines: 85
+    statements: 45
+

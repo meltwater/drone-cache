@@ -15,11 +15,13 @@ the requirements below.
 ## Pull Request Process
 
 0. Check out [Pull Request Checklist](#pull-request-checklist), ensure you have fulfilled each step.
-1. Check out [Uber Style Guide](https://github.com/uber-go/guide/blob/master/style.md), project tries to follow it, ensure you have fulfilled it as much as possible.
+1. Check out guidelines below, the project tries to follow these, ensure you have fulfilled them as much as possible.
+    * [Effective Go](https://golang.org/doc/effective_go.html)
+    * [Go Code Review Comments](https://github.com/golang/go/wiki/CodeReviewComments)
 2. Ensure any install or build dependencies are removed before the end of the layer when doing a
    build.
 3. Please ensure the [README](README.md) and [DOCS](./DOCS.md) are up-to-date with details of changes to the command-line interface,
-    this includes new environment variables, exposed ports, useful file locations and container parameters.
+    this includes new environment variables, exposed ports, used file locations, and container parameters.
 4. **PLEASE ENSURE YOU DO NOT INTRODUCE BREAKING CHANGES.**
 5. **PLEASE ENSURE BUG FIXES AND NEW FEATURES INCLUDE TESTS.**
 6. You may merge the Pull Request in once you have the sign-off of one other maintainer/code owner,
@@ -46,11 +48,11 @@ the requirements below.
 0. **PLEASE DO NOT INTRODUCE BREAKING CHANGES**
 1. Execute `make README.md`. This will update [usage](README.md#usage) section of [README.md](README.md) with latest CLI options
 2. Increase the version numbers in any examples files and the README.md to the new version that this
-   release would represent. The versioning scheme we use is [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/meltwater/drone-cache/tags).
+   the release would represent. The versioning scheme we use is [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/meltwater/drone-cache/tags).
 
 3. Ensure [CHANGELOG](CHANGELOG.md) is up-to-date with new version changes.
 4. Update version references.
-5. Create a tag on master. Any changes on master will trigger a release with given tag and `latest tag.
+5. Create a tag on the master. Any changes on the master will trigger a release with the given tag and `latest tag.
 
     ```console
     $ git tag -am 'vX.X.X'
@@ -58,5 +60,7 @@ the requirements below.
     $ git push --tags
     > ...
     ```
+6. Check whether all the generate artifacts in-place properly.
+7. Update [plugin index](https://github.com/drone/drone-plugin-index/blob/master/content/meltwater/drone-cache/index.md) using [DOCS](./DOCS.md).
 
 > **Keep in mind that users usually use the `latest` tagged images in their pipeline, please make sure you do not interfere with their working workflow.**

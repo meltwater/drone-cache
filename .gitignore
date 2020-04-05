@@ -30,7 +30,9 @@ drone-cache
 vendor
 target
 bin
-testcache
-backup
 tmp
-TODO.md
+testdata
+
+# Azurite temp files
+__*__
+__*__.json

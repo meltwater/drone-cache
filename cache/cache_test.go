@@ -1,9 +1,8 @@
 package cache
 
-import (
-	"testing"
-)
+import "testing"
 
-func TestCacheTruth(t *testing.T) {
-	t.Skip("skipping cache package tests")
+func TestCache(t *testing.T) {
+	// Implement me!
+	t.Skip("skipping unimplemented test.")
 }

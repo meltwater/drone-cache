@@ -4,6 +4,7 @@ before:
     - make vendor
 dist: target/dist
 builds:
+  # TODO: -tags netgo
 - env:
   - CGO_ENABLED=0
   goos:
@@ -71,6 +72,7 @@ release:
 
 # NOTICE: To be able to run this stage in drone.io, we need Docker which runs in a container,
 # - and Docker needs a privileged container, so it's not possible for free tier right now.
+# TODO: Alternative: https://github.com/goreleaser/goreleaser-action
 # TODO: Add missing GOOS and ARCH
 # dockers:
 #   -

@@ -1,21 +1,13 @@
 package cache
 
-import (
-	"compress/flate"
-)
-
-const (
-	DefaultCompressionLevel = flate.DefaultCompression
-	DefaultArchiveFormat    = "tar"
-)
+import "github.com/meltwater/drone-cache/key"
 
 type options struct {
-	archiveFmt       string
-	compressionLevel int
-	skipSymlinks     bool
+	namespace         string
+	fallbackGenerator key.Generator
 }
 
-// Option overrides behavior of Cache.
+// Option overrides behavior of Archive.
 type Option interface {
 	apply(*options)
 }
@@ -26,23 +18,16 @@ func (f optionFunc) apply(o *options) {
 	f(o)
 }
 
-// WithSkipSymlinks sets skip symlink option.
-func WithSkipSymlinks(b bool) Option {
+// WithNamespace sets namespace option.
+func WithNamespace(s string) Option {
 	return optionFunc(func(o *options) {
-		o.skipSymlinks = b
+		o.namespace = s
 	})
 }
 
-// WithArchiveFormat sets archive format option.
-func WithArchiveFormat(s string) Option {
+// WithFallbackGenerator sets fallback key generator option.
+func WithFallbackGenerator(g key.Generator) Option {
 	return optionFunc(func(o *options) {
-		o.archiveFmt = s
-	})
-}
-
-// WithCompressionLevel sets compression level option.
-func WithCompressionLevel(i int) Option {
-	return optionFunc(func(o *options) {
-		o.compressionLevel = i
+		o.fallbackGenerator = g
 	})
 }
