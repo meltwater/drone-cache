@@ -52,6 +52,11 @@ func TestRoundTrip(t *testing.T) {
 	test.Ok(t, err)
 
 	test.Equals(t, []byte(content), b)
+
+	exists, err := backend.Exists(context.TODO(), "test.txt")
+	test.Ok(t, err)
+
+	test.Equals(t, true, exists)
 }
 
 // Helpers

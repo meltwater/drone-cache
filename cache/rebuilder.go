@@ -27,11 +27,12 @@ type rebuilder struct {
 	fg key.Generator
 
 	namespace string
+	override  bool
 }
 
 // NewRebuilder TODO
-func NewRebuilder(logger log.Logger, s storage.Storage, a archive.Archive, g key.Generator, fg key.Generator, namespace string) Rebuilder { //nolint:lll
-	return rebuilder{logger, a, s, g, fg, namespace}
+func NewRebuilder(logger log.Logger, s storage.Storage, a archive.Archive, g key.Generator, fg key.Generator, namespace string, override bool) Rebuilder { //nolint:lll
+	return rebuilder{logger, a, s, g, fg, namespace, override}
 }
 
 // Rebuild TODO
@@ -57,6 +58,18 @@ func (r rebuilder) Rebuild(srcs []string) error {
 		}
 
 		dst := filepath.Join(namespace, key, src)
+
+		// If no override is set and object already exists in storage, skip it.
+		if !r.override {
+			exists, err := r.s.Exists(dst)
+			if err != nil {
+				return fmt.Errorf("destination <%s> existence check, %w", dst, err)
+			}
+
+			if exists {
+				continue
+			}
+		}
 
 		level.Info(r.logger).Log("msg", "rebuilding cache for directory", "local", src, "remote", dst)
 

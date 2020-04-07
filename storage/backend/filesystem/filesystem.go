@@ -115,3 +115,17 @@ func (b *Backend) Put(ctx context.Context, p string, r io.Reader) error {
 		return ctx.Err()
 	}
 }
+
+// Exists checks if object already exists.
+func (b *Backend) Exists(ctx context.Context, p string) (bool, error) {
+	path, err := filepath.Abs(filepath.Clean(filepath.Join(b.cacheRoot, p)))
+	if err != nil {
+		return false, fmt.Errorf("absolute path, %w", err)
+	}
+
+	_, err = os.Stat(path)
+	if err != nil && !os.IsNotExist(err) {
+		return false, fmt.Errorf("check the object exists, %w", err)
+	}
+	return err == nil, nil
+}

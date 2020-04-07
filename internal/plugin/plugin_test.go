@@ -193,6 +193,7 @@ func defaultConfig() *Config {
 	return &Config{
 		CompressionLevel:        archive.DefaultCompressionLevel,
 		StorageOperationTimeout: defaultStorageOperationTimeout,
+		Override:                true,
 	}
 }
 

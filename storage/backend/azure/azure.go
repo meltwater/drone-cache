@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"net/http"
 	"net/url"
 
 	"github.com/Azure/azure-storage-blob-go/azblob"
@@ -122,4 +123,16 @@ func (b *Backend) Put(ctx context.Context, p string, r io.Reader) error {
 	}
 
 	return nil
+}
+
+// Exists checks if path already exists.
+func (b *Backend) Exists(ctx context.Context, p string) (bool, error) {
+	b.logger.Log("msg", "checking if the object already exists", "name", p)
+
+	blobURL := b.containerURL.NewBlockBlobURL(p)
+	get, err := blobURL.GetProperties(ctx, azblob.BlobAccessConditions{})
+	if err != nil {
+		return false, fmt.Errorf("check if object exists, %w", err)
+	}
+	return get.StatusCode() == http.StatusOK, nil
 }

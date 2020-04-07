@@ -256,6 +256,12 @@ func main() {
 			Usage:   "local root directory to base given mount paths (default pwd [present working directory])",
 			EnvVars: []string{"PLUGIN_LOCAL_ROOT"},
 		},
+		&cli.BoolFlag{
+			Name:    "override, ovr",
+			Usage:   "override even if cache key already exists in backend",
+			Value:   true,
+			EnvVars: []string{"PLUGIN_OVERRIDE"},
+		},
 		// CACHE-KEYS
 		// REBUILD-KEYS
 		// RESTORE-KEYS
@@ -509,6 +515,7 @@ func run(c *cli.Context) error {
 		Restore:          c.Bool("restore"),
 		RemoteRoot:       c.String("remote-root"),
 		LocalRoot:        c.String("local-root"),
+		Override:         c.Bool("override"),
 
 		StorageOperationTimeout: c.Duration("backend.operation-timeout"),
 		FileSystem: filesystem.Config{

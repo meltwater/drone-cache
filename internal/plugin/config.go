@@ -27,6 +27,7 @@ type Config struct {
 	SkipSymlinks            bool
 	CompressionLevel        int
 	StorageOperationTimeout time.Duration
+	Override                bool
 
 	Mount []string
 

@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
@@ -113,4 +114,25 @@ func (b *Backend) Put(ctx context.Context, p string, r io.Reader) error {
 	}
 
 	return nil
+}
+
+// Exists checks if object already exists.
+func (b *Backend) Exists(ctx context.Context, p string) (bool, error) {
+	in := &s3.HeadObjectInput{
+		Bucket: aws.String(b.bucket),
+		Key:    aws.String(p),
+	}
+
+	out, err := b.client.HeadObjectWithContext(ctx, in)
+	if err != nil {
+		if awsErr, ok := err.(awserr.Error); ok && awsErr.Code() == s3.ErrCodeNoSuchKey || awsErr.Code() == "NotFound" {
+			return false, nil
+		}
+
+		return false, fmt.Errorf("head the object, %w", err)
+	}
+
+	// Normaly if file not exists it will be already detected by error above but in some cases
+	// Minio can return success status for without ETag, detect that here.
+	return *out.ETag != "", nil
 }
