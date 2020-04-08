@@ -12,7 +12,7 @@ GOPATH                := $(firstword $(subst :, ,$(shell go env GOPATH)))
 GOBIN                 := $(GOPATH)/bin
 
 GOCMD                 := go
-GOBUILD               := $(GOCMD) build
+GOBUILD               := $(GOCMD) build -mod=vendor -tags netgo
 GOMOD                 := $(GOCMD) mod
 GOGET                 := $(GOCMD) get
 GOFMT                 := gofmt
@@ -47,12 +47,12 @@ setup: ; $(info $(M) running setup )
 
 drone-cache: ## Runs drone-cache target
 drone-cache: vendor main.go $(wildcard *.go) $(wildcard */*.go) ; $(info $(M) running drone-cache )
-	$(Q) CGO_ENABLED=0 $(GOBUILD) -mod=vendor -a -tags netgo -ldflags '-s -w -X main.version=$(VERSION)' -o $@ .
+	$(Q) CGO_ENABLED=0 $(GOBUILD) -a -ldflags '-s -w -X main.version=$(VERSION)' -o $@ .
 
 .PHONY: build
 build: ## Runs build target
 build: main.go $(wildcard *.go) $(wildcard */*.go) ; $(info $(M) running build )
-	$(Q) $(GOBUILD) -mod=vendor -tags netgo -ldflags '-X main.version=$(VERSION)' -o drone-cache .
+	$(Q) $(GOBUILD) -ldflags '-X main.version=$(VERSION)' -o drone-cache .
 
 .PHONY: release
 release: ## Release dron-cache
