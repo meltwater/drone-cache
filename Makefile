@@ -1,3 +1,6 @@
+ROOT_DIR              := $(CURDIR)
+SCRIPTS               := $(ROOT_DIR)/scripts
+
 VERSION               := $(strip $(shell [ -d .git ] && git describe --always --tags --dirty))
 BUILD_DATE            := $(shell date -u +"%Y-%m-%dT%H:%M:%S%Z")
 VCS_REF               := $(strip $(shell [ -d .git ] && git rev-parse --short HEAD))
@@ -22,7 +25,7 @@ all: drone-cache
 
 .PHONY: setup
 setup:
-	./scripts/setup_dev_environment.sh
+	$(SCRIPTS)/setup_dev_environment.sh
 
 drone-cache: vendor main.go $(wildcard *.go) $(wildcard */*.go)
 	CGO_ENABLED=0 go build -mod=vendor -a -tags netgo -ldflags '-s -w -X main.version=$(VERSION)' -o $@ .
@@ -46,7 +49,7 @@ clean:
 
 tmp/help.txt: drone-cache
 	mkdir -p tmp
-	./drone-cache --help &> tmp/help.txt
+	$(ROOT_DIR)/drone-cache --help &> tmp/help.txt
 
 README.md: tmp/help.txt
 	$(EMBEDMD_BIN) -w README.md
