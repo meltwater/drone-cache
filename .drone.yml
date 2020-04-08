@@ -41,7 +41,7 @@ steps:
 - name: test
   image: golang:1.14.1-alpine3.11
   commands:
-  - go test -mod=vendor -short -cover -failfast -tags=integration ./...
+  - go test -mod=vendor -short -cover -tags=integration ./...
   environment:
     CGO_ENABLED: 0
     TEST_S3_ENDPOINT: minio:9000
