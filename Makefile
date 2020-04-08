@@ -1,18 +1,18 @@
-VERSION := $(strip $(shell [ -d .git ] && git describe --always --tags --dirty))
-BUILD_DATE := $(shell date -u +"%Y-%m-%dT%H:%M:%S%Z")
-VCS_REF := $(strip $(shell [ -d .git ] && git rev-parse --short HEAD))
+VERSION               := $(strip $(shell [ -d .git ] && git describe --always --tags --dirty))
+BUILD_DATE            := $(shell date -u +"%Y-%m-%dT%H:%M:%S%Z")
+VCS_REF               := $(strip $(shell [ -d .git ] && git rev-parse --short HEAD))
 
-GO_PACKAGES=$(shell go list ./... | grep -v -E '/vendor/|/test')
-GO_FILES:=$(shell find . -name \*.go -print)
-GOPATH:=$(firstword $(subst :, ,$(shell go env GOPATH)))
+GO_PACKAGES            = $(shell go list ./... | grep -v -E '/vendor/|/test')
+GO_FILES              := $(shell find . -name \*.go -print)
+GOPATH                := $(firstword $(subst :, ,$(shell go env GOPATH)))
 
-GOLANGCI_LINT_VERSION=v1.21.0
-GOLANGCI_LINT_BIN=$(GOPATH)/bin/golangci-lint
-EMBEDMD_BIN=$(GOPATH)/bin/embedmd
-GOTEST_BIN=$(GOPATH)/bin/gotest
-GORELEASER_VERSION=v0.131.1
-GORELEASER_BIN=$(GOPATH)/bin/goreleaser
-LICHE_BIN=$(GOPATH)/bin/liche
+GOLANGCI_LINT_VERSION  = v1.21.0
+GOLANGCI_LINT_BIN      = $(GOPATH)/bin/golangci-lint
+EMBEDMD_BIN            = $(GOPATH)/bin/embedmd
+GOTEST_BIN             = $(GOPATH)/bin/gotest
+GORELEASER_VERSION     = v0.131.1
+GORELEASER_BIN         = $(GOPATH)/bin/goreleaser
+LICHE_BIN              = $(GOPATH)/bin/liche
 
 .PHONY: default all
 default: drone-cache
