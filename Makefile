@@ -11,6 +11,12 @@ GO_FILES              := $(shell find . -name \*.go -print)
 GOPATH                := $(firstword $(subst :, ,$(shell go env GOPATH)))
 GOBIN                 := $(GOPATH)/bin
 
+GOCMD                 := go
+GOBUILD               := $(GOCMD) build
+GOMOD                 := $(GOCMD) mod
+GOGET                 := $(GOCMD) get
+GOFMT                 := gofmt
+
 GOLANGCI_LINT_VERSION  = v1.21.0
 GOLANGCI_LINT_BIN      = $(GOBIN)/golangci-lint
 EMBEDMD_BIN            = $(GOBIN)/embedmd
@@ -18,6 +24,13 @@ GOTEST_BIN             = $(GOBIN)/gotest
 GORELEASER_VERSION     = v0.131.1
 GORELEASER_BIN         = $(GOBIN)/goreleaser
 LICHE_BIN              = $(GOBIN)/liche
+
+UPX                   := upx
+
+DOCKER                := docker
+DOCKER_BUILD          := $(DOCKER) build
+DOCKER_PUSH           := $(DOCKER) push
+DOCKER_COMPOSE        := docker-compose
 
 .PHONY: default all
 default: drone-cache
@@ -28,11 +41,11 @@ setup:
 	$(SCRIPTS)/setup_dev_environment.sh
 
 drone-cache: vendor main.go $(wildcard *.go) $(wildcard */*.go)
-	CGO_ENABLED=0 go build -mod=vendor -a -tags netgo -ldflags '-s -w -X main.version=$(VERSION)' -o $@ .
+	CGO_ENABLED=0 $(GOBUILD) -mod=vendor -a -tags netgo -ldflags '-s -w -X main.version=$(VERSION)' -o $@ .
 
 .PHONY: build
 build: main.go $(wildcard *.go) $(wildcard */*.go)
-	go build -mod=vendor -tags netgo -ldflags '-X main.version=$(VERSION)' -o drone-cache .
+	$(GOBUILD) -mod=vendor -tags netgo -ldflags '-X main.version=$(VERSION)' -o drone-cache .
 
 .PHONY: release
 release: drone-cache $(GORELEASER_BIN)
@@ -66,17 +79,17 @@ docs: clean README.md DOCS.md $(LICHE_BIN)
 
 .PHONY: vendor
 vendor:
-	@go mod tidy
-	@go mod vendor -v
+	@$(GOMOD) tidy
+	@$(GOMOD) vendor -v
 
 .PHONY: compress
 compress: drone-cache
 	# Add as dependency
-	@upx drone-cache
+	@$(UPX) drone-cache
 
 .PHONY: container
 container: release Dockerfile
-	@docker build --build-arg BUILD_DATE="$(BUILD_DATE)" \
+	@$(DOCKER_BUILD) --build-arg BUILD_DATE="$(BUILD_DATE)" \
 		--build-arg VERSION="$(VERSION)" \
 		--build-arg VCS_REF="$(VCS_REF)" \
 		--build-arg DOCKERFILE_PATH="/Dockerfile" \
@@ -84,7 +97,7 @@ container: release Dockerfile
 
 .PHONY: container-dev
 container-dev: snapshot Dockerfile
-	@docker build --build-arg BUILD_DATE="$(BUILD_DATE)" \
+	@$(DOCKER_BUILD) --build-arg BUILD_DATE="$(BUILD_DATE)" \
 		--build-arg VERSION="$(VERSION)" \
 		--build-arg VCS_REF="$(VCS_REF)" \
 		--build-arg DOCKERFILE_PATH="/Dockerfile" \
@@ -93,23 +106,23 @@ container-dev: snapshot Dockerfile
 
 .PHONY: container-push
 container-push: container
-	docker push meltwater/drone-cache:latest
+	$(DOCKER_PUSH) meltwater/drone-cache:latest
 
 .PHONY: container-push-dev
 container-push-dev: container-dev
-	docker push meltwater/drone-cache:dev
+	$(DOCKER_PUSH) meltwater/drone-cache:dev
 
 .PHONY: test
 test: $(GOTEST_BIN)
-	docker-compose up -d && sleep 1
+	$(DOCKER_COMPOSE) up -d && sleep 1
 	-$(GOTEST_BIN) -race -short -cover -failfast -tags=integration ./...
-	docker-compose down -v
+	$(DOCKER_COMPOSE) down -v
 
 .PHONY: test-integration
 test-integration: $(GOTEST_BIN)
-	docker-compose up -d && sleep 1
+	$(DOCKER_COMPOSE) up -d && sleep 1
 	-$(GOTEST_BIN) -race -cover -tags=integration -v ./...
-	docker-compose down -v
+	$(DOCKER_COMPOSE) down -v
 
 .PHONY: test-unit
 test-unit: $(GOTEST_BIN)
@@ -117,9 +130,9 @@ test-unit: $(GOTEST_BIN)
 
 .PHONY: test-e2e
 test-e2e: $(GOTEST_BIN)
-	docker-compose up -d && sleep 1
+	$(DOCKER_COMPOSE) up -d && sleep 1
 	-$(GOTEST_BIN) -race -cover -tags=integration -v ./internal/plugin
-	docker-compose down -v
+	$(DOCKER_COMPOSE) down -v
 
 .PHONY: lint
 lint: $(GOLANGCI_LINT_BIN)
@@ -132,13 +145,13 @@ fix: $(GOLANGCI_LINT_BIN) format
 
 .PHONY: format
 format:
-	@gofmt -w -s $(GO_FILES)
+	@$(GOFMT) -w -s $(GO_FILES)
 
 $(GOTEST_BIN):
-	GO111MODULE=off go get -u github.com/rakyll/gotest
+	GO111MODULE=off $(GOGET) -u github.com/rakyll/gotest
 
 $(EMBEDMD_BIN):
-	GO111MODULE=off go get -u github.com/campoy/embedmd
+	GO111MODULE=off $(GOGET) -u github.com/campoy/embedmd
 
 $(GOLANGCI_LINT_BIN):
 	curl -sfL https://raw.githubusercontent.com/golangci/golangci-lint/$(GOLANGCI_LINT_VERSION)/install.sh \
@@ -150,4 +163,4 @@ $(GORELEASER_BIN):
 		| VERSION=$(GORELEASER_VERSION) sh -s -- -b $(GOBIN) $(GORELEASER_VERSION)
 
 $(LICHE_BIN):
-	GO111MODULE=on go get -u github.com/raviqqe/liche
+	GO111MODULE=on $(GOGET) -u github.com/raviqqe/liche
