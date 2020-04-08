@@ -18,9 +18,6 @@ services:
     image: atmoz/sftp:alpine
     ports:
     - "22:22"
-    volumes:
-        - ./testdata/sftp_test:/home/foo/sftp_test
-        - ./testdata/plugin_test:/home/bar/plugin_test
     command: foo:pass:::sftp_test bar:pass:::plugin_test
   azurite:
     image: mcr.microsoft.com/azure-storage/azurite
