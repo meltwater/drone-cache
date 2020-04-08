@@ -1,0 +1,5 @@
+baseURL = "https://underthehood.meltwater.com/drone-cache"
+languageCode = "en-us"
+title = "drone-cache"
+publishDir = "../docs"
+theme = "book"
