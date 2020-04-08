@@ -54,7 +54,7 @@ var (
 		backend.FileSystem: setupFileSystem,
 		backend.GCS:        setupGCS,
 		backend.S3:         setupS3,
-		backend.SFTP:       setupSFTP,
+		// backend.SFTP:       setupSFTP,
 	}
 
 	formats = []string{
