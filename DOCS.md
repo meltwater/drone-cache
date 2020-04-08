@@ -228,6 +228,7 @@ steps:
         from_secret: aws_secret_access_key
     settings:
       rebuild: true
+      override: false
       cache_key: '{{ .Repo.Name }}_{{ checksum "go.mod" }}_{{ checksum "go.sum" }}_{{ arch }}_{{ os }}'
       bucket: drone-cache-bucket
       region: eu-west-1
@@ -332,6 +333,9 @@ cache_key
 
 archive_format
 : archive format to use to store the cache directories (`tar`, `gzip`) (default: `tar`)
+
+override
+: override already existing cache files (default: `true`)
 
 debug
 : enable debug

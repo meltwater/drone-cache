@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"os"
 	"path/filepath"
 
 	"github.com/go-kit/kit/log"
@@ -129,6 +130,39 @@ func (b *Backend) Put(ctx context.Context, p string, r io.Reader) error {
 		return err
 	case <-ctx.Done():
 		return ctx.Err()
+	}
+}
+
+// Exists checks if object already exists.
+func (b *Backend) Exists(ctx context.Context, p string) (bool, error) {
+	path, err := filepath.Abs(filepath.Clean(filepath.Join(b.cacheRoot, p)))
+	if err != nil {
+		return false, fmt.Errorf("generate absolute path, %w", err)
+	}
+
+	type result struct {
+		val bool
+		err error
+	}
+
+	resCh := make(chan *result)
+
+	go func() {
+		defer close(resCh)
+
+		_, err := b.client.Stat(path)
+		if err != nil && !os.IsNotExist(err) {
+			resCh <- &result{err: fmt.Errorf("check the object exists, %w", err)}
+			return
+		}
+		resCh <- &result{val: err == nil}
+	}()
+
+	select {
+	case res := <-resCh:
+		return res.val, res.err
+	case <-ctx.Done():
+		return false, ctx.Err()
 	}
 }
 

@@ -5,6 +5,7 @@ import "github.com/meltwater/drone-cache/key"
 type options struct {
 	namespace         string
 	fallbackGenerator key.Generator
+	override          bool
 }
 
 // Option overrides behavior of Archive.
@@ -29,5 +30,12 @@ func WithNamespace(s string) Option {
 func WithFallbackGenerator(g key.Generator) Option {
 	return optionFunc(func(o *options) {
 		o.fallbackGenerator = g
+	})
+}
+
+// WithOverride sets object should be overriten even if it already exists.
+func WithOverride(override bool) Option {
+	return optionFunc(func(o *options) {
+		o.override = override
 	})
 }

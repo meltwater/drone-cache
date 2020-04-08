@@ -20,6 +20,9 @@ type Storage interface {
 	// Put writes contents of io.Reader to remote storage at given key location.
 	Put(p string, r io.Reader) error
 
+	// Exists checks if object with given key exists in remote storage.
+	Exists(p string) (bool, error)
+
 	// List lists contents of the given directory by given key from remote storage.
 	List(p string) ([]backend.FileEntry, error)
 
@@ -54,6 +57,14 @@ func (s *storage) Put(p string, r io.Reader) error {
 	defer cancel()
 
 	return s.b.Put(ctx, p, r)
+}
+
+// Exists checks if object with given key exists in remote storage.
+func (s *storage) Exists(p string) (bool, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), s.timeout)
+	defer cancel()
+
+	return s.b.Exists(ctx, p)
 }
 
 // List lists contents of the given directory by given key from remote storage.

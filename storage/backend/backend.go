@@ -47,6 +47,9 @@ type Backend interface {
 	// Put uploads contents of the given reader.
 	Put(ctx context.Context, p string, r io.Reader) error
 
+	// Exists checks if path already exists.
+	Exists(ctx context.Context, p string) (bool, error)
+
 	// Implement me!
 	// List(ctx context.Context, p string) ([]FileEntry, error)
 

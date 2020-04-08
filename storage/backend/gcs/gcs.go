@@ -140,6 +140,42 @@ func (b *Backend) Put(ctx context.Context, p string, r io.Reader) error {
 	}
 }
 
+// Exists checks if object already exists.
+func (b *Backend) Exists(ctx context.Context, p string) (bool, error) {
+	type result struct {
+		val bool
+		err error
+	}
+
+	resCh := make(chan *result)
+
+	go func() {
+		defer close(resCh)
+
+		bkt := b.client.Bucket(b.bucket)
+		obj := bkt.Object(p)
+
+		if b.encryption != "" {
+			obj = obj.Key([]byte(b.encryption))
+		}
+
+		attrs, err := obj.Attrs(ctx)
+		if err != nil && err != gcstorage.ErrObjectNotExist {
+			resCh <- &result{err: fmt.Errorf("get the object attrs, %w", err)}
+			return
+		}
+
+		resCh <- &result{val: err == nil && attrs.Deleted.IsZero()}
+	}()
+
+	select {
+	case res := <-resCh:
+		return res.val, res.err
+	case <-ctx.Done():
+		return false, ctx.Err()
+	}
+}
+
 // Helpers
 
 func setAuthenticationMethod(l log.Logger, c Config, opts []option.ClientOption) []option.ClientOption {
