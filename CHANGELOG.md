@@ -7,17 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
-- Azure Storage Backend.
-
 ### Added
 
+- [#86](https://github.com/meltwater/drone-cache/pull/86) Add backend operation timeout option that cancels request if they take longer than given duration. `BACKEND_OPERATION_TIMEOUT`, `backend.operation-timeot`. Default value is `3 minutes`.
+- [#86](https://github.com/meltwater/drone-cache/pull/86) Customize the cache key in the path. Adds a new `remote_root` option to customize it. Defaults to `repo.name`.
+  - Fixes [#97](https://github.com/meltwater/drone-cache/issues/97).
+[#89](https://github.com/meltwater/drone-cache/pull/89) Add Azure Storage Backend.
 [#84](https://github.com/meltwater/drone-cache/pull/84) Adds compression level option.
-[#77](https://github.com/meltwater/drone-cache/pull/77) Adds a new CLI hidden flag to be used for tests.
+[#77](https://github.com/meltwater/drone-cache/pull/77) Adds a new hidden CLI flag to be used for tests.
+[#73](https://github.com/meltwater/drone-cache/pull/73) Add Google Cloud storage support
 [#68](https://github.com/meltwater/drone-cache/pull/68) Introduces new storage backend, sFTP.
 
 ### Changed
 
-- Nothing
+- [#86](https://github.com/meltwater/drone-cache/pull/86) Support multipart uploads.
+  - Fixes [#55](https://github.com/meltwater/drone-cache/issues/55).
+  - Fixes [#88](https://github.com/meltwater/drone-cache/issues/88).
+- [#86](https://github.com/meltwater/drone-cache/pull/86) Fixed rebuild errors when a nested path given in mount.
+  - Fixes [#87](https://github.com/meltwater/drone-cache/issues/87).
 
 ### Removed
 
