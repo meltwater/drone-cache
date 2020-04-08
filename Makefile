@@ -74,13 +74,13 @@ tmp/help.txt: drone-cache
 	mkdir -p tmp
 	$(ROOT_DIR)/drone-cache --help &> tmp/help.txt
 
-README.md: tmp/help.txt
+README.md: tmp/help.txt $(EMBEDMD_BIN)
 	$(EMBEDMD_BIN) -w README.md
 
 tmp/docs.txt: drone-cache
 	$(Q) echo "IMPLEMENT ME"
 
-DOCS.md: tmp/docs.txt
+DOCS.md: tmp/docs.txt $(EMBEDMD_BIN)
 	$(EMBEDMD_BIN) -w DOCS.md
 
 docs: ## Generates docs
