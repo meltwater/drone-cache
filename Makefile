@@ -4,15 +4,17 @@ VCS_REF               := $(strip $(shell [ -d .git ] && git rev-parse --short HE
 
 GO_PACKAGES            = $(shell go list ./... | grep -v -E '/vendor/|/test')
 GO_FILES              := $(shell find . -name \*.go -print)
+
 GOPATH                := $(firstword $(subst :, ,$(shell go env GOPATH)))
+GOBIN                 := $(GOPATH)/bin
 
 GOLANGCI_LINT_VERSION  = v1.21.0
-GOLANGCI_LINT_BIN      = $(GOPATH)/bin/golangci-lint
-EMBEDMD_BIN            = $(GOPATH)/bin/embedmd
-GOTEST_BIN             = $(GOPATH)/bin/gotest
+GOLANGCI_LINT_BIN      = $(GOBIN)/golangci-lint
+EMBEDMD_BIN            = $(GOBIN)/embedmd
+GOTEST_BIN             = $(GOBIN)/gotest
 GORELEASER_VERSION     = v0.131.1
-GORELEASER_BIN         = $(GOPATH)/bin/goreleaser
-LICHE_BIN              = $(GOPATH)/bin/liche
+GORELEASER_BIN         = $(GOBIN)/goreleaser
+LICHE_BIN              = $(GOBIN)/liche
 
 .PHONY: default all
 default: drone-cache
@@ -138,11 +140,11 @@ $(EMBEDMD_BIN):
 $(GOLANGCI_LINT_BIN):
 	curl -sfL https://raw.githubusercontent.com/golangci/golangci-lint/$(GOLANGCI_LINT_VERSION)/install.sh \
 		| sed -e '/install -d/d' \
-		| sh -s -- -b $(GOPATH)/bin $(GOLANGCI_LINT_VERSION)
+		| sh -s -- -b $(GOBIN) $(GOLANGCI_LINT_VERSION)
 
 $(GORELEASER_BIN):
 	curl -sfL https://install.goreleaser.com/github.com/goreleaser/goreleaser.sh \
-		| VERSION=$(GORELEASER_VERSION) sh -s -- -b $(GOPATH)/bin $(GORELEASER_VERSION)
+		| VERSION=$(GORELEASER_VERSION) sh -s -- -b $(GOBIN) $(GORELEASER_VERSION)
 
 $(LICHE_BIN):
 	GO111MODULE=on go get -u github.com/raviqqe/liche
