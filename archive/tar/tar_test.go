@@ -125,6 +125,11 @@ func TestExtract(t *testing.T) {
 	_, err = create(ta, filesWithSymlink, archiveWithSymlinkPath)
 	test.Ok(t, err)
 
+	filesWithSymlinkHidden := exampleFileTreeWithSymlinks(t, ".tar_extract_symlink")
+	archiveWithSymlinkHiddenPath := filepath.Join(arcDir, "test_with_symlink_hidden.tar")
+	_, err = create(ta, filesWithSymlinkHidden, archiveWithSymlinkHiddenPath)
+	test.Ok(t, err)
+
 	emptyArchivePath := filepath.Join(arcDir, "empty_test.tar")
 	_, err = create(ta, []string{}, emptyArchivePath)
 	test.Ok(t, err)
@@ -193,6 +198,14 @@ func TestExtract(t *testing.T) {
 			ta:          New(log.NewNopLogger(), testRootMounted, false),
 			archivePath: archiveWithSymlinkPath,
 			srcs:        filesWithSymlink,
+			written:     43,
+			err:         nil,
+		},
+		{
+			name:        "existing archive with hidden symbolic links",
+			ta:          New(log.NewNopLogger(), testRootMounted, false),
+			archivePath: archiveWithSymlinkHiddenPath,
+			srcs:        filesWithSymlinkHidden,
 			written:     43,
 			err:         nil,
 		},
