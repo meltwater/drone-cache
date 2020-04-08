@@ -31,11 +31,11 @@ build: main.go $(wildcard *.go) $(wildcard */*.go)
 
 .PHONY: release
 release: drone-cache $(GORELEASER_BIN)
-	${GORELEASER_BIN} release --rm-dist
+	$(GORELEASER_BIN) release --rm-dist
 
 .PHONY: snapshot
 snapshot: drone-cache $(GORELEASER_BIN)
-	${GORELEASER_BIN} release --skip-publish --rm-dist --snapshot
+	$(GORELEASER_BIN) release --skip-publish --rm-dist --snapshot
 
 .PHONY: clean
 clean:
@@ -47,15 +47,15 @@ tmp/help.txt: drone-cache
 	./drone-cache --help &> tmp/help.txt
 
 README.md: tmp/help.txt
-	${EMBEDMD_BIN} -w README.md
+	$(EMBEDMD_BIN) -w README.md
 
 tmp/docs.txt: drone-cache
 	@echo "IMPLEMENT ME"
 
 DOCS.md: tmp/docs.txt
-	${EMBEDMD_BIN} -w DOCS.md
+	$(EMBEDMD_BIN) -w DOCS.md
 
-docs: clean README.md DOCS.md ${LICHE_BIN}
+docs: clean README.md DOCS.md $(LICHE_BIN)
 	@$(LICHE_BIN) --recursive docs --document-root .
 	@$(LICHE_BIN) --exclude "(goreportcard.com)" --document-root . *.md
 
@@ -142,7 +142,7 @@ $(GOLANGCI_LINT_BIN):
 
 $(GORELEASER_BIN):
 	curl -sfL https://install.goreleaser.com/github.com/goreleaser/goreleaser.sh \
-		| VERSION=${GORELEASER_VERSION} sh -s -- -b $(GOPATH)/bin ${GORELEASER_VERSION}
+		| VERSION=$(GORELEASER_VERSION) sh -s -- -b $(GOPATH)/bin $(GORELEASER_VERSION)
 
-${LICHE_BIN}:
+$(LICHE_BIN):
 	GO111MODULE=on go get -u github.com/raviqqe/liche
