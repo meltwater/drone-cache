@@ -41,25 +41,31 @@ default: drone-cache
 all: drone-cache
 
 .PHONY: setup
+setup: ## Setups dev environment
 setup: ; $(info $(M) running setup )
 	$(Q) $(SCRIPTS)/setup_dev_environment.sh
 
+drone-cache: ## Runs drone-cache target
 drone-cache: vendor main.go $(wildcard *.go) $(wildcard */*.go) ; $(info $(M) running drone-cache )
 	$(Q) CGO_ENABLED=0 $(GOBUILD) -mod=vendor -a -tags netgo -ldflags '-s -w -X main.version=$(VERSION)' -o $@ .
 
 .PHONY: build
+build: ## Runs build target
 build: main.go $(wildcard *.go) $(wildcard */*.go) ; $(info $(M) running build )
 	$(Q) $(GOBUILD) -mod=vendor -tags netgo -ldflags '-X main.version=$(VERSION)' -o drone-cache .
 
 .PHONY: release
+release: ## Release dron-cache
 release: drone-cache $(GORELEASER_BIN) ; $(info $(M) running release )
 	$(Q) $(GORELEASER_BIN) release --rm-dist
 
 .PHONY: snapshot
+snapshot: ## Creates snapshot release without publishing it
 snapshot: drone-cache $(GORELEASER_BIN); $(info $(M) running snapshot )
 	$(Q) $(GORELEASER_BIN) release --skip-publish --rm-dist --snapshot
 
 .PHONY: clean
+clean: ## Cleans build resourcess
 clean: ; $(info $(M) running clean )
 	$(Q) rm -f drone-cache
 	$(Q) rm -rf target
@@ -77,21 +83,25 @@ tmp/docs.txt: drone-cache
 DOCS.md: tmp/docs.txt
 	$(EMBEDMD_BIN) -w DOCS.md
 
+docs: ## Generates docs
 docs: clean README.md DOCS.md $(LICHE_BIN)
 	$(Q) $(LICHE_BIN) --recursive docs --document-root .
 	$(Q) $(LICHE_BIN) --exclude "(goreportcard.com)" --document-root . *.md
 
 .PHONY: vendor
+vendor: ## Updates vendored copy of dependencies
 vendor: ; $(info $(M) running vendor )
 	$(Q) $(GOMOD) tidy
 	$(Q) $(GOMOD) vendor -v
 
 .PHONY: compress
+compress: ## Creates compressed binary
 compress: drone-cache ; $(info $(M) running compress )
 	# Add as dependency
 	$(Q) $(UPX) drone-cache
 
 .PHONY: container
+container: ## Builds drone-cache docker image with latest tag
 container: release Dockerfile ; $(info $(M) running container )
 	$(Q) $(DOCKER_BUILD) --build-arg BUILD_DATE="$(BUILD_DATE)" \
 		--build-arg VERSION="$(VERSION)" \
@@ -100,6 +110,7 @@ container: release Dockerfile ; $(info $(M) running container )
 		-t meltwater/drone-cache:latest .
 
 .PHONY: container-dev
+container-dev: ## Builds development drone-cache docker image
 container-dev: snapshot Dockerfile ; $(info $(M) running container-dev )
 	$(Q) $(DOCKER_BUILD) --build-arg BUILD_DATE="$(BUILD_DATE)" \
 		--build-arg VERSION="$(VERSION)" \
@@ -109,47 +120,64 @@ container-dev: snapshot Dockerfile ; $(info $(M) running container-dev )
 		-t meltwater/drone-cache:dev .
 
 .PHONY: container-push
+container-push: ## Pushes latest meltwater/drone-cache image to repository
 container-push: container ; $(info $(M) running container-push )
 	$(Q) $(DOCKER_PUSH) meltwater/drone-cache:latest
 
 .PHONY: container-push-dev
+container-push-dev: ## Pushes dev meltwater/drone-cache image to repository
 container-push-dev: container-dev ; $(info $(M) running container-push-dev )
 	$(Q) $(DOCKER_PUSH) meltwater/drone-cache:dev
 
 .PHONY: test
+test: ## Runs tests
 test: $(GOTEST_BIN) ; $(info $(M) running test)
 	$(DOCKER_COMPOSE) up -d && sleep 1
 	-$(GOTEST_BIN) -race -short -cover -failfast -tags=integration ./...
 	$(DOCKER_COMPOSE) down -v
 
 .PHONY: test-integration ; $(info $(M) running test-integration )
+test-integration: ## Runs integration tests
 test-integration: $(GOTEST_BIN)
 	$(DOCKER_COMPOSE) up -d && sleep 1
 	-$(GOTEST_BIN) -race -cover -tags=integration -v ./...
 	$(DOCKER_COMPOSE) down -v
 
 .PHONY: test-unit
+test-unit: ## Runs unit tests
 test-unit: $(GOTEST_BIN) ; $(info $(M) running test-unit )
 	$(GOTEST_BIN) -race -cover -benchmem -v ./...
 
 .PHONY: test-e2e
+test-e2e: ## Runs e2e tests
 test-e2e: $(GOTEST_BIN) ; $(info $(M) running test-e2e )
 	$(DOCKER_COMPOSE) up -d && sleep 1
 	-$(GOTEST_BIN) -race -cover -tags=integration -v ./internal/plugin
 	$(DOCKER_COMPOSE) down -v
 
 .PHONY: lint
+lint: ## Runs golangci-lint analysis
 lint: $(GOLANGCI_LINT_BIN) ; $(info $(M) running lint )
 	# Check .golangci.yml for configuration
 	$(Q) $(GOLANGCI_LINT_BIN) run -v --enable-all --skip-dirs tmp -c .golangci.yml
 
 .PHONY: fix
+fix: ## Runs golangci-lint fix
 fix: $(GOLANGCI_LINT_BIN) format ; $(info $(M) running fix )
 	$(Q) $(GOLANGCI_LINT_BIN) run --fix --enable-all --skip-dirs tmp -c .golangci.yml
 
 .PHONY: format
+format: ## Runs gofmt
 format: ; $(info $(M) running format )
 	$(Q) $(GOFMT) -w -s $(GO_FILES)
+
+.PHONY: help
+help: ## Shows this help message
+	$(Q) echo 'usage: make [target] ...'
+	$(Q) echo
+	$(Q) echo 'targets : '
+	$(Q) echo
+	$(Q) fgrep -h "##" $(MAKEFILE_LIST) | fgrep -v fgrep | sed -e 's/\\$$//' | sed -e 's/##//'| column -s: -t
 
 $(GOTEST_BIN): ; $(info $(M) getting gotest )
 	$(Q) GO111MODULE=off $(GOGET) -u github.com/rakyll/gotest
