@@ -53,9 +53,9 @@ drone-cache: vendor main.go $(wildcard *.go) $(wildcard */*.go) ; $(info $(M) ru
 	$(Q) CGO_ENABLED=0 $(GOBUILD) -a -ldflags '-s -w -X main.version=$(VERSION)' -o $@ .
 
 .PHONY: build
-build: ## Runs build target
-build: main.go $(wildcard *.go) $(wildcard */*.go) ; $(info $(M) running build )
-	$(Q) $(GOBUILD) -ldflags '-X main.version=$(VERSION)' -o drone-cache .
+build: ## Runs build target, always builds
+build: vendor main.go $(wildcard *.go) $(wildcard */*.go) ; $(info $(M) running build )
+	$(Q) CGO_ENABLED=0 $(GOBUILD) -ldflags '-X main.version=$(VERSION)' -o drone-cache .
 
 .PHONY: release
 release: ## Release dron-cache
@@ -80,7 +80,7 @@ tmp/help.txt: drone-cache
 
 tmp/make_help.txt: Makefile
 	mkdir -p tmp
-	make help &> tmp/make_help.txt
+	awk 'BEGIN {FS = ":.*##"; printf "\nUsage:\n  make <target>\n\nTargets:\n"} /^[a-zA-Z_-]+:.*?##/ { printf "  %-15s\t %s\n", $$1, $$2 }' $(MAKEFILE_LIST) &> tmp/make_help.txt
 
 README.md: tmp/help.txt tmp/make_help.txt $(EMBEDMD_BIN)
 	$(EMBEDMD_BIN) -w README.md
@@ -167,11 +167,7 @@ format: ; $(info $(M) running format )
 
 .PHONY: help
 help: ## Shows this help message
-	$(Q) echo 'usage: make [target] ...'
-	$(Q) echo
-	$(Q) echo 'targets : '
-	$(Q) echo
-	$(Q) fgrep -h "##" $(MAKEFILE_LIST) | fgrep -v fgrep | sed -e 's/\\$$//' | sed -e 's/##//'| column -s: -t
+	$(Q) awk 'BEGIN {FS = ":.*##"; printf "\nUsage:\n  make \033[36m<target>\033[0m\n\nTargets:\n"} /^[a-zA-Z_-]+:.*?##/ { printf "  \033[36m%-15s\033[0m\t %s\n", $$1, $$2 }' $(MAKEFILE_LIST)
 
 # Dependencies
 

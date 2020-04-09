@@ -116,7 +116,7 @@ USAGE:
    drone-cache [global options] command [command options] [arguments...]
 
 VERSION:
-   v1.1.0-rc0-dirty
+   v1.1.0-rc0-5-gd6e3a15-dirty
 
 COMMANDS:
    help, h  Shows a list of commands or help for one command
@@ -220,29 +220,30 @@ $ docker run --rm \
 
 [embedmd]:# (tmp/make_help.txt)
 ```txt
-usage: make [target] ...
 
-targets :
+Usage:
+  make <target>
 
-setup               Setups dev environment
-drone-cache         Runs drone-cache target
-build               Runs build target
-release             Release dron-cache
-snapshot            Creates snapshot release without publishing it
-clean               Cleans build resourcess
-docs                Generates docs
-vendor              Updates vendored copy of dependencies
-compress            Creates compressed binary
-container           Builds drone-cache docker image with latest tag
-container-push      Pushes latest $(DOCKER_REPO) image to repository
-test                Runs tests
-test-integration    Runs integration tests
-test-unit           Runs unit tests
-test-e2e            Runs e2e tests
-lint                Runs golangci-lint analysis
-fix                 Runs golangci-lint fix
-format              Runs gofmt
-help                Shows this help message
+Targets:
+  setup          	  Setups dev environment
+  drone-cache    	  Runs drone-cache target
+  build          	  Runs build target, always builds
+  release        	  Release dron-cache
+  snapshot       	  Creates snapshot release without publishing it
+  clean          	  Cleans build resourcess
+  docs           	  Generates docs
+  generate       	  Generate documentation, website and yaml files,
+  vendor         	  Updates vendored copy of dependencies
+  compress       	  Creates compressed binary
+  container      	  Builds drone-cache docker image with latest tag
+  container-push 	  Pushes latest $(DOCKER_REPO) image to repository
+  test           	  Runs tests
+  test-integration	  Runs integration tests
+  test-unit      	  Runs unit tests
+  lint           	  Runs golangci-lint analysis
+  fix            	  Runs golangci-lint fix
+  format         	  Runs gofmt
+  help           	  Shows this help message
 ```
 
 ## Releases
