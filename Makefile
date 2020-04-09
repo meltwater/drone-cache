@@ -32,6 +32,11 @@ DOCKER_BUILD          := $(DOCKER) build
 DOCKER_PUSH           := $(DOCKER) push
 DOCKER_COMPOSE        := docker-compose
 
+DOCKER_BUILD_ARGS     :=  --build-arg BUILD_DATE="$(BUILD_DATE)" \
+                          --build-arg VERSION="$(VERSION)" \
+                          --build-arg VCS_REF="$(VCS_REF)" \
+                          --build-arg DOCKERFILE_PATH="/Dockerfile"
+
 V                      = 0
 Q                      = $(if $(filter 1,$V),,@)
 M                      = $(shell printf "\033[34;1m▶\033[0m")
@@ -103,21 +108,12 @@ compress: drone-cache ; $(info $(M) running compress )
 .PHONY: container
 container: ## Builds drone-cache docker image with latest tag
 container: release Dockerfile ; $(info $(M) running container )
-	$(Q) $(DOCKER_BUILD) --build-arg BUILD_DATE="$(BUILD_DATE)" \
-		--build-arg VERSION="$(VERSION)" \
-		--build-arg VCS_REF="$(VCS_REF)" \
-		--build-arg DOCKERFILE_PATH="/Dockerfile" \
-		-t meltwater/drone-cache:latest .
+	$(Q) $(DOCKER_BUILD) $(DOCKER_BUILD_ARGS) -t meltwater/drone-cache:latest .
 
 .PHONY: container-dev
 container-dev: ## Builds development drone-cache docker image
 container-dev: snapshot Dockerfile ; $(info $(M) running container-dev )
-	$(Q) $(DOCKER_BUILD) --build-arg BUILD_DATE="$(BUILD_DATE)" \
-		--build-arg VERSION="$(VERSION)" \
-		--build-arg VCS_REF="$(VCS_REF)" \
-		--build-arg DOCKERFILE_PATH="/Dockerfile" \
-		--no-cache \
-		-t meltwater/drone-cache:dev .
+	$(Q) $(DOCKER_BUILD) $(DOCKER_BUILD_ARGS) --no-cache -t meltwater/drone-cache:dev .
 
 .PHONY: container-push
 container-push: ## Pushes latest meltwater/drone-cache image to repository
