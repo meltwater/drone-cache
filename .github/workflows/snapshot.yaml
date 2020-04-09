@@ -28,7 +28,6 @@ jobs:
         with:
           version: v0.131.1
           args: release --rm-dist --snapshot
-          key: ${{ secrets.GORELEASER_PRIVATE_KEY }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
