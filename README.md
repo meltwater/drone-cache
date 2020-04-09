@@ -50,8 +50,6 @@ With restored dependencies from a cache, commands like `mix deps.get` will only 
 
 The following example configuration file (`.drone.yml`) shows the most common use of drone-cache.
 
-Note: These configs use drone 1.0 syntax. If you are using drone 0.8, check the examples in [docs/examples/drone-0.8.md](docs/examples/drone-0.8.md).
-
 [//]: # (TODO: Move to a dedicated directory in docs, per backend!)
 ### Simple (with AWS S3 backend)
 
@@ -101,10 +99,9 @@ steps:
 
 ```
 
-### Other Examples
+### More Examples
 
-- examples for Drone 0.8, see [docs/examples/drone-0.8.md](docs/examples/drone-0.8.md)
-- examples for Drone 1.0, see [docs/examples/drone-1.0.md](docs/examples/drone-1.0.md)
+- examples for Drone, see [docs/examples/drone-1.0.md](docs/examples/drone.md)
 
 ## Usage
 
