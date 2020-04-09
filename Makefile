@@ -72,6 +72,7 @@ clean: ## Cleans build resourcess
 clean: ; $(info $(M) running clean )
 	$(Q) rm -f drone-cache
 	$(Q) rm -rf target
+	$(Q) rm -rf tmp
 
 tmp/help.txt: drone-cache
 	mkdir -p tmp
@@ -94,6 +95,10 @@ docs: ## Generates docs
 docs: clean README.md DOCS.md $(LICHE_BIN)
 	$(Q) $(LICHE_BIN) --recursive docs --document-root .
 	$(Q) $(LICHE_BIN) --exclude "(goreportcard.com)" --document-root . *.md
+
+generate: ## Generate documentation, website and yaml files,
+generate: docs # site
+	$(Q) echo "Generated!"
 
 .PHONY: vendor
 vendor: ## Updates vendored copy of dependencies

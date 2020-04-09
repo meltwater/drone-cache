@@ -48,6 +48,13 @@ steps:
   - name: testdata
     path: /drone/src/tmp/testdata/cache
 
+- name: generate
+  image: golang:1.14.1-alpine3.11
+  commands:
+  - apk add --update make git
+  - make generate
+  - git diff --exit-code
+
 - name: rebuild-cache
   image: meltwater/drone-cache:dev
   pull: always
