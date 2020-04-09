@@ -161,6 +161,7 @@ GLOBAL OPTIONS:
    --cache-key value                     cache key to use for the cache directories [$PLUGIN_CACHE_KEY]
    --remote-root value                   remote root directory to contain all the cache files created (default repo.name) [$PLUGIN_REMOTE_ROOT]
    --local-root value                    local root directory to base given mount paths (default pwd [present working directory]) [$PLUGIN_LOCAL_ROOT]
+   --override                            override even if cache key already exists in backend (default: true) [$PLUGIN_OVERRIDE]
    --archive-format value                archive format to use to store the cache directories (tar, gzip) (default: "tar") [$PLUGIN_ARCHIVE_FORMAT]
    --compression-level value             compression level to use for gzip compression when archive-format specified as gzip
                                              (check https://godoc.org/compress/flate#pkg-constants for available options) (default: -1) [$PLUGIN_COMPRESSION_LEVEL]
