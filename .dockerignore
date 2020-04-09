@@ -7,4 +7,10 @@
 .github
 vendor
 backup
+bin
+tmp
+test
+docs
+site
+scripts
 LICENSE
