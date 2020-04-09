@@ -77,7 +77,11 @@ tmp/help.txt: drone-cache
 	mkdir -p tmp
 	$(ROOT_DIR)/drone-cache --help &> tmp/help.txt
 
-README.md: tmp/help.txt $(EMBEDMD_BIN)
+tmp/make_help.txt: Makefile
+	mkdir -p tmp
+	make help &> tmp/make_help.txt
+
+README.md: tmp/help.txt tmp/make_help.txt $(EMBEDMD_BIN)
 	$(EMBEDMD_BIN) -w README.md
 
 tmp/docs.txt: drone-cache
@@ -164,7 +168,7 @@ help: ## Shows this help message
 	$(Q) echo
 	$(Q) fgrep -h "##" $(MAKEFILE_LIST) | fgrep -v fgrep | sed -e 's/\\$$//' | sed -e 's/##//'| column -s: -t
 
-### Dependencies
+# Dependencies
 
 $(GOTEST_BIN): ; $(info $(M) getting gotest )
 	$(Q) GO111MODULE=off $(GOGET) -u github.com/rakyll/gotest

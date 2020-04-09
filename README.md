@@ -1,6 +1,10 @@
 # drone-cache
 
-[![semver](https://img.shields.io/badge/semver-1.0.4-blue.svg?cacheSeconds=2592000)](https://github.com/meltwater/drone-cache/releases) [![Drone](https://cloud.drone.io/api/badges/meltwater/drone-cache/status.svg)](https://cloud.drone.io/meltwater/drone-cache) [![Maintenance](https://img.shields.io/maintenance/yes/2020.svg)](https://github.com/meltwater/drone-cache/commits/master) [![Go Doc](https://godoc.org/github.com/meltwater/drone-cache?status.svg)](http://godoc.org/github.com/meltwater/drone-cache) [![Go Report Card](https://goreportcard.com/badge/github.com/meltwater/drone-cache)](https://goreportcard.com/report/github.com/meltwater/drone-cache) [![codebeat badge](https://codebeat.co/badges/802c6149-ac2d-4514-8648-f618c63a8d9e)](https://codebeat.co/projects/github-com-meltwater-drone-cache-master) [![](https://images.microbadger.com/badges/image/meltwater/drone-cache.svg)](https://microbadger.com/images/meltwater/drone-cache) [![](https://images.microbadger.com/badges/version/meltwater/drone-cache.svg)](https://microbadger.com/images/meltwater/drone-cache)
+[![Latest Release](https://img.shields.io/github/release/meltwater/drone-cache.svg?)](https://github.com/meltwater/drone-cache/releases/latest) [![Maintenance](https://img.shields.io/maintenance/yes/2020.svg)](https://github.com/meltwater/drone-cache/commits/master) ![GitHub](https://img.shields.io/github/license/meltwater/drone-cache) [![Gitter](https://badges.gitter.im/drone-cache/community.svg)](https://gitter.im/drone-cache/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge) [![drone](https://cloud.drone.io/api/badges/meltwater/drone-cache/status.svg)](https://cloud.drone.io/meltwater/drone-cache) ![release](https://github.com/meltwater/drone-cache/workflows/release/badge.svg) ![snapshot](https://github.com/meltwater/drone-cache/workflows/snapshot/badge.svg)
+
+[![Go Doc](https://godoc.org/github.com/meltwater/drone-cache?status.svg)](http://godoc.org/github.com/meltwater/drone-cache) [![Go Code reference](https://img.shields.io/badge/code%20reference-go.dev-darkblue.svg)](https://pkg.go.dev/github.com/meltwater/drone-cache?tab=subdirectories) [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/2713/badge)](https://bestpractices.coreinfrastructure.org/projects/2713) [![Go Report Card](https://goreportcard.com/badge/github.com/meltwater/drone-cache)](https://goreportcard.com/report/github.com/meltwater/drone-cache) [![codebeat badge](https://codebeat.co/badges/802c6149-ac2d-4514-8648-f618c63a8d9e)](https://codebeat.co/projects/github-com-meltwater-drone-cache-master)
+
+[![meltwater/drone-cache on DockerHub](https://img.shields.io/badge/docker-ready-blue.svg)](https://hub.docker.com/r/meltwater/drone-cache) [![DockerHub Pulls](https://img.shields.io/docker/pulls/meltwater/drone-cache.svg)](https://hub.docker.com/r/meltwater/drone-cache) [![](https://images.microbadger.com/badges/image/meltwater/drone-cache.svg)](https://microbadger.com/images/meltwater/drone-cache) [![](https://images.microbadger.com/badges/version/meltwater/drone-cache.svg)](https://microbadger.com/images/meltwater/drone-cache)
 
 <p align="center"><img src="images/drone_gopher.png" width="400"></p>
 
@@ -49,7 +53,7 @@ The following example configuration file (`.drone.yml`) shows the most common us
 Note: These configs use drone 1.0 syntax. If you are using drone 0.8, check the examples in [docs/examples/drone-0.8.md](docs/examples/drone-0.8.md).
 
 [//]: # (TODO: Move to a dedicated directory in docs, per backend!)
-### Simple (Storing the cache in S3)
+### Simple (with AWS S3 backend)
 
 ```yaml
 kind: pipeline
@@ -115,7 +119,7 @@ USAGE:
    drone-cache [global options] command [command options] [arguments...]
 
 VERSION:
-   v1.0.4-36-g97fce2d
+   v1.1.0-rc0-dirty
 
 COMMANDS:
    help, h  Shows a list of commands or help for one command
@@ -217,32 +221,31 @@ $ docker run --rm \
 
 ## Development
 
-### Local set-up
+[embedmd]:# (tmp/make_help.txt)
+```txt
+usage: make [target] ...
 
-```console
-$ make setup
-```
+targets :
 
-### Tests
-
-```console
-$ make test
-```
-
-### Build Binary
-
-Build the binary with the following commands:
-
-```console
-$ make build
-```
-
-### Build Docker image
-
-Build the docker image with the following commands:
-
-```console
-$ make container
+setup               Setups dev environment
+drone-cache         Runs drone-cache target
+build               Runs build target
+release             Release dron-cache
+snapshot            Creates snapshot release without publishing it
+clean               Cleans build resourcess
+docs                Generates docs
+vendor              Updates vendored copy of dependencies
+compress            Creates compressed binary
+container           Builds drone-cache docker image with latest tag
+container-push      Pushes latest $(DOCKER_REPO) image to repository
+test                Runs tests
+test-integration    Runs integration tests
+test-unit           Runs unit tests
+test-e2e            Runs e2e tests
+lint                Runs golangci-lint analysis
+fix                 Runs golangci-lint fix
+format              Runs gofmt
+help                Shows this help message
 ```
 
 ## Releases
@@ -275,7 +278,6 @@ See the list of [all contributors](https://github.com/meltwater/drone-cache/grap
 - [github.com/bsm/drone-s3-cache](https://github.com/bsm/drone-s3-cache) (original work)
 - [github.com/Drillster/drone-volume-cache](https://github.com/Drillster/drone-volume-cache)
 - [github.com/drone/drone-cache-lib](https://github.com/drone/drone-cache-lib)
-  > From the version `v1.1.0` and forward, `drone-cache` conforms interfaces from `github.com/drone/drone-cache-lib`, with anticipation of [a future cache plugin interface in the configuration](https://github.com/drone/drone/issues/2060).
 
 ## Contributing
 
