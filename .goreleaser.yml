@@ -1,51 +1,63 @@
+project_name: drone-cache
 before:
   hooks:
     - make clean
     - make vendor
 dist: target/dist
 builds:
-  # TODO: -tags netgo
-- env:
-  - CGO_ENABLED=0
+-
   goos:
     - darwin
     - linux
-    # - windows
+    - windows
+    # github.com/mattn/go-ieproxy vendor/github.com/mattn/go-ieproxy/GetProxyFunc.go:10:9: undefined: proxyMiddleman
+    # - openbsd
+    # - freebsd
+    # - netbsd
+    # - dragonfly
   goarch:
     - 386
     - amd64
     - arm
     - arm64
   goarm:
-    - 5
     - 6
     - 7
+  env:
+    - CGO_ENABLED=0
+  flags:
+    -tags netgo
   ldflags: >
     -s
     -w
     -X main.Version={{.Version}}
-    -X main.DateBuilt={{.Date}}
+    -X main.Commit={{.ShortCommit}}
+    -X main.Date={{.Date}}
+  ignore:
+    - goos: darwin
+      goarch: 386
   hooks:
     post: find target/dist -name drone-cache -type f -exec upx {} +
 archives:
-  - id: tarball
+  -
+    id: tarball
     format: tar.gz
+    format_overrides:
+      - goos: windows
+        format: zip
+    wrap_in_directory: true
     replacements:
-      darwin: Darwin
-      linux: Linux
-      386: i386
-      amd64: x86_64
-    files:
-      - README.md
-      - CHANGELOG.md
-      - LICENSE
-  - id: zip
-    format: zip
-    replacements:
-      darwin: Darwin
-      linux: Linux
-      386: i386
-      amd64: x86_64
+      amd64: 64bit
+      386: 32bit
+      arm: ARM
+      arm64: ARM64
+      darwin: macOS
+      linux: linux
+      windows: windows
+      openbsd: openBSD
+      netbsd: netBSD
+      freebsd: freeBSD
+      dragonfly: dragonFlyBSD
     files:
       - README.md
       - CHANGELOG.md
@@ -53,7 +65,13 @@ archives:
 checksum:
   name_template: "{{ .ProjectName }}_{{ .Version }}_checksums.txt" # default
 snapshot:
-  name_template: "SNAPSHOT-{{.ShortCommit}}" # default
+  name_template: "{{ .Tag }}-SNAPSHOT-{{.ShortCommit}}" # default
+release:
+  github:
+    owner: meltwater
+    name: drone-cache
+  prerelease: auto # in case there is an indicator for this in the tag e.g. v1.0.0-rc1
+  draft: true
 changelog:
   sort: asc
   filters:
@@ -63,36 +81,43 @@ changelog:
     - '^test:'
     - Merge pull request
     - Merge branch
-release:
-  github:
-    owner: meltwater
-    name: drone-cache
-  prerelease: auto # in case there is an indicator for this in the tag e.g. v1.0.0-rc1
-  disable: false
+dockers:
+  -
+    goos: linux
+    goarch: amd64
+    goarm: ''
+    binaries:
+    - drone-cache
+    image_templates:
+    # TODO: Add missing GOOS and ARCH
+    # .Os	GOOS (usually allow replacements)
+    # .Arch	GOARCH (usually allow replacements)
+    # .Arm	GOARM (usually allow replacements)
+    # .Mips	GOMIPS (usually allow replacements)
+    - "meltwater/drone-cache:latest"
+    - "meltwater/drone-cache:{{ .Tag }}"
+    - "meltwater/drone-cache:v{{ .Major }}.{{ .Minor }}"
+    - "meltwater/drone-cache:v{{ .Major }}"
+    # - "docker.pkg.github.com/meltwater/drone-cache/drone-cache:latest"
+    # - "docker.pkg.github.com/meltwater/drone-cache/drone-cache:{{ .Tag }}"
+    # - "docker.pkg.github.com/meltwater/drone-cache/drone-cache:v{{ .Major }}.{{ .Minor }}"
+    # - "docker.pkg.github.com/meltwater/drone-cache/drone-cache:v{{ .Major }}"
 
-# NOTICE: To be able to run this stage in drone.io, we need Docker which runs in a container,
-# - and Docker needs a privileged container, so it's not possible for free tier right now.
-# TODO: Alternative: https://github.com/goreleaser/goreleaser-action
-# TODO: Add missing GOOS and ARCH
-# dockers:
-#   -
-#     goos: linux
-#     goarch: amd64
-#     goarm: ''
-#     binaries:
-#     - drone-cache
-#     image_templates:
-#     - "meltwater/drone-cache:latest"
-#     - "meltwater/drone-cache:{{ .Tag }}"
-#     - "meltwater/drone-cache:v{{ .Major }}.{{ .Minor }}"
-#     - "meltwater/drone-cache:v{{ .Major }}"
-#     # Skips the docker push. Could be useful if you also do draft releases.
-#     # If set to auto, the release will not be pushed to the docker repository
-#     # in case there is an indicator for prerelease in the tag e.g. v1.0.0-rc1
-#     # Defaults to false.
-#     skip_push: auto
-#     dockerfile: Dockerfile
-#     build_flag_templates:
-#     - "--label=org.label-schema.schema-version=1.0"
-#     - "--label=org.label-schema.version={{.Version}}"
-#     - "--label=org.label-schema.name={{.ProjectName}}"
+    # Skips the docker push. Could be useful if you also do draft releases.
+    # If set to auto, the release will not be pushed to the docker repository
+    # in case there is an indicator for prerelease in the tag e.g. v1.0.0-rc1
+    # Defaults to false.
+    skip_push: auto
+    dockerfile: Dockerfile
+    build_flag_templates:
+    - "--label=org.label-schema.schema-version=1.0"
+    - "--label=version={{.Version}}"
+    - "--label=org.label-schema.name={{.ProjectName}}"
+    - "--label=org.label-schema.version={{.Version}}"
+    - "--label=org.label-schema.build-date={{.Date}}"
+    - "--label=org.label-schema.vcs-ref={{.FullCommit}}"
+    - "--label=org.label-schema.docker.dockerfile=Dockerfile"
+    - "--label=org.opencontainers.image.name={{.ProjectName}}"
+    - "--label=org.opencontainers.image.version={{.Version}}"
+    - "--label=org.opencontainers.image.created={{.Date}}"
+    - "--label=org.opencontainers.image.revision={{.FullCommit}}"
