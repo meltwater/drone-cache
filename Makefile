@@ -32,6 +32,8 @@ DOCKER_BUILD          := $(DOCKER) build
 DOCKER_PUSH           := $(DOCKER) push
 DOCKER_COMPOSE        := docker-compose
 
+
+DOCKER_REPO           :=  meltwater/drone-cache
 DOCKER_BUILD_ARGS     :=  --build-arg BUILD_DATE="$(BUILD_DATE)" \
                           --build-arg VERSION="$(VERSION)" \
                           --build-arg VCS_REF="$(VCS_REF)" \
@@ -108,22 +110,22 @@ compress: drone-cache ; $(info $(M) running compress )
 .PHONY: container
 container: ## Builds drone-cache docker image with latest tag
 container: release Dockerfile ; $(info $(M) running container )
-	$(Q) $(DOCKER_BUILD) $(DOCKER_BUILD_ARGS) -t meltwater/drone-cache:latest .
+	$(Q) $(DOCKER_BUILD) $(DOCKER_BUILD_ARGS) -t $(DOCKER_REPO):latest .
 
 .PHONY: container-dev
 container-dev: ## Builds development drone-cache docker image
 container-dev: snapshot Dockerfile ; $(info $(M) running container-dev )
-	$(Q) $(DOCKER_BUILD) $(DOCKER_BUILD_ARGS) --no-cache -t meltwater/drone-cache:dev .
+	$(Q) $(DOCKER_BUILD) $(DOCKER_BUILD_ARGS) --no-cache -t $(DOCKER_REPO):dev .
 
 .PHONY: container-push
-container-push: ## Pushes latest meltwater/drone-cache image to repository
+container-push: ## Pushes latest $(DOCKER_REPO) image to repository
 container-push: container ; $(info $(M) running container-push )
-	$(Q) $(DOCKER_PUSH) meltwater/drone-cache:latest
+	$(Q) $(DOCKER_PUSH) $(DOCKER_REPO):latest
 
 .PHONY: container-push-dev
-container-push-dev: ## Pushes dev meltwater/drone-cache image to repository
+container-push-dev: ## Pushes dev $(DOCKER_REPO) image to repository
 container-push-dev: container-dev ; $(info $(M) running container-push-dev )
-	$(Q) $(DOCKER_PUSH) meltwater/drone-cache:dev
+	$(Q) $(DOCKER_PUSH) $(DOCKER_REPO):dev
 
 .PHONY: test
 test: ## Runs tests
