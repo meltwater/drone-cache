@@ -23,7 +23,7 @@ steps:
     - mc mb --region=eu-west-1 minio/drone-cache-bucket
 
 - name: build
-  image: golang:1.14.1-alpine3.11
+  image: golang:1.14.2-alpine3.11
   commands:
   - apk add --update make git
   - make drone-cache
@@ -31,7 +31,7 @@ steps:
     CGO_ENABLED: 0
 
 - name: lint
-  image: golang:1.14.1-alpine3.11
+  image: golang:1.14.2-alpine3.11
   commands:
   - apk add --update make git curl
   - make lint
@@ -39,7 +39,7 @@ steps:
     CGO_ENABLED: 0
 
 - name: test
-  image: golang:1.14.1-alpine3.11
+  image: golang:1.14.2-alpine3.11
   commands:
   - go test -mod=vendor -short -cover -tags=integration ./...
   environment:
