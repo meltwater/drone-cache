@@ -116,7 +116,7 @@ USAGE:
    drone-cache [global options] command [command options] [arguments...]
 
 VERSION:
-   v1.1.0-rc0-5-gd6e3a15-dirty
+   v1.1.0-rc0-5-g63b3af3-dirty
 
 COMMANDS:
    help, h  Shows a list of commands or help for one command
@@ -236,7 +236,7 @@ Targets:
   vendor         	  Updates vendored copy of dependencies
   compress       	  Creates compressed binary
   container      	  Builds drone-cache docker image with latest tag
-  container-push 	  Pushes latest $(DOCKER_REPO) image to repository
+  container-push 	  Pushes latest $(CONTAINER_REPO) image to repository
   test           	  Runs tests
   test-integration	  Runs integration tests
   test-unit      	  Runs unit tests

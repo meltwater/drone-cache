@@ -3,19 +3,19 @@ SCRIPTS               := $(ROOT_DIR)/scripts
 
 VERSION               := $(strip $(shell [ -d .git ] && git describe --always --tags --dirty))
 BUILD_DATE            := $(shell date -u +"%Y-%m-%dT%H:%M:%S%Z")
-VCS_REF               := $(strip $(shell [ -d .git ] && git rev-parse --short HEAD))
+VCS_REF               := $(strip $(shell [ -d .git ] && git rev-parse HEAD))
 
 GO_PACKAGES            = $(shell go list ./... | grep -v -E '/vendor/|/test')
 GO_FILES              := $(shell find . -name \*.go -print)
 
+GOBUILD               := go build -mod=vendor -tags netgo
+GOMOD                 := go mod
+GOFMT                 := gofmt
+
+LDFLAGS               := '-s -w -X main.version=$(VERSION) -X main.commit=$(VCS_REF) -X main.date=$(BUILD_DATE)'
+
 GOPATH                := $(firstword $(subst :, ,$(shell go env GOPATH)))
 GOBIN                 := $(GOPATH)/bin
-
-GOCMD                 := go
-GOBUILD               := $(GOCMD) build -mod=vendor -tags netgo
-GOMOD                 := $(GOCMD) mod
-GOGET                 := $(GOCMD) get
-GOFMT                 := gofmt
 
 GOLANGCI_LINT_VERSION  = v1.21.0
 GOLANGCI_LINT_BIN      = $(GOBIN)/golangci-lint
@@ -32,8 +32,7 @@ DOCKER_BUILD          := $(DOCKER) build
 DOCKER_PUSH           := $(DOCKER) push
 DOCKER_COMPOSE        := docker-compose
 
-
-DOCKER_REPO           :=  meltwater/drone-cache
+CONTAINER_REPO        :=  meltwater/drone-cache
 
 V                      = 0
 Q                      = $(if $(filter 1,$V),,@)
@@ -50,12 +49,12 @@ setup: ; $(info $(M) running setup )
 
 drone-cache: ## Runs drone-cache target
 drone-cache: vendor main.go $(wildcard *.go) $(wildcard */*.go) ; $(info $(M) running drone-cache )
-	$(Q) CGO_ENABLED=0 $(GOBUILD) -a -ldflags '-s -w -X main.version=$(VERSION)' -o $@ .
+	$(Q) CGO_ENABLED=0 $(GOBUILD) -a -ldflags $(LDFLAGS) -o $@ .
 
 .PHONY: build
 build: ## Runs build target, always builds
 build: vendor main.go $(wildcard *.go) $(wildcard */*.go) ; $(info $(M) running build )
-	$(Q) CGO_ENABLED=0 $(GOBUILD) -ldflags '-X main.version=$(VERSION)' -o drone-cache .
+	$(Q) CGO_ENABLED=0 $(GOBUILD) -ldflags $(LDFLAGS) -o drone-cache .
 
 .PHONY: release
 release: ## Release dron-cache
@@ -75,12 +74,12 @@ clean: ; $(info $(M) running clean )
 	$(Q) rm -rf tmp
 
 tmp/help.txt: drone-cache
-	mkdir -p tmp
+	-mkdir -p tmp
 	$(ROOT_DIR)/drone-cache --help &> tmp/help.txt
 
 tmp/make_help.txt: Makefile
-	mkdir -p tmp
-	awk 'BEGIN {FS = ":.*##"; printf "\nUsage:\n  make <target>\n\nTargets:\n"} /^[a-zA-Z_-]+:.*?##/ { printf "  %-15s\t %s\n", $$1, $$2 }' $(MAKEFILE_LIST) &> tmp/make_help.txt
+	-mkdir -p tmp
+	$(Q) awk 'BEGIN {FS = ":.*##"; printf "\nUsage:\n  make <target>\n\nTargets:\n"} /^[a-zA-Z_-]+:.*?##/ { printf "  %-15s\t %s\n", $$1, $$2 }' $(MAKEFILE_LIST) &> tmp/make_help.txt
 
 README.md: tmp/help.txt tmp/make_help.txt $(EMBEDMD_BIN)
 	$(EMBEDMD_BIN) -w README.md
@@ -115,13 +114,12 @@ compress: drone-cache ; $(info $(M) running compress )
 .PHONY: container
 container: ## Builds drone-cache docker image with latest tag
 container: release Dockerfile ; $(info $(M) running container )
-	$(Q) $(DOCKER_BUILD) -t $(DOCKER_REPO):dev .
-
+	$(Q) $(DOCKER_BUILD) -t $(CONTAINER_REPO):dev .
 
 .PHONY: container-push
-container-push: ## Pushes latest $(DOCKER_REPO) image to repository
+container-push: ## Pushes latest $(CONTAINER_REPO) image to repository
 container-push: container ; $(info $(M) running container-push )
-	$(Q) $(DOCKER_PUSH) $(DOCKER_REPO):dev
+	$(Q) $(DOCKER_PUSH) $(CONTAINER_REPO):dev
 
 .PHONY: test
 test: ## Runs tests
@@ -172,10 +170,13 @@ help: ## Shows this help message
 # Dependencies
 
 $(GOTEST_BIN): ; $(info $(M) getting gotest )
-	$(Q) GO111MODULE=off $(GOGET) -u github.com/rakyll/gotest
+	$(Q) $(GOBUILD) -o $@ github.com/rakyll/gotest
 
 $(EMBEDMD_BIN): ; $(info $(M) getting embedmd )
-	$(Q) GO111MODULE=off $(GOGET) -u github.com/campoy/embedmd
+	$(Q) $(GOBUILD) -o $@ github.com/campoy/embedmd
+
+$(LICHE_BIN): ; $(info $(M) getting liche )
+	$(Q) $(GOBUILD) -o $@ github.com/raviqqe/liche
 
 $(GOLANGCI_LINT_BIN): ; $(info $(M) getting golangci-lint )
 	$(Q) curl -sfL https://raw.githubusercontent.com/golangci/golangci-lint/$(GOLANGCI_LINT_VERSION)/install.sh \
@@ -185,6 +186,3 @@ $(GOLANGCI_LINT_BIN): ; $(info $(M) getting golangci-lint )
 $(GORELEASER_BIN): ; $(info $(M) getting goreleaser )
 	$(Q) curl -sfL https://install.goreleaser.com/github.com/goreleaser/goreleaser.sh \
 		| VERSION=$(GORELEASER_VERSION) sh -s -- -b $(GOBIN) $(GORELEASER_VERSION)
-
-$(LICHE_BIN): ; $(info $(M) getting liche )
-	$(Q) GO111MODULE=on $(GOGET) -u github.com/raviqqe/liche
