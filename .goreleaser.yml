@@ -48,17 +48,18 @@ archives:
         format: zip
     wrap_in_directory: true
     replacements:
-      amd64: 64bit
-      386: 32bit
-      arm: ARM
-      arm64: ARM64
-      darwin: macOS
-      linux: linux
-      windows: windows
-      openbsd: openBSD
-      netbsd: netBSD
-      freebsd: freeBSD
-      dragonfly: dragonFlyBSD
+      # https://en.wikipedia.org/wiki/Uname
+      # uname -m compatible.
+      amd64: x86_64
+      386: i386
+      # uname -s compatible.
+      darwin: Darwin
+      linux: Linux
+      windows: Windows
+      openbsd: OpenBSD
+      netbsd: NetBSD
+      freebsd: FreeBSD
+      dragonfly: DragonFly
     files:
       - README.md
       - CHANGELOG.md
