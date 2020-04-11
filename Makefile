@@ -40,7 +40,8 @@ all: drone-cache
 
 .PHONY: setup
 setup: ## Setups dev environment
-setup: install-tools ; $(info $(M) running setup )
+setup: vendor ; $(info $(M) running setup for development )
+	$(Q) make $(GOTEST_BIN) $(EMBEDMD_BIN) $(LICHE_BIN) $(GOLANGCI_LINT_BIN)
 
 drone-cache: ## Runs drone-cache target
 drone-cache: vendor main.go $(wildcard *.go) $(wildcard */*.go) ; $(info $(M) running drone-cache )
@@ -151,11 +152,6 @@ format: ; $(info $(M) running format )
 .PHONY: help
 help: ## Shows this help message
 	$(Q) awk 'BEGIN {FS = ":.*##"; printf "\nUsage:\n  make \033[36m<target>\033[0m\n\nTargets:\n"} /^[a-zA-Z_-]+:.*?##/ { printf "  \033[36m%-15s\033[0m\t %s\n", $$1, $$2 }' $(MAKEFILE_LIST)
-
-.PHONY: install-tools
-install-tools: ## Install tools
-install-tools: vendor ; $(info $(M) installing tools)
-	$(Q) make $(GOTEST_BIN) $(EMBEDMD_BIN) $(LICHE_BIN) $(GOLANGCI_LINT_BIN)
 
 # Dependencies
 

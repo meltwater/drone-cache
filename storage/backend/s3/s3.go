@@ -132,7 +132,7 @@ func (b *Backend) Exists(ctx context.Context, p string) (bool, error) {
 		return false, fmt.Errorf("head the object, %w", err)
 	}
 
-	// Normaly if file not exists it will be already detected by error above but in some cases
+	// Normally if file not exists it will be already detected by error above but in some cases
 	// Minio can return success status for without ETag, detect that here.
 	return *out.ETag != "", nil
 }

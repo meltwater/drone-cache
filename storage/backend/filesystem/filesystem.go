@@ -127,5 +127,6 @@ func (b *Backend) Exists(ctx context.Context, p string) (bool, error) {
 	if err != nil && !os.IsNotExist(err) {
 		return false, fmt.Errorf("check the object exists, %w", err)
 	}
+
 	return err == nil, nil
 }

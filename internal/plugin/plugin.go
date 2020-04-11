@@ -42,7 +42,7 @@ func New(logger log.Logger) *Plugin {
 }
 
 // Exec entry point of Plugin, where the magic happens.
-func (p *Plugin) Exec() error {
+func (p *Plugin) Exec() error { //nolint:funlen
 	cfg := p.Config
 
 	// 1. Check parameters

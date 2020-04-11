@@ -125,7 +125,9 @@ func relative(parent string, path string) (string, error) {
 	for strings.HasPrefix(rel, "../") {
 		rel = strings.TrimPrefix(rel, "../")
 	}
+
 	rel = filepath.ToSlash(rel)
+
 	return strings.TrimPrefix(filepath.Join(rel, name), "/"), nil
 }
 

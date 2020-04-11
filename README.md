@@ -228,8 +228,6 @@ Targets:
   setup          	  Setups dev environment
   drone-cache    	  Runs drone-cache target
   build          	  Runs build target, always builds
-  release        	  Release dron-cache
-  snapshot       	  Creates snapshot release without publishing it
   clean          	  Cleans build resourcess
   docs           	  Generates docs
   generate       	  Generate documentation, website and yaml files,
