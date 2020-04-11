@@ -10,6 +10,11 @@ clone:
   depth: 50
 
 steps:
+# This is needed for the tags. And the tags are needed to determine version.
+- name: fetch
+  image: docker:git
+  commands:
+  - git fetch --tags
 - name: configure-buckets
   image: minio/mc:RELEASE.2018-09-26T00-42-43Z
   commands:
@@ -52,7 +57,7 @@ steps:
   image: golang:1.14.1-alpine3.11
   commands:
   - apk add --update make git
-  - make generate
+  - env -i make PATH=$PATH HOME=$HOME PWD=$PWD GOPATH=$GOPATH generate
   - git diff --exit-code
 
 - name: rebuild-cache

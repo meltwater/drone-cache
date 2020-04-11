@@ -1,7 +1,8 @@
 ROOT_DIR              := $(CURDIR)
 SCRIPTS               := $(ROOT_DIR)/scripts
 
-VERSION               := $(strip $(shell [ -d .git ] && git describe --always --tags --dirty))
+VERSION               := $(strip $(shell [ -d .git ] && git describe --abbrev=0))
+LONG_VERSION          := $(strip $(shell [ -d .git ] && git describe --always --tags --dirty))
 BUILD_DATE            := $(shell date -u +"%Y-%m-%dT%H:%M:%S%Z")
 VCS_REF               := $(strip $(shell [ -d .git ] && git rev-parse HEAD))
 
