@@ -1,5 +1,4 @@
 ROOT_DIR              := $(CURDIR)
-SCRIPTS               := $(ROOT_DIR)/scripts
 
 VERSION               := $(strip $(shell [ -d .git ] && git describe --abbrev=0))
 LONG_VERSION          := $(strip $(shell [ -d .git ] && git describe --always --tags --dirty))
@@ -10,21 +9,17 @@ GO_PACKAGES            = $(shell go list ./... | grep -v -E '/vendor/|/test')
 GO_FILES              := $(shell find . -name \*.go -print)
 
 GOBUILD               := go build -mod=vendor -tags netgo
+GOINSTALL             := go install -mod=vendor -tags netgo
 GOMOD                 := go mod
 GOFMT                 := gofmt
-
 LDFLAGS               := '-s -w -X main.version=$(VERSION) -X main.commit=$(VCS_REF) -X main.date=$(BUILD_DATE)'
 
-GOPATH                := $(firstword $(subst :, ,$(shell go env GOPATH)))
-GOBIN                 := $(GOPATH)/bin
+BIN_DIR               ?= $(ROOT_DIR)/tmp/bin
 
-GOLANGCI_LINT_VERSION  = v1.21.0
-GOLANGCI_LINT_BIN      = $(GOBIN)/golangci-lint
-EMBEDMD_BIN            = $(GOBIN)/embedmd
-GOTEST_BIN             = $(GOBIN)/gotest
-GORELEASER_VERSION     = v0.131.1
-GORELEASER_BIN         = $(GOBIN)/goreleaser
-LICHE_BIN              = $(GOBIN)/liche
+GOLANGCI_LINT_BIN      = $(BIN_DIR)/golangci-lint
+EMBEDMD_BIN            = $(BIN_DIR)/embedmd
+GOTEST_BIN             = $(BIN_DIR)/gotest
+LICHE_BIN              = $(BIN_DIR)/liche
 
 UPX                   := upx
 
@@ -33,7 +28,7 @@ DOCKER_BUILD          := $(DOCKER) build
 DOCKER_PUSH           := $(DOCKER) push
 DOCKER_COMPOSE        := docker-compose
 
-CONTAINER_REPO        :=  meltwater/drone-cache
+CONTAINER_REPO        ?=  meltwater/drone-cache
 
 V                      = 0
 Q                      = $(if $(filter 1,$V),,@)
@@ -45,8 +40,7 @@ all: drone-cache
 
 .PHONY: setup
 setup: ## Setups dev environment
-setup: ; $(info $(M) running setup )
-	$(Q) $(SCRIPTS)/setup_dev_environment.sh
+setup: install-tools ; $(info $(M) running setup )
 
 drone-cache: ## Runs drone-cache target
 drone-cache: vendor main.go $(wildcard *.go) $(wildcard */*.go) ; $(info $(M) running drone-cache )
@@ -56,16 +50,6 @@ drone-cache: vendor main.go $(wildcard *.go) $(wildcard */*.go) ; $(info $(M) ru
 build: ## Runs build target, always builds
 build: vendor main.go $(wildcard *.go) $(wildcard */*.go) ; $(info $(M) running build )
 	$(Q) CGO_ENABLED=0 $(GOBUILD) -ldflags $(LDFLAGS) -o drone-cache .
-
-.PHONY: release
-release: ## Release dron-cache
-release: drone-cache $(GORELEASER_BIN) ; $(info $(M) running release )
-	$(Q) $(GORELEASER_BIN) release --rm-dist
-
-.PHONY: snapshot
-snapshot: ## Creates snapshot release without publishing it
-snapshot: drone-cache $(GORELEASER_BIN); $(info $(M) running snapshot )
-	$(Q) $(GORELEASER_BIN) release --skip-publish --rm-dist --snapshot
 
 .PHONY: clean
 clean: ## Cleans build resourcess
@@ -168,6 +152,11 @@ format: ; $(info $(M) running format )
 help: ## Shows this help message
 	$(Q) awk 'BEGIN {FS = ":.*##"; printf "\nUsage:\n  make \033[36m<target>\033[0m\n\nTargets:\n"} /^[a-zA-Z_-]+:.*?##/ { printf "  \033[36m%-15s\033[0m\t %s\n", $$1, $$2 }' $(MAKEFILE_LIST)
 
+.PHONY: install-tools
+install-tools: ## Install tools
+install-tools: vendor ; $(info $(M) installing tools)
+	$(Q) make $(GOTEST_BIN) $(EMBEDMD_BIN) $(LICHE_BIN) $(GOLANGCI_LINT_BIN)
+
 # Dependencies
 
 $(GOTEST_BIN): ; $(info $(M) getting gotest )
@@ -180,10 +169,4 @@ $(LICHE_BIN): ; $(info $(M) getting liche )
 	$(Q) $(GOBUILD) -o $@ github.com/raviqqe/liche
 
 $(GOLANGCI_LINT_BIN): ; $(info $(M) getting golangci-lint )
-	$(Q) curl -sfL https://raw.githubusercontent.com/golangci/golangci-lint/$(GOLANGCI_LINT_VERSION)/install.sh \
-		| sed -e '/install -d/d' \
-		| sh -s -- -b $(GOBIN) $(GOLANGCI_LINT_VERSION)
-
-$(GORELEASER_BIN): ; $(info $(M) getting goreleaser )
-	$(Q) curl -sfL https://install.goreleaser.com/github.com/goreleaser/goreleaser.sh \
-		| VERSION=$(GORELEASER_VERSION) sh -s -- -b $(GOBIN) $(GORELEASER_VERSION)
+	$(Q) $(GOBUILD) -o $@ github.com/golangci/golangci-lint/cmd/golangci-lint
