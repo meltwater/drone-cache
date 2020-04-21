@@ -102,6 +102,8 @@ steps:
   - name: restore-cache
     image: meltwater/drone-cache:dev
     environment:
+      # leaving these variables unset will default to using instance profile credentials
+      # when running in EC2 or IAM Roles for Service Accounts, if configured, in Kubernetes
       AWS_ACCESS_KEY_ID:
         from_secret: aws_access_key_id
       AWS_SECRET_ACCESS_KEY:
