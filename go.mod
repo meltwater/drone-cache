@@ -4,7 +4,7 @@ require (
 	cloud.google.com/go/storage v1.1.0
 	github.com/Azure/azure-storage-blob-go v0.8.0
 	github.com/Azure/go-autorest/autorest/adal v0.8.1 // indirect
-	github.com/aws/aws-sdk-go v1.16.35
+	github.com/aws/aws-sdk-go v1.23.13
 	github.com/campoy/embedmd v1.0.0
 	github.com/dustin/go-humanize v1.0.0
 	github.com/go-kit/kit v0.9.0
