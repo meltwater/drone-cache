@@ -65,7 +65,7 @@ tmp/help.txt: drone-cache
 
 tmp/make_help.txt: Makefile
 	-mkdir -p tmp
-	$(Q) awk 'BEGIN {FS = ":.*##"; printf "\nUsage:\n  make <target>\n\nTargets:\n"} /^[a-zA-Z_-]+:.*?##/ { printf "  %-15s\t %s\n", $$1, $$2 }' $(MAKEFILE_LIST) &> tmp/make_help.txt
+	$(Q) awk 'BEGIN {FS = ":.*##"; printf "Usage:\n  make <target>\n\nTargets:\n"} /^[a-zA-Z_-]+:.*?##/ { printf "  %-15s\t %s\n", $$1, $$2 }' $(MAKEFILE_LIST) &> tmp/make_help.txt
 
 README.md: tmp/help.txt tmp/make_help.txt $(EMBEDMD_BIN)
 	$(EMBEDMD_BIN) -w README.md
