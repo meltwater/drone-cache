@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"net/http"
 	"net/url"
 
@@ -113,17 +114,14 @@ func (b *Backend) Get(ctx context.Context, p string, w io.Writer) (err error) {
 func (b *Backend) Put(ctx context.Context, p string, r io.Reader) error {
 	b.logger.Log("msg", "uploading the file with blob", "name", p)
 
-	blobURL := b.containerURL.NewBlockBlobURL(p)
-	if _, err := azblob.UploadStreamToBlockBlob(ctx, r, blobURL,
-		azblob.UploadStreamToBlockBlobOptions{
-			BufferSize: defaultBufferSize,
-			MaxBuffers: defaultMaxBuffers,
-		},
-	); err != nil {
-		return fmt.Errorf("put the object, %w", err)
+	m, err := ioutil.ReadAll(r)
+	if err != nil {
+		return fmt.Errorf("read cache stream, %w", err)
 	}
 
-	return nil
+	blobURL := b.containerURL.NewBlockBlobURL(p)
+	_, err = azblob.UploadBufferToBlockBlob(ctx, m, blobURL, azblob.UploadToBlockBlobOptions{})
+	return err
 }
 
 // Exists checks if path already exists.
