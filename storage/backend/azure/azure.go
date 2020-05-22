@@ -18,8 +18,8 @@ const (
 	// DefaultBlobMaxRetryRequests TODO
 	DefaultBlobMaxRetryRequests = 4
 
-	defaultBufferSize = 3 * 1024 * 1024
-	defaultMaxBuffers = 4
+	// defaultBufferSize = 3 * 1024 * 1024
+	// defaultMaxBuffers = 4
 )
 
 // Backend TODO
@@ -120,6 +120,7 @@ func (b *Backend) Put(ctx context.Context, p string, r io.Reader) error {
 
 	blobURL := b.containerURL.NewBlockBlobURL(p)
 	_, err = azblob.UploadBufferToBlockBlob(ctx, m, blobURL, azblob.UploadToBlockBlobOptions{})
+
 	return err
 }
 
