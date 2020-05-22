@@ -79,7 +79,6 @@ func New(l log.Logger, c Config) (*Backend, error) {
 
 // Get writes downloaded content to the given writer.
 func (b *Backend) Get(ctx context.Context, p string, w io.Writer) (err error) {
-	b.logger.Log("msg", "!!!this is fucking correct version")
 	errCh := make(chan error)
 
 	go func() {
