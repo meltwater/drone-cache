@@ -26,6 +26,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Fixes [#88](https://github.com/meltwater/drone-cache/issues/88).
 - [#86](https://github.com/meltwater/drone-cache/pull/86) Fixed rebuild errors when a nested path given in mount.
   - Fixes [#87](https://github.com/meltwater/drone-cache/issues/87).
+- [120](https://github.com/meltwater/drone-cache/pull/121) 
 
 ### Removed
 
