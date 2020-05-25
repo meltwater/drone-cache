@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+[#119] (https://github.com/meltwater/drone-cache/pull/119) Add support for page upload for azure
+
 ### Added
 
 - [#102](https://github.com/meltwater/drone-cache/pull/102) Implement option to disable cache rebuild if it already exists in storage.
