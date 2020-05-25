@@ -219,8 +219,8 @@ $ docker run --rm \
 ## Development
 
 [embedmd]:# (tmp/make_help.txt)
-```txt
 
+```txt
 Usage:
   make <target>
 
