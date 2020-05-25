@@ -213,7 +213,7 @@ services:
   ports:
   - 9000
 - name: fakegcs
-  image: fsouza/fake-gcs-server
+  image: fsouza/fake-gcs-server:1.18.3
   ports:
     - 4443
   commands:
