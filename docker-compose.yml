@@ -10,7 +10,7 @@ services:
       - 9000:9000
     command: server /data
   fake-gcs:
-    image: fsouza/fake-gcs-server
+    image: fsouza/fake-gcs-server:1.18.3
     ports:
       - 4443:4443
     command: -public-host localhost -scheme http
