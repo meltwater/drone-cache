@@ -60,6 +60,27 @@ steps:
   - env -i make PATH=$PATH HOME=$HOME PWD=$PWD GOPATH=$GOPATH generate
   - git diff --exit-code
 
+- name: release-docker-dev
+  image: plugins/docker
+  settings:
+    build_args_from_env:
+      - BUILD_DATE
+      - DOCKERFILE_PATH
+      - VCS_REF
+      - VERSION
+    dockerfile: docker/Dockerfile.linux.386
+    environment:
+      - "BUILD_DATE=$(date -u +\"%Y-%m-%dT%H:%M:%S%Z\")"
+      - "DOCKERFILE_PATH=\"/docker/Dockerfile.linux.386\""
+      - VCS_REF=$(git rev-parse --short HEAD)
+      - VERSION=$(git describe --always --tags --dirty)
+    password:
+      from_secret: docker_password
+    repo: meltwater/drone-cache
+    tags: dev
+    username:
+      from_secret: docker_username
+
 - name: rebuild-cache
   image: meltwater/drone-cache:dev
   pull: always
