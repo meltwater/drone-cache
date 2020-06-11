@@ -45,7 +45,7 @@ setup: vendor ; $(info $(M) running setup for development )
 
 drone-cache: ## Runs drone-cache target
 drone-cache: vendor main.go $(wildcard *.go) $(wildcard */*.go) ; $(info $(M) running drone-cache )
-	$(Q) CGO_ENABLED=0 $(GOBUILD) -a -ldflags $(LDFLAGS) -o $@ .
+	$(Q) CGO_ENABLED=0 GOOS=linux GOARCH=amd64 $(GOBUILD) -a -ldflags $(LDFLAGS) -o $@ .
 
 .PHONY: build
 build: ## Runs build target, always builds
@@ -99,7 +99,7 @@ compress: drone-cache ; $(info $(M) running compress )
 
 .PHONY: container
 container: ## Builds drone-cache docker image with latest tag
-container: release Dockerfile ; $(info $(M) running container )
+container: drone-cache Dockerfile ; $(info $(M) running container )
 	$(Q) $(DOCKER_BUILD) -t $(CONTAINER_REPO):dev .
 
 .PHONY: container-push

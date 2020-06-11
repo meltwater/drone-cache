@@ -27,6 +27,12 @@ jobs:
         name: Set up UPX
         run: sudo apt-get update && sudo apt-get install upx-ucl
       -
+        name: Login to Docker Registry
+        run: docker login --username $DOCKER_USERNAME --password $DOCKER_PASSWORD
+         env:
+           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+      -
         name: Run GoReleaser for Release
         uses: goreleaser/goreleaser-action@v1
         with:
@@ -36,4 +42,3 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-          DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
