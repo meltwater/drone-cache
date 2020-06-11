@@ -31,9 +31,9 @@ jobs:
       -
         name: Login to Docker Registry
         run: docker login --username $DOCKER_USERNAME --password $DOCKER_PASSWORD
-          env:
-            DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-            DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
       -
         name: Run GoReleaser for Snapshot
         uses: goreleaser/goreleaser-action@v1
