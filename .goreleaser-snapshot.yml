@@ -39,6 +39,29 @@ builds:
   hooks:
     # Ignores failures, this is just best effort. Alternative: find target/dist -name drone-cache -type f -exec upx {} +
     post: find target/dist -name drone-cache -type f -print0 | xargs -n 1 -0 upx
+archives:
+  - id: tarball
+    format: tar.gz
+    format_overrides:
+      - goos: windows
+        format: zip
+    wrap_in_directory: true
+    replacements:
+      amd64: 64bit
+      386: 32bit
+      arm: ARM
+      arm64: ARM64
+      darwin: macOS
+      linux: linux
+      windows: windows
+      openbsd: openBSD
+      netbsd: netBSD
+      freebsd: freeBSD
+      dragonfly: dragonFlyBSD
+    files:
+      - README.md
+      - CHANGELOG.md
+      - LICENSE
 checksum:
   name_template: "{{ .ProjectName }}_{{ .Version }}_checksums.txt" # default
 snapshot:
@@ -47,9 +70,17 @@ release:
   github:
     owner: meltwater
     name: drone-cache
-  disable: true
+  prerelease: auto # in case there is an indicator for this in the tag e.g. v1.0.0-rc1
+  draft: true # we want human in the loop
 changelog:
-  skip: true
+  sort: asc
+  filters:
+    exclude:
+      - typo
+      - '^docs:'
+      - '^test:'
+      - Merge pull request
+      - Merge branch
 dockers:
   -
     goos: linux
