@@ -10,7 +10,7 @@ run:
 linters:
   enable-all: true
   disable:
-    - gochecknoglobals
+    - goerr113
 
 linters-settings:
   errcheck:

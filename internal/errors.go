@@ -6,23 +6,22 @@ import (
 	"sync"
 )
 
-// NOTICE: Modified version of https://github.com/prometheus/prometheus/blob/master/tsdb/errors/errors.go
+// NOTICE: Modified version of https://github.com/prometheus/prometheus/blob/master/tsdb/errors/errors.go.
 
-// The MultiError type implements the error interface, and contains the
-// Errors used to construct it.
+// The MultiError type implements the error interface, and contains the Errors used to construct it.
 type MultiError struct {
 	mu   sync.Mutex
 	errs []error
 }
 
-// Returns a concatenated string of the contained errors
+// Returns a concatenated string of the contained errors.
 func (me *MultiError) Error() string {
 	var buf bytes.Buffer
 
 	me.mu.Lock()
 	defer me.mu.Unlock()
 
-	if len(me.errs) > 1 { //nolint:gomnd
+	if len(me.errs) > 1 {
 		fmt.Fprintf(&buf, "%d errors: ", len(me.errs))
 	}
 

@@ -2,6 +2,7 @@ package azure
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -10,18 +11,19 @@ import (
 	"github.com/Azure/azure-storage-blob-go/azblob"
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/log/level"
+
 	"github.com/meltwater/drone-cache/internal"
 )
 
 const (
-	// DefaultBlobMaxRetryRequests TODO
+	// DefaultBlobMaxRetryRequests Default value for Azure Blob Storage Max Retry Requests.
 	DefaultBlobMaxRetryRequests = 4
 
 	defaultBufferSize = 3 * 1024 * 1024
 	defaultMaxBuffers = 4
 )
 
-// Backend TODO
+// Backend implements sotrage.Backend for Azure Blob Storage.
 type Backend struct {
 	logger log.Logger
 
@@ -33,7 +35,7 @@ type Backend struct {
 func New(l log.Logger, c Config) (*Backend, error) {
 	// 1. From the Azure portal, get your storage account name and key and set environment variables.
 	if c.AccountName == "" || c.AccountKey == "" {
-		return nil, fmt.Errorf("either the AZURE_ACCOUNT_NAME or AZURE_ACCOUNT_KEY environment variable is not set")
+		return nil, errors.New("either the AZURE_ACCOUNT_NAME or AZURE_ACCOUNT_KEY environment variable is not set")
 	}
 
 	// 2. Create a default request pipeline using your storage account name and account key.

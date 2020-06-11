@@ -11,6 +11,7 @@ import (
 
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/log/level"
+
 	"github.com/meltwater/drone-cache/internal"
 )
 
@@ -31,7 +32,6 @@ func New(l log.Logger, c Config) (*Backend, error) {
 
 	level.Debug(l).Log("msg", "Filesystem backend", "config", fmt.Sprintf("%#v", c))
 
-	//nolint: TODO(kakkoyun): Should it be created?
 	if _, err := os.Stat(c.CacheRoot); err != nil {
 		return nil, fmt.Errorf("make sure volume is mounted, <%s> as cache root, %w", c.CacheRoot, err)
 	}

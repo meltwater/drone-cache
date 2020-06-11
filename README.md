@@ -226,7 +226,6 @@ Usage:
 Targets:
   setup          	  Setups dev environment
   drone-cache    	  Runs drone-cache target
-  build          	  Runs build target, always builds
   clean          	  Cleans build resourcess
   docs           	  Generates docs
   generate       	  Generate documentation, website and yaml files,

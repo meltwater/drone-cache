@@ -17,7 +17,7 @@ type SSHAuth struct {
 	Method        SSHAuthMethod
 }
 
-// Config is a structure to store sFTP backend configuration
+// Config is a structure to store sFTP backend configuration.
 type Config struct {
 	CacheRoot string
 	Username  string

@@ -1,7 +1,6 @@
 package generator
 
 import (
-	// #nosec
 	"errors"
 	"fmt"
 	"os"
@@ -14,11 +13,12 @@ import (
 
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/log/level"
+
 	"github.com/meltwater/drone-cache/internal"
 	"github.com/meltwater/drone-cache/internal/metadata"
 )
 
-// Metadata TODO
+// Metadata implements a key generator that uses a template engine to generate keys from give metadata.
 type Metadata struct {
 	logger log.Logger
 

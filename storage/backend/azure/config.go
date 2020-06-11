@@ -2,7 +2,7 @@ package azure
 
 import "time"
 
-// Config is a structure to store Azure backend configuration
+// Config is a structure to store Azure backend configuration.
 type Config struct {
 	AccountName      string
 	AccountKey       string

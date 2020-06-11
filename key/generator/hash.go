@@ -6,12 +6,12 @@ import (
 	"strings"
 )
 
-// Hash TODO
+// Hash implements a key generator with md5.
 type Hash struct {
 	defaultParts []string
 }
 
-// NewHash TODO
+// NewHash creates a new hash kye generator.
 func NewHash(defaultParts ...string) *Hash {
 	return &Hash{defaultParts: defaultParts}
 }

@@ -1,6 +1,6 @@
 package s3
 
-// Config is a structure to store S3  backend configuration
+// Config is a structure to store S3  backend configuration.
 type Config struct {
 	// Indicates the files ACL, which should be one,
 	// of the following:
@@ -12,7 +12,7 @@ type Config struct {
 	//     bucket-owner-full-control
 	ACL        string
 	Bucket     string
-	Encryption string // if not "", enables server-side encryption. valid values are: AES256, aws:kms
+	Encryption string // if not "", enables server-side encryption. valid values are: AES256, aws:kms.
 	Endpoint   string
 	Key        string
 
@@ -27,5 +27,5 @@ type Config struct {
 	Region string
 	Secret string
 
-	PathStyle bool // Use path style instead of domain style. Should be true for minio and false for AWS
+	PathStyle bool // Use path style instead of domain style. Should be true for minio and false for AWS.
 }

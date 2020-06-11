@@ -14,10 +14,11 @@ import (
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/log/level"
+
 	"github.com/meltwater/drone-cache/internal"
 )
 
-// Backend TODO
+// Backend implements storage.Backend for AWs S3.
 type Backend struct {
 	logger log.Logger
 

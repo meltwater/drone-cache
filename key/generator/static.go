@@ -6,7 +6,7 @@ type Static struct {
 	defaultParts []string
 }
 
-// NewStatic TODO
+// Hash implements a key generator form given strings.
 func NewStatic(defaultParts ...string) *Static {
 	return &Static{defaultParts: defaultParts}
 }
