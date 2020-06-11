@@ -11,11 +11,12 @@ VCS_REF               := $(strip $(shell [ -d .git ] && git rev-parse HEAD))
 GO_PACKAGES            = $(shell go list ./... | grep -v -E '/vendor/|/test')
 GO_FILES              := $(shell find . -name \*.go -print)
 
-GOBUILD               := go build -mod=vendor -tags netgo
-GOINSTALL             := go install -mod=vendor -tags netgo
+GOBUILD               := go build -mod=vendor
+GOINSTALL             := go install -mod=vendor
 GOMOD                 := go mod
 GOFMT                 := gofmt
 LDFLAGS               := '-s -w -X main.version=$(VERSION) -X main.commit=$(VCS_REF) -X main.date=$(BUILD_DATE)'
+TAGS                  := netgo
 
 ROOT_DIR              := $(CURDIR)
 BIN_DIR               ?= $(ROOT_DIR)/tmp/bin
@@ -43,12 +44,7 @@ setup: vendor ; $(info $(M) running setup for development )
 
 drone-cache: ## Runs drone-cache target
 drone-cache: vendor main.go $(wildcard *.go) $(wildcard */*.go) ; $(info $(M) running drone-cache )
-	$(Q) CGO_ENABLED=0 GOOS=linux GOARCH=amd64 $(GOBUILD) -a -ldflags $(LDFLAGS) -o $@ .
-
-.PHONY: build
-build: ## Runs build target, always builds
-build: vendor main.go $(wildcard *.go) $(wildcard */*.go) ; $(info $(M) running build )
-	$(Q) CGO_ENABLED=0 $(GOBUILD) -ldflags $(LDFLAGS) -o drone-cache .
+	$(Q) CGO_ENABLED=0 $(GOBUILD) -a -ldflags $(LDFLAGS) -tags $(TAGS) -o $@ .
 
 .PHONY: clean
 clean: ## Cleans build resourcess
