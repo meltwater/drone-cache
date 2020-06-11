@@ -145,8 +145,8 @@ GLOBAL OPTIONS:
    --build.event value                   build event (default: "push") [$DRONE_BUILD_EVENT]
    --build.number value                  build number (default: 0) [$DRONE_BUILD_NUMBER]
    --build.created value                 build created (default: 0) [$DRONE_BUILD_CREATED]
-   --build.started value                 build started (default: 0) [$DRONE_BUILD_STARTED]
-   --build.finished value                build finished (default: 0) [$DRONE_BUILD_FINISHED]
+   --build.started value                 build started (default: 1591888868) [$DRONE_BUILD_STARTED]
+   --build.finished value                build finished (default: 1591888947) [$DRONE_BUILD_FINISHED]
    --build.status value                  build status (default: "success") [$DRONE_BUILD_STATUS]
    --build.link value                    build link [$DRONE_BUILD_LINK]
    --build.deploy value                  build deployment target [$DRONE_DEPLOY_TO]
@@ -226,7 +226,6 @@ Usage:
 Targets:
   setup          	  Setups dev environment
   drone-cache    	  Runs drone-cache target
-  build          	  Runs build target, always builds
   clean          	  Cleans build resourcess
   docs           	  Generates docs
   generate       	  Generate documentation, website and yaml files,
