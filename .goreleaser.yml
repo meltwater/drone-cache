@@ -23,6 +23,9 @@ builds:
   goarm:
     - 6
     - 7
+  ignore:
+    - goos: darwin
+      goarch: 386
   env:
     - CGO_ENABLED=0
   flags:
@@ -33,9 +36,6 @@ builds:
     -X main.Version={{.Version}}
     -X main.Commit={{.ShortCommit}}
     -X main.Date={{.Date}}
-  ignore:
-    - goos: darwin
-      goarch: 386
   hooks:
     # Ignores failures, this is just best effort. Alternative: find target/dist -name drone-cache -type f -exec upx {} +
     post: find target/dist -name drone-cache -type f -print0 | xargs -n 1 -0 upx
@@ -48,17 +48,18 @@ archives:
         format: zip
     wrap_in_directory: true
     replacements:
-      amd64: 64bit
-      386: 32bit
-      arm: ARM
-      arm64: ARM64
-      darwin: macOS
-      linux: linux
-      windows: windows
-      openbsd: openBSD
-      netbsd: netBSD
-      freebsd: freeBSD
-      dragonfly: dragonFlyBSD
+      # https://en.wikipedia.org/wiki/Uname
+      # uname -m compatible.
+      amd64: x86_64
+      386: i386
+      # uname -s compatible.
+      darwin: Darwin
+      linux: Linux
+      windows: Windows
+      openbsd: OpenBSD
+      netbsd: NetBSD
+      freebsd: FreeBSD
+      dragonfly: DragonFly
     files:
       - README.md
       - CHANGELOG.md
@@ -99,7 +100,7 @@ dockers:
     # .Arch	GOARCH (usually allow replacements)
     # .Arm	GOARM (usually allow replacements)
     # .Mips	GOMIPS (usually allow replacements)
-    # TODO: Add more mirror registries
+    # TODO: Add github docker repo
     # - "docker.pkg.github.com/meltwater/drone-cache/drone-cache:latest"
     # - "docker.pkg.github.com/meltwater/drone-cache/drone-cache:{{ .Tag }}"
     # - "docker.pkg.github.com/meltwater/drone-cache/drone-cache:v{{ .Major }}.{{ .Minor }}"
