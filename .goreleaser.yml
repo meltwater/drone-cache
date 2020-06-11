@@ -72,7 +72,7 @@ release:
     owner: meltwater
     name: drone-cache
   prerelease: auto # in case there is an indicator for this in the tag e.g. v1.0.0-rc1
-  draft: true
+  draft: true # we want human in the loop
 changelog:
   sort: asc
   filters:

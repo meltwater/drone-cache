@@ -30,7 +30,8 @@ jobs:
         uses: goreleaser/goreleaser-action@v1
         with:
           version: v0.137.0
-          args: release --rm-dist --snapshot --config=.goreleaser-snapshot.yml
+          # not using --snapshot because we want to push images for snapshots
+          args: release --rm-dist --config=.goreleaser-snapshot.yml
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}

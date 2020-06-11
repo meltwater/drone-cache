@@ -91,18 +91,7 @@ dockers:
     - drone-cache
     image_templates:
     - "meltwater/drone-cache:{{ .Tag }}"
-
-    # TODO: Add missing GOOS and ARCH
-    # .Os	GOOS (usually allow replacements)
-    # .Arch	GOARCH (usually allow replacements)
-    # .Arm	GOARM (usually allow replacements)
-    # .Mips	GOMIPS (usually allow replacements)
-    # TODO: Add more mirror registries
-    # - "docker.pkg.github.com/meltwater/drone-cache/drone-cache:latest"
-    # - "docker.pkg.github.com/meltwater/drone-cache/drone-cache:{{ .Tag }}"
-    # - "docker.pkg.github.com/meltwater/drone-cache/drone-cache:v{{ .Major }}.{{ .Minor }}"
-    # - "docker.pkg.github.com/meltwater/drone-cache/drone-cache:v{{ .Major }}"
-
+    skip_push: false
     dockerfile: Dockerfile
     build_flag_templates:
     - "--label=org.label-schema.schema-version=1.0"
