@@ -1,4 +1,5 @@
 name: snapshot
+# A dedicated action to build a snapshot images, rest will be handled by release action.
 
 on:
   push:
@@ -38,3 +39,4 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+          DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
