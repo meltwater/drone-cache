@@ -1,5 +1,5 @@
 # This file is designed to only used by goreleaser.
-FROM golang:1.14.2-alpine3.11 AS builder
+FROM golang:1.14.4-alpine3.12 AS builder
 RUN apk add --update --no-cache ca-certificates tzdata && update-ca-certificates
 
 FROM scratch as runner
