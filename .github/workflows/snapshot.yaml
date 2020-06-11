@@ -1,8 +1,11 @@
 name: snapshot
 
 on:
-  pull_request:
   push:
+    tags:
+    branches:
+      - master
+      - "release-*"
 
 jobs:
   goreleaser:
@@ -26,8 +29,8 @@ jobs:
         name: Run GoReleaser for Snapshot
         uses: goreleaser/goreleaser-action@v1
         with:
-          version: v0.131.1
-          args: release --rm-dist --snapshot
+          version: v0.137.0
+          args: release --rm-dist --snapshot --config=.goreleaser-snapshot.yml
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
