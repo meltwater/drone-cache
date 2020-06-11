@@ -3,9 +3,7 @@ name: snapshot
 on:
   push:
     tags:
-    branches:
-      - master
-      - "release-*"
+      - '*'
 
 jobs:
   goreleaser:
