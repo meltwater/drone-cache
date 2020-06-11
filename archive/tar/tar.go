@@ -10,19 +10,20 @@ import (
 	"strings"
 
 	"github.com/go-kit/kit/log"
+
 	"github.com/meltwater/drone-cache/internal"
 )
 
 const defaultDirPermission = 0755
 
 var (
-	// ErrSourceNotReachable TODO
+	// ErrSourceNotReachable means that given source is not reachable.
 	ErrSourceNotReachable = errors.New("source not reachable")
-	// ErrArchiveNotReadable TODO
+	// ErrArchiveNotReadable means that given archive not readable/corrupted.
 	ErrArchiveNotReadable = errors.New("archive not readable")
 )
 
-// Archive TODO
+// Archive implements archive for tar.
 type Archive struct {
 	logger log.Logger
 
@@ -56,7 +57,7 @@ func (a *Archive) Create(srcs []string, w io.Writer) (int64, error) {
 	return written, nil
 }
 
-//nolint: lll
+// nolint: lll
 func writeToArchive(tw *tar.Writer, root string, skipSymlinks bool, written *int64) func(string, os.FileInfo, error) error {
 	return func(path string, fi os.FileInfo, err error) error {
 		if err != nil {

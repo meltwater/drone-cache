@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-// CreateTempFile TODO
+// CreateTempFile is a test helper to create a temporary file with given name and content, in given directory.
 func CreateTempFile(t testing.TB, name string, content []byte, in ...string) (string, func()) {
 	t.Helper()
 
@@ -31,7 +31,7 @@ func CreateTempFile(t testing.TB, name string, content []byte, in ...string) (st
 	return tmpfile.Name(), func() { os.Remove(tmpfile.Name()) }
 }
 
-// CreateTempFilesInDir TODO
+// CreateTempFilesInDir is a test helper to create temporary files using name as prefix and content, in given directory.
 func CreateTempFilesInDir(t testing.TB, name string, content []byte, in ...string) (string, func()) {
 	t.Helper()
 
@@ -63,7 +63,7 @@ func CreateTempFilesInDir(t testing.TB, name string, content []byte, in ...strin
 	return tmpDir, func() { os.RemoveAll(tmpDir) }
 }
 
-// CreateTempDir TODO
+// CreateTempDir is a test helper to create a temporary directory, in given directory.
 func CreateTempDir(t testing.TB, name string, in ...string) (string, func()) {
 	t.Helper()
 

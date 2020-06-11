@@ -17,7 +17,7 @@ import (
 	"github.com/meltwater/drone-cache/internal"
 )
 
-// Backend TODO
+// Backend implements storage.Backend for sFTP.
 type Backend struct {
 	logger log.Logger
 
@@ -49,7 +49,6 @@ func New(l log.Logger, c Config) (*Backend, error) {
 		return nil, fmt.Errorf("unable to connect to ssh with sftp protocol, %w", err)
 	}
 
-	//nolint: TODO(kakkoyun): Should it be created?
 	if _, err := client.Stat(c.CacheRoot); err != nil {
 		return nil, fmt.Errorf("make sure cache root <%s> created, %w", c.CacheRoot, err)
 	}

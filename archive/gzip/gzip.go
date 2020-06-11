@@ -11,7 +11,7 @@ import (
 	"github.com/go-kit/kit/log"
 )
 
-// pArchive TODO
+// Archive implements archive for gzip.
 type Archive struct {
 	logger log.Logger
 

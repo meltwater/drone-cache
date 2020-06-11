@@ -22,10 +22,10 @@ import (
 // Error recognized error from plugin.
 type Error string
 
-// Error TODO
+// Error is a sentinel plugin error.
 func (e Error) Error() string { return string(e) }
 
-// Unwrap TODO
+// Unwrap unwraps underlying error.
 func (e Error) Unwrap() error { return e }
 
 // Plugin stores metadata about current plugin.
@@ -36,13 +36,13 @@ type Plugin struct {
 	Config   Config
 }
 
-// New TODO
+// New creates a new plugin.
 func New(logger log.Logger) *Plugin {
 	return &Plugin{logger: logger}
 }
 
 // Exec entry point of Plugin, where the magic happens.
-func (p *Plugin) Exec() error { //nolint:funlen
+func (p *Plugin) Exec() error { // nolint:funlen
 	cfg := p.Config
 
 	// 1. Check parameters

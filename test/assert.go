@@ -1,4 +1,3 @@
-//nolint:gomnd
 package test
 
 import (
@@ -91,7 +90,7 @@ func Equals(tb testing.TB, want, got interface{}, v ...interface{}) {
 	}
 }
 
-//nolint:funlen // EqualDirs fails if the contents of given directories are not the same.
+// nolint:funlen // EqualDirs fails if the contents of given directories are not the same.
 func EqualDirs(tb testing.TB, dst string, src string, srcs []string) {
 	tb.Helper()
 

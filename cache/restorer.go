@@ -9,6 +9,7 @@ import (
 
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/log/level"
+
 	"github.com/meltwater/drone-cache/archive"
 	"github.com/meltwater/drone-cache/internal"
 	"github.com/meltwater/drone-cache/key"
@@ -26,12 +27,12 @@ type restorer struct {
 	namespace string
 }
 
-// NewRestorer TODO
-func NewRestorer(logger log.Logger, s storage.Storage, a archive.Archive, g key.Generator, fg key.Generator, namespace string) Restorer { //nolint:lll
+// NewRestorer creates a new cache.Restorer.
+func NewRestorer(logger log.Logger, s storage.Storage, a archive.Archive, g key.Generator, fg key.Generator, namespace string) Restorer { // nolint:lll
 	return restorer{logger, a, s, g, fg, namespace}
 }
 
-// Restore TODO
+// Restore restores files from the cache provided with given paths.
 func (r restorer) Restore(dsts []string) error {
 	level.Info(r.logger).Log("msg", "restoring  cache")
 
@@ -53,7 +54,7 @@ func (r restorer) Restore(dsts []string) error {
 
 		level.Info(r.logger).Log("msg", "restoring directory", "local", dst, "remote", src)
 
-		wg.Add(1) //nolint:gomnd
+		wg.Add(1)
 
 		go func(src, dst string) {
 			defer wg.Done()

@@ -22,13 +22,14 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
+// nolint:gochecknoglobals // Used for dynamically adding metadata to binary.
 var (
 	version = "dev"
 	commit  = "none"
 	date    = "unknown"
 )
 
-//nolint:funlen
+// nolint:funlen
 func main() {
 	app := cli.NewApp()
 	app.Name = "Drone cache plugin"
@@ -462,7 +463,7 @@ func main() {
 	}
 }
 
-//nolint:funlen
+// nolint:funlen
 func run(c *cli.Context) error {
 	var logLevel = c.String("log.level")
 	if c.Bool("debug") {

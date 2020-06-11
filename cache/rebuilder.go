@@ -30,12 +30,12 @@ type rebuilder struct {
 	override  bool
 }
 
-// NewRebuilder TODO
-func NewRebuilder(logger log.Logger, s storage.Storage, a archive.Archive, g key.Generator, fg key.Generator, namespace string, override bool) Rebuilder { //nolint:lll
+// NewRebuilder creates a new cache.Rebuilder.
+func NewRebuilder(logger log.Logger, s storage.Storage, a archive.Archive, g key.Generator, fg key.Generator, namespace string, override bool) Rebuilder { // nolint:lll
 	return rebuilder{logger, a, s, g, fg, namespace, override}
 }
 
-// Rebuild TODO
+// Rebuild rebuilds cache from the files provided with given paths.
 func (r rebuilder) Rebuild(srcs []string) error {
 	level.Info(r.logger).Log("msg", "rebuilding cache")
 
@@ -73,7 +73,7 @@ func (r rebuilder) Rebuild(srcs []string) error {
 
 		level.Info(r.logger).Log("msg", "rebuilding cache for directory", "local", src, "remote", dst)
 
-		wg.Add(1) //nolint:gomnd
+		wg.Add(1)
 
 		go func(dst, src string) {
 			defer wg.Done()
@@ -142,7 +142,7 @@ func (r rebuilder) rebuild(src, dst string) (err error) {
 		"remote", dst,
 		"archived bytes", humanize.Bytes(uint64(sw.written)),
 		"read bytes", humanize.Bytes(uint64(written)),
-		"ratio", fmt.Sprintf("%%%0.2f", float64(sw.written)/float64(written)*100.0), //nolint:gomnd
+		"ratio", fmt.Sprintf("%%%0.2f", float64(sw.written)/float64(written)*100.0), // nolint:gomnd
 	)
 
 	return nil
