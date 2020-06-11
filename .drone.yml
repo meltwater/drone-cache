@@ -61,7 +61,7 @@ steps:
   - git diff --exit-code
 
 - name: rebuild-cache
-  image: meltwater/drone-cache:dev
+  image: meltwater/drone-cache:v1.1.0-rc1
   pull: always
   settings:
     bucket: drone-cache-bucket
@@ -77,7 +77,7 @@ steps:
     AWS_SECRET_ACCESS_KEY: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
 
 - name: rebuild-cache-with-key
-  image: meltwater/drone-cache:dev
+  image: meltwater/drone-cache:v1.1.0-rc1
   pull: always
   settings:
     bucket: drone-cache-bucket
@@ -94,7 +94,7 @@ steps:
     AWS_SECRET_ACCESS_KEY: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
 
 - name: rebuild-cache-with-gzip
-  image: meltwater/drone-cache:dev
+  image: meltwater/drone-cache:v1.1.0-rc1
   pull: always
   settings:
     archive_format: gzip
@@ -112,7 +112,7 @@ steps:
     AWS_SECRET_ACCESS_KEY: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
 
 - name: rebuild-cache-with-filesystem
-  image: meltwater/drone-cache:dev
+  image: meltwater/drone-cache:v1.1.0-rc1
   pull: always
   settings:
     archive_format: gzip
@@ -127,7 +127,7 @@ steps:
     path: /tmp/cache
 
 - name: restore-cache-with-key
-  image: meltwater/drone-cache:dev
+  image: meltwater/drone-cache:v1.1.0-rc1
   pull: always
   settings:
     bucket: drone-cache-bucket
@@ -145,7 +145,7 @@ steps:
     AWS_SECRET_ACCESS_KEY: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
 
 - name: restore-cache-with-gzip
-  image: meltwater/drone-cache:dev
+  image: meltwater/drone-cache:v1.1.0-rc1
   pull: always
   settings:
     archive_format: gzip
@@ -163,7 +163,7 @@ steps:
     AWS_SECRET_ACCESS_KEY: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
 
 - name: restore-cache-with-filesystem
-  image: meltwater/drone-cache:dev
+  image: meltwater/drone-cache:v1.1.0-rc1
   pull: always
   settings:
     archive_format: gzip
@@ -178,7 +178,7 @@ steps:
     path: /tmp/cache
 
 - name: restore-cache-debug
-  image: meltwater/drone-cache:dev
+  image: meltwater/drone-cache:v1.1.0-rc1
   pull: always
   settings:
     debug: true
@@ -186,7 +186,7 @@ steps:
     pull: always
 
 - name: restore-cache
-  image: meltwater/drone-cache:dev
+  image: meltwater/drone-cache:v1.1.0-rc1
   pull: always
   settings:
     bucket: drone-cache-bucket
