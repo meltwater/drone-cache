@@ -58,7 +58,9 @@ steps:
     image: golang:1.14.1-alpine3.11
     commands:
       - apk add --update make git
-      - env -i make PATH=$PATH HOME=$HOME PWD=$PWD generate
+      # Following environment tricks are because of unintended variable capture by flag library.
+      # This mitigates contamination happens when generating CLI flag documentation.
+      - env -i make PATH=$(which go):$PATH HOME=$HOME PWD=$PWD GO=$(which go) GOPATH=$(go env GOPATH) generate
       - git diff --exit-code
 
   - name: rebuild-cache
