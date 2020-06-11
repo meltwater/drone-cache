@@ -71,7 +71,7 @@ release:
   github:
     owner: meltwater
     name: drone-cache
-  prerelease: auto # in case there is an indicator for this in the tag e.g. v1.0.0-rc1
+  prerelease: true
   draft: true
 changelog:
   sort: asc
@@ -90,10 +90,7 @@ dockers:
     binaries:
     - drone-cache
     image_templates:
-    - "meltwater/drone-cache:latest"
     - "meltwater/drone-cache:{{ .Tag }}"
-    - "meltwater/drone-cache:v{{ .Major }}.{{ .Minor }}"
-    - "meltwater/drone-cache:v{{ .Major }}"
 
     # TODO: Add missing GOOS and ARCH
     # .Os	GOOS (usually allow replacements)
@@ -106,11 +103,6 @@ dockers:
     # - "docker.pkg.github.com/meltwater/drone-cache/drone-cache:v{{ .Major }}.{{ .Minor }}"
     # - "docker.pkg.github.com/meltwater/drone-cache/drone-cache:v{{ .Major }}"
 
-    # Skips the docker push. Could be useful if you also do draft releases.
-    # If set to auto, the release will not be pushed to the docker repository
-    # in case there is an indicator for prerelease in the tag e.g. v1.0.0-rc1
-    # Defaults to false. It's auto as an additional safety measure.
-    skip_push: auto
     dockerfile: Dockerfile
     build_flag_templates:
     - "--label=org.label-schema.schema-version=1.0"
