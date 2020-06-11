@@ -1,4 +1,7 @@
-ROOT_DIR              := $(CURDIR)
+include .bingo/Variables.mk
+
+OS                    ?= $(shell uname -s | tr '[A-Z]' '[a-z]')
+ARCH                  ?= $(shell uname -m)
 
 VERSION               := $(strip $(shell [ -d .git ] && git describe --abbrev=0))
 LONG_VERSION          := $(strip $(shell [ -d .git ] && git describe --always --tags --dirty))
@@ -14,13 +17,8 @@ GOMOD                 := go mod
 GOFMT                 := gofmt
 LDFLAGS               := '-s -w -X main.version=$(VERSION) -X main.commit=$(VCS_REF) -X main.date=$(BUILD_DATE)'
 
+ROOT_DIR              := $(CURDIR)
 BIN_DIR               ?= $(ROOT_DIR)/tmp/bin
-
-GOLANGCI_LINT_BIN      = $(BIN_DIR)/golangci-lint
-EMBEDMD_BIN            = $(BIN_DIR)/embedmd
-GOTEST_BIN             = $(BIN_DIR)/gotest
-LICHE_BIN              = $(BIN_DIR)/liche
-
 UPX                   := upx
 
 DOCKER                := docker
@@ -41,7 +39,7 @@ all: drone-cache
 .PHONY: setup
 setup: ## Setups dev environment
 setup: vendor ; $(info $(M) running setup for development )
-	$(Q) make $(GOTEST_BIN) $(EMBEDMD_BIN) $(LICHE_BIN) $(GOLANGCI_LINT_BIN)
+	$(Q) make $(GOTEST) $(EMBEDMD) $(LICHE) $(GOLANGCI_LINT) $(BINGO)
 
 drone-cache: ## Runs drone-cache target
 drone-cache: vendor main.go $(wildcard *.go) $(wildcard */*.go) ; $(info $(M) running drone-cache )
@@ -67,19 +65,19 @@ tmp/make_help.txt: Makefile
 	-mkdir -p tmp
 	$(Q) awk 'BEGIN {FS = ":.*##"; printf "Usage:\n  make <target>\n\nTargets:\n"} /^[a-zA-Z_-]+:.*?##/ { printf "  %-15s\t %s\n", $$1, $$2 }' $(MAKEFILE_LIST) &> tmp/make_help.txt
 
-README.md: tmp/help.txt tmp/make_help.txt $(EMBEDMD_BIN)
-	$(EMBEDMD_BIN) -w README.md
+README.md: tmp/help.txt tmp/make_help.txt $(EMBEDMD)
+	$(EMBEDMD) -w README.md
 
 tmp/docs.txt: drone-cache
 	$(Q) echo "IMPLEMENT ME"
 
-DOCS.md: tmp/docs.txt $(EMBEDMD_BIN)
-	$(EMBEDMD_BIN) -w DOCS.md
+DOCS.md: tmp/docs.txt $(EMBEDMD)
+	$(EMBEDMD) -w DOCS.md
 
 docs: ## Generates docs
-docs: clean README.md DOCS.md $(LICHE_BIN)
-	$(Q) $(LICHE_BIN) --recursive docs --document-root .
-	$(Q) $(LICHE_BIN) --exclude "(goreportcard.com)" --document-root . *.md
+docs: clean README.md DOCS.md $(LICHE)
+	$(Q) $(LICHE) --recursive docs --document-root .
+	$(Q) $(LICHE) --exclude "(goreportcard.com)" --document-root . *.md
 
 generate: ## Generate documentation, website and yaml files,
 generate: docs # site
@@ -100,49 +98,49 @@ compress: drone-cache ; $(info $(M) running compress )
 .PHONY: container
 container: ## Builds drone-cache docker image with latest tag
 container: drone-cache Dockerfile ; $(info $(M) running container )
-	$(Q) $(DOCKER_BUILD) -t $(CONTAINER_REPO):dev .
+	$(Q) $(DOCKER_BUILD) -t $(CONTAINER_REPO):$(LONG_VERSION) .
 
 .PHONY: container-push
 container-push: ## Pushes latest $(CONTAINER_REPO) image to repository
 container-push: container ; $(info $(M) running container-push )
-	$(Q) $(DOCKER_PUSH) $(CONTAINER_REPO):dev
+	$(Q) $(DOCKER_PUSH) $(CONTAINER_REPO):$(LONG_VERSION)
 
 .PHONY: test
 test: ## Runs tests
-test: $(GOTEST_BIN) ; $(info $(M) running test)
+test: $(GOTEST) ; $(info $(M) running test)
 	$(DOCKER_COMPOSE) up -d && sleep 1
-	-$(GOTEST_BIN) -race -short -cover -failfast -tags=integration ./...
+	-$(GOTEST) -race -short -cover -failfast -tags=integration ./...
 	$(DOCKER_COMPOSE) down -v
 
 .PHONY: test-integration ; $(info $(M) running test-integration )
 test-integration: ## Runs integration tests
-test-integration: $(GOTEST_BIN)
+test-integration: $(GOTEST)
 	$(DOCKER_COMPOSE) up -d && sleep 1
-	-$(GOTEST_BIN) -race -cover -tags=integration -v ./...
+	-$(GOTEST) -race -cover -tags=integration -v ./...
 	$(DOCKER_COMPOSE) down -v
 
 .PHONY: test-unit
 test-unit: ## Runs unit tests
-test-unit: $(GOTEST_BIN) ; $(info $(M) running test-unit )
-	$(GOTEST_BIN) -race -cover -benchmem -v ./...
+test-unit: $(GOTEST) ; $(info $(M) running test-unit )
+	$(GOTEST) -race -cover -benchmem -v ./...
 
 .PHONY: test-e2e
 test-e2e: ## Runs e2e tests
-test-e2e: $(GOTEST_BIN) ; $(info $(M) running test-e2e )
+test-e2e: $(GOTEST) ; $(info $(M) running test-e2e )
 	$(DOCKER_COMPOSE) up -d && sleep 1
-	-$(GOTEST_BIN) -race -cover -tags=integration -v ./internal/plugin
+	-$(GOTEST) -race -cover -tags=integration -v ./internal/plugin
 	$(DOCKER_COMPOSE) down -v
 
 .PHONY: lint
 lint: ## Runs golangci-lint analysis
-lint: $(GOLANGCI_LINT_BIN) ; $(info $(M) running lint )
+lint: $(GOLANGCI_LINT) ; $(info $(M) running lint )
 	# Check .golangci.yml for configuration
-	$(Q) $(GOLANGCI_LINT_BIN) run -v --enable-all --skip-dirs tmp -c .golangci.yml
+	$(Q) $(GOLANGCI_LINT) run -v --enable-all --skip-dirs tmp -c .golangci.yml
 
 .PHONY: fix
 fix: ## Runs golangci-lint fix
-fix: $(GOLANGCI_LINT_BIN) format ; $(info $(M) running fix )
-	$(Q) $(GOLANGCI_LINT_BIN) run --fix --enable-all --skip-dirs tmp -c .golangci.yml
+fix: $(GOLANGCI_LINT) format ; $(info $(M) running fix )
+	$(Q) $(GOLANGCI_LINT) run --fix --enable-all --skip-dirs tmp -c .golangci.yml
 
 .PHONY: format
 format: ## Runs gofmt
@@ -152,17 +150,3 @@ format: ; $(info $(M) running format )
 .PHONY: help
 help: ## Shows this help message
 	$(Q) awk 'BEGIN {FS = ":.*##"; printf "\nUsage:\n  make \033[36m<target>\033[0m\n\nTargets:\n"} /^[a-zA-Z_-]+:.*?##/ { printf "  \033[36m%-15s\033[0m\t %s\n", $$1, $$2 }' $(MAKEFILE_LIST)
-
-# Dependencies
-
-$(GOTEST_BIN): ; $(info $(M) getting gotest )
-	$(Q) $(GOBUILD) -o $@ github.com/rakyll/gotest
-
-$(EMBEDMD_BIN): ; $(info $(M) getting embedmd )
-	$(Q) $(GOBUILD) -o $@ github.com/campoy/embedmd
-
-$(LICHE_BIN): ; $(info $(M) getting liche )
-	$(Q) $(GOBUILD) -o $@ github.com/raviqqe/liche
-
-$(GOLANGCI_LINT_BIN): ; $(info $(M) getting golangci-lint )
-	$(Q) $(GOBUILD) -o $@ github.com/golangci/golangci-lint/cmd/golangci-lint
