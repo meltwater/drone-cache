@@ -266,6 +266,11 @@ Targets:
   help           	  Shows this help message
 ```
 
+For testing purposes you might want to build your container and push it into your own container registry. Use this command for it:
+```
+CONTAINER_REPO=<your-container-reginstry-address>/drone-cache OS=linux ARCH=amd64 make container-push
+```
+
 ## Releases
 
 Release management handled by the CI pipeline. When you create a tag on `master` branch, CI handles the rest.

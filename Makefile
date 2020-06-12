@@ -11,7 +11,7 @@ VCS_REF               := $(strip $(shell [ -d .git ] && git rev-parse HEAD))
 GO_PACKAGES            = $(shell go list ./... | grep -v -E '/vendor/|/test')
 GO_FILES              := $(shell find . -name \*.go -print)
 
-GOBUILD               := go build -mod=vendor
+GOBUILD               := GOOS=$(OS) GOARCH=$(ARCH) go build -mod=vendor
 GOINSTALL             := go install -mod=vendor
 GOMOD                 := go mod
 GOFMT                 := gofmt
