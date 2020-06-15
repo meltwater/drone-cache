@@ -1,7 +1,7 @@
 include .bingo/Variables.mk
 
-OS                    ?= $(shell uname -s | tr '[A-Z]' '[a-z]')
-ARCH                  ?= $(shell uname -m)
+OS                    ?= linux
+ARCH                  ?= amd64
 
 VERSION               := $(strip $(shell [ -d .git ] && git describe --abbrev=0))
 LONG_VERSION          := $(strip $(shell [ -d .git ] && git describe --always --tags --dirty))

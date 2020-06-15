@@ -27,7 +27,7 @@ steps:
     image: golang:1.14.4-alpine3.12
     commands:
       - apk add --update make git
-      - OS=linux ARCH=amd64 make drone-cache
+      - make drone-cache
     environment:
       CGO_ENABLED: 0
 
