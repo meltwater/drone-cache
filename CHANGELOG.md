@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+- Fixed Anonymous Credentials Error on public buckets
+  - Fixes [#132](https://github.com/meltwater/drone-cache/issues/132)
+
 ### Added
 
 - [#102](https://github.com/meltwater/drone-cache/pull/102) Implement option to disable cache rebuild if it already exists in storage.
