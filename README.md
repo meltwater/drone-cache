@@ -116,7 +116,7 @@ USAGE:
    drone-cache [global options] command [command options] [arguments...]
 
 VERSION:
-   v1.1.0-rc0
+   v1.1.0
 
 COMMANDS:
    help, h  Shows a list of commands or help for one command
