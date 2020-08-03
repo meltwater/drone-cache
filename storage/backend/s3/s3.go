@@ -35,6 +35,7 @@ func New(l log.Logger, c Config, debug bool) (*Backend, error) {
 		Endpoint:         &c.Endpoint,
 		DisableSSL:       aws.Bool(!strings.HasPrefix(c.Endpoint, "https://")),
 		S3ForcePathStyle: aws.Bool(c.PathStyle),
+		Credentials:      credentials.AnonymousCredentials,
 	}
 
 	if c.Key != "" && c.Secret != "" {
