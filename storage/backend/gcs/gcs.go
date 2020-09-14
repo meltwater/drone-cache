@@ -35,16 +35,16 @@ func New(l log.Logger, c Config) (*Backend, error) {
 
 	if c.Endpoint != "" {
 		opts = append(opts, option.WithEndpoint(c.Endpoint))
+
+		if !strings.HasPrefix(c.Endpoint, "https://") { // This is not settable from outside world, only used for mock tests.
+			opts = append(opts, option.WithHTTPClient(&http.Client{Transport: &http.Transport{
+				// ignore unverified/expired SSL certificates for tests.
+				TLSClientConfig: &tls.Config{InsecureSkipVerify: true}, //nolint:gosec
+			}}))
+		}
 	}
 
-	if !strings.HasPrefix(c.Endpoint, "https://") { // This is not settable from outside world, only used for mock tests.
-		opts = append(opts, option.WithHTTPClient(&http.Client{Transport: &http.Transport{
-			// ignore unverified/expired SSL certificates for tests.
-			TLSClientConfig: &tls.Config{InsecureSkipVerify: true}, //nolint:gosec
-		}}))
-	}
-
-	setAuthenticationMethod(l, c, opts)
+	opts = setAuthenticationMethod(l, c, opts)
 
 	ctx, cancel := context.WithTimeout(context.Background(), c.Timeout)
 	defer cancel()
