@@ -561,7 +561,7 @@ func run(c *cli.Context) error {
 			Bucket:     c.String("bucket"),
 			Endpoint:   c.String("endpoint"),
 			APIKey:     c.String("gcs.api-key"),
-			JSONKey:    c.String("gcsjson-key"),
+			JSONKey:    c.String("gcs.json-key"),
 			Encryption: c.String("gcs.encryption-key"),
 			Timeout:    c.Duration("backend.operation-timeout"),
 		},
