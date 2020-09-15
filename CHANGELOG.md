@@ -7,9 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
-- Fixed Anonymous Credentials Error on public buckets
+- [#133](https://github.com/meltwater/drone-cache/pull/133) bacnkend/s3: Fixed Anonymous Credentials Error on public buckets. 
   - Fixes [#132](https://github.com/meltwater/drone-cache/issues/132)
-- [#138](https://github.com/meltwater/drone-cache/pull/138) Fix GCS to pass credentials correctly when `GCS_ENDPOINT` is not set.
+- [#138](https://github.com/meltwater/drone-cache/pull/138) backend/gcs: Fix GCS to pass credentials correctly when `GCS_ENDPOINT` is not set.
+- [#135](https://github.com/meltwater/drone-cache/issues/135) backend/gcs: Fixed parsing of GCS JSON key.
 
 ### Added
 
