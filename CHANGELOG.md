@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Fixed Anonymous Credentials Error on public buckets
   - Fixes [#132](https://github.com/meltwater/drone-cache/issues/132)
+- [#135](https://github.com/meltwater/drone-cache/issues/135) Fixed parsing of GCS JSON key.
 
 ### Added
 
