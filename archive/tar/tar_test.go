@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/meltwater/drone-cache/test"
@@ -16,12 +17,21 @@ var (
 	testRoot          = "testdata"
 	testRootMounted   = "testdata/mounted"
 	testRootExtracted = "testdata/extracted"
+	testAbsPattern    = "testdata_absolute"
 )
 
 func TestCreate(t *testing.T) {
 	test.Ok(t, os.MkdirAll(testRootMounted, 0755))
 	test.Ok(t, os.MkdirAll(testRootExtracted, 0755))
-	t.Cleanup(func() { os.RemoveAll(testRoot) })
+
+	testAbs, err := ioutil.TempDir("", testAbsPattern)
+	test.Ok(t, err)
+	test.Equals(t, filepath.IsAbs(testAbs), true)
+
+	t.Cleanup(func() {
+		os.RemoveAll(testRoot)
+		os.RemoveAll(testAbs)
+	})
 
 	for _, tc := range []struct {
 		name    string
@@ -50,7 +60,7 @@ func TestCreate(t *testing.T) {
 		{
 			name:    "existing mount paths",
 			ta:      New(log.NewNopLogger(), testRootMounted, true),
-			srcs:    exampleFileTree(t, "tar_create"),
+			srcs:    exampleFileTree(t, "tar_create", testRootMounted),
 			written: 43, // 3 x tmpfile in dir, 1 tmpfile
 			err:     nil,
 		},
@@ -68,12 +78,30 @@ func TestCreate(t *testing.T) {
 			written: 43,
 			err:     nil,
 		},
+		{
+			name:    "absolute mount paths",
+			ta:      New(log.NewNopLogger(), testRootMounted, true),
+			srcs:    exampleFileTree(t, "tar_create", testAbs),
+			written: 43,
+			err:     nil,
+		},
 	} {
 		tc := tc // NOTICE: https://github.com/golang/go/wiki/CommonMistakes#using-goroutines-on-loop-iterator-variables
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
 
 			// Setup
+			var absSrcs []string
+			var relativeSrcs []string
+
+			for _, src := range tc.srcs {
+				if strings.HasPrefix(src, "/") {
+					absSrcs = append(absSrcs, src)
+				} else {
+					relativeSrcs = append(relativeSrcs, src)
+				}
+			}
+
 			dstDir, dstDirClean := test.CreateTempDir(t, "tar_create_archives", testRootMounted)
 			t.Cleanup(dstDirClean)
 
@@ -89,12 +117,21 @@ func TestCreate(t *testing.T) {
 			}
 
 			// Test
+			for _, src := range absSrcs {
+				test.Ok(t, os.RemoveAll(src))
+			}
+
 			test.Exists(t, archivePath)
 			test.Assert(t, written == tc.written, "case %q: written bytes got %d want %v", tc.name, written, tc.written)
 
 			_, err = extract(tc.ta, archivePath, extDir)
 			test.Ok(t, err)
-			test.EqualDirs(t, extDir, testRootMounted, tc.srcs)
+
+			test.EqualDirs(t, extDir, testRootMounted, relativeSrcs)
+
+			for _, src := range absSrcs {
+				test.Exists(t, src)
+			}
 		})
 	}
 }
@@ -102,7 +139,15 @@ func TestCreate(t *testing.T) {
 func TestExtract(t *testing.T) {
 	test.Ok(t, os.MkdirAll(testRootMounted, 0755))
 	test.Ok(t, os.MkdirAll(testRootExtracted, 0755))
-	t.Cleanup(func() { os.RemoveAll(testRoot) })
+
+	testAbs, err := ioutil.TempDir("", testAbsPattern)
+	test.Ok(t, err)
+	test.Equals(t, filepath.IsAbs(testAbs), true)
+
+	t.Cleanup(func() {
+		os.RemoveAll(testRoot)
+		os.RemoveAll(testAbs)
+	})
 
 	// Setup
 	ta := New(log.NewNopLogger(), testRootMounted, false)
@@ -110,9 +155,9 @@ func TestExtract(t *testing.T) {
 	arcDir, arcDirClean := test.CreateTempDir(t, "tar_extract_archives", testRootMounted)
 	t.Cleanup(arcDirClean)
 
-	files := exampleFileTree(t, "tar_extract")
+	files := exampleFileTree(t, "tar_extract", testRootMounted)
 	archivePath := filepath.Join(arcDir, "test.tar")
-	_, err := create(ta, files, archivePath)
+	_, err = create(ta, files, archivePath)
 	test.Ok(t, err)
 
 	nestedFiles := exampleNestedFileTree(t, "tar_extract_nested")
@@ -136,6 +181,11 @@ func TestExtract(t *testing.T) {
 
 	badArchivePath := filepath.Join(arcDir, "bad_test.tar")
 	test.Ok(t, ioutil.WriteFile(badArchivePath, []byte("hello\ndrone\n"), 0644))
+
+	filesAbs := exampleFileTree(t, ".tar_extract_absolute", testAbs)
+	archiveAbsPath := filepath.Join(arcDir, "test_absolute.tar")
+	_, err = create(ta, filesAbs, archiveAbsPath)
+	test.Ok(t, err)
 
 	for _, tc := range []struct {
 		name        string
@@ -209,16 +259,38 @@ func TestExtract(t *testing.T) {
 			written:     43,
 			err:         nil,
 		},
+		{
+			name:        "absolute mount paths",
+			ta:          New(log.NewNopLogger(), testRootMounted, true),
+			archivePath: archiveAbsPath,
+			srcs:        filesAbs,
+			written:     43,
+			err:         nil,
+		},
 	} {
 		tc := tc // NOTE: https://github.com/golang/go/wiki/CommonMistakes#using-goroutines-on-loop-iterator-variables
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
 
 			// Setup
+			var absSrcs []string
+			var relativeSrcs []string
+
+			for _, src := range tc.srcs {
+				if strings.HasPrefix(src, "/") {
+					absSrcs = append(absSrcs, src)
+				} else {
+					relativeSrcs = append(relativeSrcs, src)
+				}
+			}
+
 			dstDir, dstDirClean := test.CreateTempDir(t, "tar_extract_"+tc.name, testRootExtracted)
 			t.Cleanup(dstDirClean)
 
 			// Run
+			for _, src := range absSrcs {
+				test.Ok(t, os.RemoveAll(src))
+			}
 			written, err := extract(tc.ta, tc.archivePath, dstDir)
 			if err != nil {
 				test.Expected(t, err, tc.err)
@@ -227,7 +299,13 @@ func TestExtract(t *testing.T) {
 
 			// Test
 			test.Assert(t, written == tc.written, "case %q: written bytes got %d want %v", tc.name, written, tc.written)
-			test.EqualDirs(t, dstDir, testRootMounted, tc.srcs)
+
+			for _, src := range absSrcs {
+				test.Exists(t, src)
+			}
+
+			test.EqualDirs(t, dstDir, testRootMounted, relativeSrcs)
+
 		})
 	}
 }
@@ -286,11 +364,11 @@ func extract(a *Archive, src string, dst string) (int64, error) {
 
 // Fixtures
 
-func exampleFileTree(t *testing.T, name string) []string {
-	file, fileClean := test.CreateTempFile(t, name, []byte("hello\ndrone!\n"), testRootMounted) // 13 bytes
+func exampleFileTree(t *testing.T, name string, in string) []string {
+	file, fileClean := test.CreateTempFile(t, name, []byte("hello\ndrone!\n"), in) // 13 bytes
 	t.Cleanup(fileClean)
 
-	dir, dirClean := test.CreateTempFilesInDir(t, name, []byte("hello\ngo!\n"), testRootMounted) // 10 bytes
+	dir, dirClean := test.CreateTempFilesInDir(t, name, []byte("hello\ngo!\n"), in) // 10 bytes
 	t.Cleanup(dirClean)
 
 	return []string{file, dir}

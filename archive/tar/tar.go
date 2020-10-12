@@ -85,7 +85,14 @@ func writeToArchive(tw *tar.Writer, root string, skipSymlinks bool, written *int
 			}
 		}
 
-		name, err := relative(root, path)
+		var name string
+
+		if strings.HasPrefix(path, "/") {
+			name, err = filepath.Abs(path)
+		} else {
+			name, err = relative(root, path)
+		}
+
 		if err != nil {
 			return fmt.Errorf("relative name <%s>: <%s>, %w", path, root, err)
 		}
@@ -182,7 +189,7 @@ func (a *Archive) Extract(dst string, r io.Reader) (int64, error) {
 		}
 
 		var target string
-		if dst == h.Name {
+		if dst == h.Name || strings.HasPrefix(h.Name, "/") {
 			target = h.Name
 		} else {
 			name, err := relative(dst, h.Name)
