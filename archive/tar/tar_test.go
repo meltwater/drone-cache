@@ -126,7 +126,6 @@ func TestCreate(t *testing.T) {
 
 			_, err = extract(tc.ta, archivePath, extDir)
 			test.Ok(t, err)
-
 			test.EqualDirs(t, extDir, testRootMounted, relativeSrcs)
 
 			for _, src := range absSrcs {
@@ -299,13 +298,10 @@ func TestExtract(t *testing.T) {
 
 			// Test
 			test.Assert(t, written == tc.written, "case %q: written bytes got %d want %v", tc.name, written, tc.written)
-
 			for _, src := range absSrcs {
 				test.Exists(t, src)
 			}
-
 			test.EqualDirs(t, dstDir, testRootMounted, relativeSrcs)
-
 		})
 	}
 }
