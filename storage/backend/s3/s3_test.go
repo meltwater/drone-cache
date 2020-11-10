@@ -20,26 +20,58 @@ import (
 )
 
 const (
-	defaultEndpoint        = "127.0.0.1:9000"
-	defaultAccessKey       = "AKIAIOSFODNN7EXAMPLE"
-	defaultSecretAccessKey = "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
-	defaultRegion          = "eu-west-1"
-	defaultACL             = "private"
+	defaultEndpoint            = "127.0.0.1:9000"
+	defaultAccessKey           = "AKIAIOSFODNN7EXAMPLE"
+	defaultSecretAccessKey     = "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
+	defaultRegion              = "eu-west-1"
+	defaultACL             	   = "private"
+	defaultUserAccessKey   	   = "foo"
+	defaultUserSecretAccessKey = "barbarbar"
 )
 
 var (
-	endpoint        = getEnv("TEST_S3_ENDPOINT", defaultEndpoint)
-	accessKey       = getEnv("TEST_S3_ACCESS_KEY", defaultAccessKey)
-	secretAccessKey = getEnv("TEST_S3_SECRET_KEY", defaultSecretAccessKey)
-	acl             = getEnv("TEST_S3_ACL", defaultACL)
+	endpoint        	= getEnv("TEST_S3_ENDPOINT", defaultEndpoint)
+	accessKey       	= getEnv("TEST_S3_ACCESS_KEY", defaultAccessKey)
+	secretAccessKey 	= getEnv("TEST_S3_SECRET_KEY", defaultSecretAccessKey)
+	acl             	= getEnv("TEST_S3_ACL", defaultACL)
+	userAccessKey       = getEnv("TEST_USER_S3_ACCESS_KEY", defaultUserAccessKey)
+	userSecretAccessKey = getEnv("TEST_USER_S3_SECRET_KEY", defaultUserSecretAccessKey)
 )
 
 func TestRoundTrip(t *testing.T) {
 	t.Parallel()
 
-	backend, cleanUp := setup(t)
+	backend, cleanUp := setup(t, Config{
+		ACL:       acl,
+		Bucket:    "s3-round-trip",
+		Endpoint:  endpoint,
+		Key:       accessKey,
+		PathStyle: true, // Should be true for minio and false for AWS.
+		Region:    defaultRegion,
+		Secret:    secretAccessKey,
+	})
 	t.Cleanup(cleanUp)
+	roundTrip(t, backend)
+}
 
+func TestRoundTripWithAssumeRole(t *testing.T) {
+	t.Parallel()
+
+	backend, cleanUp := setup(t, Config{
+		ACL:       acl,
+		Bucket:    "s3-round-trip-with-role",
+		Endpoint:  endpoint,
+		Key:       userAccessKey,
+		PathStyle: true, // Should be true for minio and false for AWS.
+		Region:    defaultRegion,
+		Secret:    userSecretAccessKey,
+		RoleArn:   "arn:aws:iam::account-id:role/TestRole",
+	})
+	t.Cleanup(cleanUp)
+	roundTrip(t, backend)
+}
+
+func roundTrip(t *testing.T, backend *Backend) {
 	content := "Hello world4"
 
 	// Test Put
@@ -62,44 +94,35 @@ func TestRoundTrip(t *testing.T) {
 
 // Helpers
 
-func setup(t *testing.T) (*Backend, func()) {
-	client := newClient()
-	bucket := "s3-round-trip"
+func setup(t *testing.T, config Config) (*Backend, func()) {
+	client := newClient(config)
 
 	_, err := client.CreateBucketWithContext(context.Background(), &s3.CreateBucketInput{
-		Bucket: aws.String(bucket),
+		Bucket: aws.String(config.Bucket),
 	})
 	test.Ok(t, err)
 
 	b, err := New(
 		log.NewNopLogger(),
-		Config{
-			ACL:       acl,
-			Bucket:    bucket,
-			Endpoint:  endpoint,
-			Key:       accessKey,
-			PathStyle: true, // Should be true for minio and false for AWS.
-			Region:    defaultRegion,
-			Secret:    secretAccessKey,
-		},
+		config,
 		false,
 	)
 	test.Ok(t, err)
 
 	return b, func() {
-		_, _ = client.DeleteBucket(&s3.DeleteBucketInput{
-			Bucket: aws.String(bucket),
+		_, err = client.DeleteBucket(&s3.DeleteBucketInput{
+			Bucket: aws.String(config.Bucket),
 		})
 	}
 }
 
-func newClient() *s3.S3 {
+func newClient(config Config) *s3.S3 {
 	conf := &aws.Config{
 		Region:           aws.String(defaultRegion),
 		Endpoint:         aws.String(endpoint),
 		DisableSSL:       aws.Bool(!strings.HasPrefix(endpoint, "https://")),
 		S3ForcePathStyle: aws.Bool(true),
-		Credentials:      credentials.NewStaticCredentials(accessKey, secretAccessKey, ""),
+		Credentials:      credentials.NewStaticCredentials(config.Key, config.Secret, ""),
 	}
 
 	return s3.New(session.Must(session.NewSessionWithOptions(session.Options{})), conf)
