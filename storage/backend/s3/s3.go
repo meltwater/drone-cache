@@ -13,7 +13,6 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
-	"github.com/aws/aws-sdk-go/service/sts"
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/log/level"
 
@@ -47,8 +46,18 @@ func New(l log.Logger, c Config, debug bool) (*Backend, error) {
 	}
 
 	if c.RoleArn != "" {
+		stsConf := conf
+		if c.StsEndpoint != "" {
+			 stsConf = conf.Copy(&aws.Config{
+				Endpoint: &c.StsEndpoint,
+				DisableSSL: aws.Bool(!strings.HasPrefix(c.StsEndpoint, "https://")),
+			})
+		} else {
+			stsConf.Endpoint = nil
+			stsConf.DisableSSL = nil
+		}
 		conf.Credentials = credentials.NewStaticCredentials(c.Key, c.Secret, "")
-		crds := assumeRole(l, conf, c.RoleArn)
+		crds := assumeRole(l, stsConf, c.RoleArn)
 		conf.Credentials = credentials.NewStaticCredentials(crds.AccessKeyID, crds.SecretAccessKey, crds.SessionToken)
 	}
 
@@ -148,18 +157,19 @@ func (b *Backend) Exists(ctx context.Context, p string) (bool, error) {
 }
 
 func assumeRole(l log.Logger, c *aws.Config, roleArn string) credentials.Value {
-	client := sts.New(session.Must(session.NewSessionWithOptions(session.Options{})), c)
-
-	stsProvider := stscreds.AssumeRoleProvider{
-		Client:          client,
-		RoleARN:         roleArn,
-		RoleSessionName: "drone-cache",
-	}
-
-	role, err := stsProvider.Retrieve()
+	sess, err := session.NewSession(&aws.Config{
+		Credentials: c.Credentials,
+		Region: c.Region,
+		Endpoint: c.Endpoint,
+		DisableSSL: c.DisableSSL,
+		CredentialsChainVerboseErrors: aws.Bool(true),
+	})
+	creds, err := stscreds.NewCredentials(sess, roleArn, func(p *stscreds.AssumeRoleProvider) {
+		p.RoleSessionName = "drone-cache"
+	}).Get()
 	if err != nil {
 		level.Error(l).Log("msg", "s3 backend", "assume-role", err.Error())
 	}
 
-	return role
+	return creds
 }
