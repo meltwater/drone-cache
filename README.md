@@ -243,30 +243,6 @@ Targets:
   help           	  Shows this help message
 ```
 
-```txt
-Usage:
-  make <target>
-
-Targets:
-  setup          	  Setups dev environment
-  drone-cache    	  Runs drone-cache target
-  build          	  Runs build target, always builds
-  clean          	  Cleans build resourcess
-  docs           	  Generates docs
-  generate       	  Generate documentation, website and yaml files,
-  vendor         	  Updates vendored copy of dependencies
-  compress       	  Creates compressed binary
-  container      	  Builds drone-cache docker image with latest tag
-  container-push 	  Pushes latest $(CONTAINER_REPO) image to repository
-  test           	  Runs tests
-  test-integration	  Runs integration tests
-  test-unit      	  Runs unit tests
-  lint           	  Runs golangci-lint analysis
-  fix            	  Runs golangci-lint fix
-  format         	  Runs gofmt
-  help           	  Shows this help message
-```
-
 ## Releases
 
 Release management handled by the CI pipeline. When you create a tag on `master` branch, CI handles the rest.
