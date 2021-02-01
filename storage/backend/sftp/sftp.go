@@ -15,6 +15,7 @@ import (
 	"golang.org/x/crypto/ssh"
 
 	"github.com/meltwater/drone-cache/internal"
+	"github.com/meltwater/drone-cache/storage/common"
 )
 
 // Backend implements storage.Backend for sFTP.
@@ -163,6 +164,11 @@ func (b *Backend) Exists(ctx context.Context, p string) (bool, error) {
 	case <-ctx.Done():
 		return false, ctx.Err()
 	}
+}
+
+// List all the entries present at prefixed path.
+func (b *Backend) List(ctx context.Context, p string) ([]common.FileEntry, error) {
+	return nil, common.ErrNotImplemented
 }
 
 // Helpers

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"path/filepath"
+	"strings"
 	"sync"
 	"time"
 
@@ -14,6 +15,7 @@ import (
 	"github.com/meltwater/drone-cache/internal"
 	"github.com/meltwater/drone-cache/key"
 	"github.com/meltwater/drone-cache/storage"
+	"github.com/meltwater/drone-cache/storage/common"
 )
 
 type restorer struct {
@@ -48,6 +50,18 @@ func (r restorer) Restore(dsts []string) error {
 		errs      = &internal.MultiError{}
 		namespace = filepath.ToSlash(filepath.Clean(r.namespace))
 	)
+
+	if len(dsts) == 0 {
+		prefix := filepath.Join(namespace, key)
+		entries, err := r.s.List(prefix)
+		if err == nil {
+			for _, e := range entries {
+				dsts = append(dsts, strings.TrimPrefix(e.Path, prefix+"/"))
+			}
+		} else if err != common.ErrNotImplemented {
+			return err
+		}
+	}
 
 	for _, dst := range dsts {
 		src := filepath.Join(namespace, key, dst)

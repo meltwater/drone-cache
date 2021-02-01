@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/meltwater/drone-cache/storage"
-	"github.com/meltwater/drone-cache/storage/backend"
+	"github.com/meltwater/drone-cache/storage/common"
 
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/log/level"
@@ -15,7 +15,7 @@ type flusher struct {
 	logger log.Logger
 
 	store storage.Storage
-	dirty func(backend.FileEntry) bool
+	dirty func(common.FileEntry) bool
 }
 
 // NewFlusher creates a new cache flusher.
@@ -47,8 +47,8 @@ func (f flusher) Flush(srcs []string) error {
 }
 
 // IsExpired creates a function to check if file expired.
-func IsExpired(ttl time.Duration) func(file backend.FileEntry) bool {
-	return func(file backend.FileEntry) bool {
+func IsExpired(ttl time.Duration) func(file common.FileEntry) bool {
+	return func(file common.FileEntry) bool {
 		return time.Now().After(file.LastModified.Add(ttl))
 	}
 }

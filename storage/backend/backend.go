@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"time"
 
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/log/level"
@@ -15,6 +14,7 @@ import (
 	"github.com/meltwater/drone-cache/storage/backend/gcs"
 	"github.com/meltwater/drone-cache/storage/backend/s3"
 	"github.com/meltwater/drone-cache/storage/backend/sftp"
+	"github.com/meltwater/drone-cache/storage/common"
 )
 
 const (
@@ -30,15 +30,6 @@ const (
 	SFTP = "sftp"
 )
 
-// MOTICE: FileEntry needs a better place.
-
-// FileEntry defines a single cache item.
-type FileEntry struct {
-	Path         string
-	Size         int64
-	LastModified time.Time
-}
-
 // Backend implements operations for caching files.
 type Backend interface {
 	// Get writes downloaded content to the given writer.
@@ -51,7 +42,7 @@ type Backend interface {
 	Exists(ctx context.Context, p string) (bool, error)
 
 	// Implement me!
-	// List(ctx context.Context, p string) ([]FileEntry, error)
+	List(ctx context.Context, p string) ([]common.FileEntry, error)
 
 	// Implement me!
 	// Delete(ctx context.Context, p string) error

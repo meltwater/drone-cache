@@ -9,11 +9,13 @@ import (
 	"strings"
 
 	"github.com/meltwater/drone-cache/internal"
+	"github.com/meltwater/drone-cache/storage/common"
 
 	gcstorage "cloud.google.com/go/storage"
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/log/level"
 	"golang.org/x/oauth2/google"
+	"google.golang.org/api/iterator"
 	"google.golang.org/api/option"
 )
 
@@ -174,6 +176,32 @@ func (b *Backend) Exists(ctx context.Context, p string) (bool, error) {
 	case <-ctx.Done():
 		return false, ctx.Err()
 	}
+}
+
+// List all the entries present at prefixed path.
+func (b *Backend) List(ctx context.Context, p string) ([]common.FileEntry, error) {
+	it := b.client.Bucket(b.bucket).Objects(ctx, &gcstorage.Query{
+		Prefix: p,
+	})
+
+	var entries []common.FileEntry
+	for {
+		attrs, err := it.Next()
+		if err == iterator.Done {
+			break
+		}
+		if err != nil {
+			return nil, fmt.Errorf("failed to iterate objects present at path %s/%s with err: %v",
+				b.bucket, p, err)
+		}
+
+		entries = append(entries, common.FileEntry{
+			Path:         attrs.Name,
+			Size:         attrs.Size,
+			LastModified: attrs.Updated,
+		})
+	}
+	return entries, nil
 }
 
 // Helpers

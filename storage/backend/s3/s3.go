@@ -18,6 +18,7 @@ import (
 	"github.com/go-kit/kit/log/level"
 
 	"github.com/meltwater/drone-cache/internal"
+	"github.com/meltwater/drone-cache/storage/common"
 )
 
 // Backend implements storage.Backend for AWs S3.
@@ -145,6 +146,28 @@ func (b *Backend) Exists(ctx context.Context, p string) (bool, error) {
 	// Normally if file not exists it will be already detected by error above but in some cases
 	// Minio can return success status for without ETag, detect that here.
 	return *out.ETag != "", nil
+}
+
+// List all the entries present at prefixed path.
+func (b *Backend) List(ctx context.Context, p string) ([]common.FileEntry, error) {
+	in := &s3.ListObjectsInput{
+		Bucket: aws.String(b.bucket),
+		Prefix: aws.String(p),
+	}
+
+	var entries []common.FileEntry
+	err := b.client.ListObjectsPagesWithContext(ctx, in, func(page *s3.ListObjectsOutput, lastPage bool) bool {
+		for _, item := range page.Contents {
+			entries = append(entries, common.FileEntry{
+				Path:         *item.Key,
+				Size:         *item.Size,
+				LastModified: *item.LastModified,
+			})
+		}
+		return lastPage != true
+	})
+
+	return entries, err
 }
 
 func assumeRole(l log.Logger, c *aws.Config, roleArn string) credentials.Value {

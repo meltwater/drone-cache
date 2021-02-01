@@ -13,6 +13,7 @@ import (
 	"github.com/go-kit/kit/log/level"
 
 	"github.com/meltwater/drone-cache/internal"
+	"github.com/meltwater/drone-cache/storage/common"
 )
 
 const (
@@ -139,4 +140,9 @@ func (b *Backend) Exists(ctx context.Context, p string) (bool, error) {
 	}
 
 	return get.StatusCode() == http.StatusOK, nil
+}
+
+// List all the object present at prefixed path.
+func (b *Backend) List(ctx context.Context, p string) ([]common.FileEntry, error) {
+	return nil, common.ErrNotImplemented
 }
