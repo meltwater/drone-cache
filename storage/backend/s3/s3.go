@@ -48,14 +48,15 @@ func New(l log.Logger, c Config, debug bool) (*Backend, error) {
 	if c.RoleArn != "" {
 		stsConf := conf
 		if c.StsEndpoint != "" {
-			 stsConf = conf.Copy(&aws.Config{
-				Endpoint: &c.StsEndpoint,
+			stsConf = conf.Copy(&aws.Config{
+				Endpoint:   &c.StsEndpoint,
 				DisableSSL: aws.Bool(!strings.HasPrefix(c.StsEndpoint, "https://")),
 			})
 		} else {
 			stsConf.Endpoint = nil
 			stsConf.DisableSSL = nil
 		}
+
 		conf.Credentials = credentials.NewStaticCredentials(c.Key, c.Secret, "")
 		crds := assumeRole(l, stsConf, c.RoleArn)
 		conf.Credentials = credentials.NewStaticCredentials(crds.AccessKeyID, crds.SecretAccessKey, crds.SessionToken)
@@ -158,15 +159,21 @@ func (b *Backend) Exists(ctx context.Context, p string) (bool, error) {
 
 func assumeRole(l log.Logger, c *aws.Config, roleArn string) credentials.Value {
 	sess, err := session.NewSession(&aws.Config{
-		Credentials: c.Credentials,
-		Region: c.Region,
-		Endpoint: c.Endpoint,
-		DisableSSL: c.DisableSSL,
+		Credentials:                   c.Credentials,
+		Region:                        c.Region,
+		Endpoint:                      c.Endpoint,
+		DisableSSL:                    c.DisableSSL,
 		CredentialsChainVerboseErrors: aws.Bool(true),
 	})
+
+	if err != nil {
+		level.Error(l).Log("msg", "s3 backend", "assume-role", err.Error())
+	}
+
 	creds, err := stscreds.NewCredentials(sess, roleArn, func(p *stscreds.AssumeRoleProvider) {
 		p.RoleSessionName = "drone-cache"
 	}).Get()
+
 	if err != nil {
 		level.Error(l).Log("msg", "s3 backend", "assume-role", err.Error())
 	}

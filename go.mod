@@ -11,7 +11,6 @@ require (
 	github.com/go-logfmt/logfmt v0.4.0 // indirect
 	github.com/go-stack/stack v1.8.0 // indirect
 	github.com/google/go-cmp v0.4.0
-	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pkg/sftp v1.10.1
 	github.com/urfave/cli/v2 v2.1.1
 	golang.org/x/crypto v0.0.0-20200622213623-75b288015ac9
