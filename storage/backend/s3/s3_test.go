@@ -61,6 +61,7 @@ func TestRoundTripWithAssumeRole(t *testing.T) {
 		ACL:       acl,
 		Bucket:    "s3-round-trip-with-role",
 		Endpoint:  endpoint,
+		StsEndpoint: endpoint,
 		Key:       userAccessKey,
 		PathStyle: true, // Should be true for minio and false for AWS.
 		Region:    defaultRegion,
