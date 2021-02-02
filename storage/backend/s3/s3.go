@@ -9,9 +9,11 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/aws/aws-sdk-go/aws/credentials"
+	"github.com/aws/aws-sdk-go/aws/credentials/stscreds"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
+	"github.com/aws/aws-sdk-go/service/sts"
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/log/level"
 
@@ -42,6 +44,12 @@ func New(l log.Logger, c Config, debug bool) (*Backend, error) {
 		conf.Credentials = credentials.NewStaticCredentials(c.Key, c.Secret, "")
 	} else {
 		level.Warn(l).Log("msg", "aws key and/or Secret not provided (falling back to anonymous credentials)")
+	}
+
+	if c.RoleArn != "" {
+		conf.Credentials = credentials.NewStaticCredentials(c.Key, c.Secret, "")
+		crds := assumeRole(l, conf, c.RoleArn)
+		conf.Credentials = credentials.NewStaticCredentials(crds.AccessKeyID, crds.SecretAccessKey, crds.SessionToken)
 	}
 
 	level.Debug(l).Log("msg", "s3 backend", "config", fmt.Sprintf("%#v", c))
@@ -137,4 +145,21 @@ func (b *Backend) Exists(ctx context.Context, p string) (bool, error) {
 	// Normally if file not exists it will be already detected by error above but in some cases
 	// Minio can return success status for without ETag, detect that here.
 	return *out.ETag != "", nil
+}
+
+func assumeRole(l log.Logger, c *aws.Config, roleArn string) credentials.Value {
+	client := sts.New(session.Must(session.NewSessionWithOptions(session.Options{})), c)
+
+	stsProvider := stscreds.AssumeRoleProvider{
+		Client:          client,
+		RoleARN:         roleArn,
+		RoleSessionName: "drone-cache",
+	}
+
+	role, err := stsProvider.Retrieve()
+	if err != nil {
+		level.Error(l).Log("msg", "s3 backend", "assume-role", err.Error())
+	}
+
+	return role
 }

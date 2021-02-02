@@ -1,7 +1,7 @@
 version: '3'
 services:
   minio:
-    image: minio/minio:RELEASE.2020-03-05T01-04-19Z
+    image: minio/minio:RELEASE.2020-11-06T23-17-07Z
     environment:
       MINIO_ACCESS_KEY: AKIAIOSFODNN7EXAMPLE
       MINIO_SECRET_KEY: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
@@ -25,8 +25,16 @@ services:
     - "10000:10000"
     command: azurite-blob --blobHost 0.0.0.0
   configure-buckets:
-    image: minio/mc:RELEASE.2020-02-20T23-49-54Z
+    image: minio/mc:RELEASE.2020-10-03T02-54-56Z
     entrypoint: sh
     depends_on:
       - minio
-    command: -c "sleep 5 && mc config host add minio http://minio:9000 AKIAIOSFODNN7EXAMPLE wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
+    command:
+      - -c
+      - |
+        sleep 2 &&
+        mc config host add minio http://minio:9000 AKIAIOSFODNN7EXAMPLE wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY &&
+        mc admin user add minio foo barbarbar &&
+        echo '{"Version": "2012-10-17", "Statement": [{"Action": ["s3:GetObject", "s3:PutObject", "s3:DeleteObject", "s3:CreateBucket", "s3:DeleteBucket"], "Effect": "Allow", "Resource": ["arn:aws:s3:::s3-round-trip-with-role/*", "arn:aws:s3:::s3-round-trip-with-role"], "Sid": ""}]}' > /tmp/policy.json &&
+        mc admin policy add minio userpolicy /tmp/policy.json &&
+        mc admin policy set minio userpolicy user=foo

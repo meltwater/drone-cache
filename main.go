@@ -363,6 +363,12 @@ func main() {
 			Usage:   "server-side encryption algorithm, defaults to none. (AES256, aws:kms)",
 			EnvVars: []string{"PLUGIN_ENCRYPTION", "AWS_ENCRYPTION"},
 		},
+		&cli.StringFlag{
+			Name:    "role-arn",
+			Usage:   "AWS IAM role ARN to assume",
+			Value:   "",
+			EnvVars: []string{"PLUGIN_ASSUME_ROLE_ARN", "AWS_ASSUME_ROLE_ARN"},
+		},
 
 		// GCS specific Configs flags
 

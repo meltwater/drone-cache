@@ -1,6 +1,6 @@
 # drone-cache
 
-[![Latest Release](https://img.shields.io/github/release/meltwater/drone-cache.svg?)](https://github.com/meltwater/drone-cache/releases/latest) [![Maintenance](https://img.shields.io/maintenance/yes/2020.svg)](https://github.com/meltwater/drone-cache/commits/master) ![GitHub](https://img.shields.io/github/license/meltwater/drone-cache) [![Gitter](https://badges.gitter.im/drone-cache/community.svg)](https://gitter.im/drone-cache/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge) [![drone](https://cloud.drone.io/api/badges/meltwater/drone-cache/status.svg)](https://cloud.drone.io/meltwater/drone-cache) ![release](https://github.com/meltwater/drone-cache/workflows/release/badge.svg) ![snapshot](https://github.com/meltwater/drone-cache/workflows/snapshot/badge.svg)
+[![Latest Release](https://img.shields.io/github/release/meltwater/drone-cache.svg?)](https://github.com/meltwater/drone-cache/releases/latest) [![Maintenance](https://img.shields.io/maintenance/yes/2021.svg)](https://github.com/meltwater/drone-cache/commits/master) ![GitHub](https://img.shields.io/github/license/meltwater/drone-cache) [![drone](https://cloud.drone.io/api/badges/meltwater/drone-cache/status.svg)](https://cloud.drone.io/meltwater/drone-cache) ![release](https://github.com/meltwater/drone-cache/workflows/release/badge.svg) ![snapshot](https://github.com/meltwater/drone-cache/workflows/snapshot/badge.svg)
 
 [![Go Doc](https://godoc.org/github.com/meltwater/drone-cache?status.svg)](http://godoc.org/github.com/meltwater/drone-cache) [![Go Code reference](https://img.shields.io/badge/code%20reference-go.dev-darkblue.svg)](https://pkg.go.dev/github.com/meltwater/drone-cache?tab=subdirectories) [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/2713/badge)](https://bestpractices.coreinfrastructure.org/projects/2713) [![Go Report Card](https://goreportcard.com/badge/github.com/meltwater/drone-cache)](https://goreportcard.com/report/github.com/meltwater/drone-cache) [![codebeat badge](https://codebeat.co/badges/802c6149-ac2d-4514-8648-f618c63a8d9e)](https://codebeat.co/projects/github-com-meltwater-drone-cache-master)
 
@@ -24,6 +24,8 @@ If you want to learn more about the story behind `drone-cache`, you can read our
   * Other AWS API compatible stores:
     * [Minio](https://min.io/)
     * [Red Hat Ceph](https://www.redhat.com/en/technologies/storage/ceph)
+    * [IBM Object Store](https://www.ibm.com/cloud/object-storage)
+    * and many many others
 * [Azure Storage](https://azure.microsoft.com/en-us/services/storage/blobs/)
   * [Configuration](#)
   * [Example](#)
@@ -178,6 +180,7 @@ GLOBAL OPTIONS:
    --path-style                          AWS path style to use for bucket paths. (true for minio, false for aws) (default: false) [$PLUGIN_PATH_STYLE, $AWS_PLUGIN_PATH_STYLE]
    --acl value                           upload files with acl (private, public-read, ...) (default: "private") [$PLUGIN_ACL, $AWS_ACL]
    --encryption value                    server-side encryption algorithm, defaults to none. (AES256, aws:kms) [$PLUGIN_ENCRYPTION, $AWS_ENCRYPTION]
+   --role-arn value                      AWS IAM role ARN to assume [$PLUGIN_ASSUME_ROLE_ARN, $AWS_ASSUME_ROLE_ARN]
    --gcs.api-key value                   Google service account API key [$PLUGIN_API_KEY, $GCP_API_KEY]
    --gcs.json-key value                  Google service account JSON key [$PLUGIN_JSON_KEY, $GCS_CACHE_JSON_KEY]
    --gcs.acl value                       upload files with acl (private, public-read, ...) (default: "private") [$PLUGIN_GCS_ACL, $GCS_ACL]
@@ -226,30 +229,6 @@ Usage:
 Targets:
   setup          	  Setups dev environment
   drone-cache    	  Runs drone-cache target
-  clean          	  Cleans build resourcess
-  docs           	  Generates docs
-  generate       	  Generate documentation, website and yaml files,
-  vendor         	  Updates vendored copy of dependencies
-  compress       	  Creates compressed binary
-  container      	  Builds drone-cache docker image with latest tag
-  container-push 	  Pushes latest $(CONTAINER_REPO) image to repository
-  test           	  Runs tests
-  test-integration	  Runs integration tests
-  test-unit      	  Runs unit tests
-  lint           	  Runs golangci-lint analysis
-  fix            	  Runs golangci-lint fix
-  format         	  Runs gofmt
-  help           	  Shows this help message
-```
-
-```txt
-Usage:
-  make <target>
-
-Targets:
-  setup          	  Setups dev environment
-  drone-cache    	  Runs drone-cache target
-  build          	  Runs build target, always builds
   clean          	  Cleans build resourcess
   docs           	  Generates docs
   generate       	  Generate documentation, website and yaml files,
