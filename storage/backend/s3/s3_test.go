@@ -58,15 +58,15 @@ func TestRoundTripWithAssumeRole(t *testing.T) {
 	t.Parallel()
 
 	backend, cleanUp := setup(t, Config{
-		ACL:       acl,
-		Bucket:    "s3-round-trip-with-role",
-		Endpoint:  endpoint,
+		ACL:         acl,
+		Bucket:      "s3-round-trip-with-role",
+		Endpoint:    endpoint,
 		StsEndpoint: endpoint,
-		Key:       userAccessKey,
-		PathStyle: true, // Should be true for minio and false for AWS.
-		Region:    defaultRegion,
-		Secret:    userSecretAccessKey,
-		RoleArn:   "arn:aws:iam::account-id:role/TestRole",
+		Key:         userAccessKey,
+		PathStyle:   true, // Should be true for minio and false for AWS.
+		Region:      defaultRegion,
+		Secret:      userSecretAccessKey,
+		RoleArn:     "arn:aws:iam::account-id:role/TestRole",
 	})
 	t.Cleanup(cleanUp)
 	roundTrip(t, backend)

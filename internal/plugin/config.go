@@ -24,10 +24,11 @@ type Config struct {
 	Restore bool
 
 	// Optional
-	SkipSymlinks            bool
-	Override                bool
-	CompressionLevel        int
-	StorageOperationTimeout time.Duration
+	SkipSymlinks                bool
+	Override                    bool
+	FailRestoreOnNonExistentKey bool
+	CompressionLevel            int
+	StorageOperationTimeout     time.Duration
 
 	Mount []string
 

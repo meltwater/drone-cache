@@ -26,12 +26,13 @@ type restorer struct {
 	g  key.Generator
 	fg key.Generator
 
-	namespace string
+	namespace            string
+	failOnNonExistentKey bool
 }
 
 // NewRestorer creates a new cache.Restorer.
-func NewRestorer(logger log.Logger, s storage.Storage, a archive.Archive, g key.Generator, fg key.Generator, namespace string) Restorer { // nolint:lll
-	return restorer{logger, a, s, g, fg, namespace}
+func NewRestorer(logger log.Logger, s storage.Storage, a archive.Archive, g key.Generator, fg key.Generator, namespace string, failOnNonExistentKey bool) Restorer { // nolint:lll
+	return restorer{logger, a, s, g, fg, namespace, failOnNonExistentKey}
 }
 
 // Restore restores files from the cache provided with given paths.
@@ -50,6 +51,19 @@ func (r restorer) Restore(dsts []string) error {
 		errs      = &internal.MultiError{}
 		namespace = filepath.ToSlash(filepath.Clean(r.namespace))
 	)
+
+	if r.failOnNonExistentKey {
+		prefix := filepath.Join(namespace, key)
+		exists, err := r.s.Exists(prefix)
+
+		if err != nil {
+			return fmt.Errorf("failed to find key: %s with err: %v", prefix, err)
+		}
+
+		if !exists {
+			return fmt.Errorf("key %s does not exist", prefix)
+		}
+	}
 
 	if len(dsts) == 0 {
 		prefix := filepath.Join(namespace, key)
