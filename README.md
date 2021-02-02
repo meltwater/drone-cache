@@ -1,6 +1,6 @@
 # drone-cache
 
-[![Latest Release](https://img.shields.io/github/release/meltwater/drone-cache.svg?)](https://github.com/meltwater/drone-cache/releases/latest) [![Maintenance](https://img.shields.io/maintenance/yes/2020.svg)](https://github.com/meltwater/drone-cache/commits/master) ![GitHub](https://img.shields.io/github/license/meltwater/drone-cache) [![Gitter](https://badges.gitter.im/drone-cache/community.svg)](https://gitter.im/drone-cache/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge) [![drone](https://cloud.drone.io/api/badges/meltwater/drone-cache/status.svg)](https://cloud.drone.io/meltwater/drone-cache) ![release](https://github.com/meltwater/drone-cache/workflows/release/badge.svg) ![snapshot](https://github.com/meltwater/drone-cache/workflows/snapshot/badge.svg)
+[![Latest Release](https://img.shields.io/github/release/meltwater/drone-cache.svg?)](https://github.com/meltwater/drone-cache/releases/latest) [![Maintenance](https://img.shields.io/maintenance/yes/2021.svg)](https://github.com/meltwater/drone-cache/commits/master) ![GitHub](https://img.shields.io/github/license/meltwater/drone-cache) [![drone](https://cloud.drone.io/api/badges/meltwater/drone-cache/status.svg)](https://cloud.drone.io/meltwater/drone-cache) ![release](https://github.com/meltwater/drone-cache/workflows/release/badge.svg) ![snapshot](https://github.com/meltwater/drone-cache/workflows/snapshot/badge.svg)
 
 [![Go Doc](https://godoc.org/github.com/meltwater/drone-cache?status.svg)](http://godoc.org/github.com/meltwater/drone-cache) [![Go Code reference](https://img.shields.io/badge/code%20reference-go.dev-darkblue.svg)](https://pkg.go.dev/github.com/meltwater/drone-cache?tab=subdirectories) [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/2713/badge)](https://bestpractices.coreinfrastructure.org/projects/2713) [![Go Report Card](https://goreportcard.com/badge/github.com/meltwater/drone-cache)](https://goreportcard.com/report/github.com/meltwater/drone-cache) [![codebeat badge](https://codebeat.co/badges/802c6149-ac2d-4514-8648-f618c63a8d9e)](https://codebeat.co/projects/github-com-meltwater-drone-cache-master)
 
@@ -24,6 +24,8 @@ If you want to learn more about the story behind `drone-cache`, you can read our
   * Other AWS API compatible stores:
     * [Minio](https://min.io/)
     * [Red Hat Ceph](https://www.redhat.com/en/technologies/storage/ceph)
+    * [IBM Object Store](https://www.ibm.com/cloud/object-storage)
+    * and many many others
 * [Azure Storage](https://azure.microsoft.com/en-us/services/storage/blobs/)
   * [Configuration](#)
   * [Example](#)
