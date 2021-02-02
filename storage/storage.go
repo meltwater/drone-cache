@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/meltwater/drone-cache/storage/backend"
+	"github.com/meltwater/drone-cache/storage/common"
 
 	"github.com/go-kit/kit/log"
 )
@@ -24,7 +25,7 @@ type Storage interface {
 	Exists(p string) (bool, error)
 
 	// List lists contents of the given directory by given key from remote storage.
-	List(p string) ([]backend.FileEntry, error)
+	List(p string) ([]common.FileEntry, error)
 
 	// Delete deletes the object from remote storage.
 	Delete(p string) error
@@ -68,10 +69,11 @@ func (s *storage) Exists(p string) (bool, error) {
 }
 
 // List lists contents of the given directory by given key from remote storage.
-func (s *storage) List(p string) ([]backend.FileEntry, error) {
-	// Implement me!
-	// Make sure consumer utilizes context.
-	return []backend.FileEntry{}, nil
+func (s *storage) List(p string) ([]common.FileEntry, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), s.timeout)
+	defer cancel()
+
+	return s.b.List(ctx, p)
 }
 
 // Delete deletes the object from remote storage.

@@ -13,6 +13,7 @@ import (
 	"github.com/go-kit/kit/log/level"
 
 	"github.com/meltwater/drone-cache/internal"
+	"github.com/meltwater/drone-cache/storage/common"
 )
 
 const defaultFileMode = 0755
@@ -129,4 +130,9 @@ func (b *Backend) Exists(ctx context.Context, p string) (bool, error) {
 	}
 
 	return err == nil, nil
+}
+
+// List contents of the given directory by given key from remote storage.
+func (b *Backend) List(ctx context.Context, p string) ([]common.FileEntry, error) {
+	return nil, common.ErrNotImplemented
 }

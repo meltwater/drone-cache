@@ -35,6 +35,6 @@ services:
         sleep 2 &&
         mc config host add minio http://minio:9000 AKIAIOSFODNN7EXAMPLE wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY &&
         mc admin user add minio foo barbarbar &&
-        echo '{"Version": "2012-10-17", "Statement": [{"Action": ["s3:GetObject", "s3:PutObject", "s3:DeleteObject", "s3:CreateBucket", "s3:DeleteBucket"], "Effect": "Allow", "Resource": ["arn:aws:s3:::s3-round-trip-with-role/*", "arn:aws:s3:::s3-round-trip-with-role"], "Sid": ""}]}' > /tmp/policy.json &&
+        echo '{"Version": "2012-10-17", "Statement": [{"Action": ["s3:GetObject", "s3:PutObject", "s3:DeleteObject", "s3:CreateBucket", "s3:DeleteBucket", "s3:ListBucket"], "Effect": "Allow", "Resource": ["arn:aws:s3:::s3-round-trip-with-role/*", "arn:aws:s3:::s3-round-trip-with-role"], "Sid": ""}]}' > /tmp/policy.json &&
         mc admin policy add minio userpolicy /tmp/policy.json &&
         mc admin policy set minio userpolicy user=foo

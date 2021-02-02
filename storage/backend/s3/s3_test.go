@@ -24,16 +24,16 @@ const (
 	defaultAccessKey           = "AKIAIOSFODNN7EXAMPLE"
 	defaultSecretAccessKey     = "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
 	defaultRegion              = "eu-west-1"
-	defaultACL             	   = "private"
-	defaultUserAccessKey   	   = "foo"
+	defaultACL                 = "private"
+	defaultUserAccessKey       = "foo"
 	defaultUserSecretAccessKey = "barbarbar"
 )
 
 var (
-	endpoint        	= getEnv("TEST_S3_ENDPOINT", defaultEndpoint)
-	accessKey       	= getEnv("TEST_S3_ACCESS_KEY", defaultAccessKey)
-	secretAccessKey 	= getEnv("TEST_S3_SECRET_KEY", defaultSecretAccessKey)
-	acl             	= getEnv("TEST_S3_ACL", defaultACL)
+	endpoint            = getEnv("TEST_S3_ENDPOINT", defaultEndpoint)
+	accessKey           = getEnv("TEST_S3_ACCESS_KEY", defaultAccessKey)
+	secretAccessKey     = getEnv("TEST_S3_SECRET_KEY", defaultSecretAccessKey)
+	acl                 = getEnv("TEST_S3_ACL", defaultACL)
 	userAccessKey       = getEnv("TEST_USER_S3_ACCESS_KEY", defaultUserAccessKey)
 	userSecretAccessKey = getEnv("TEST_USER_S3_SECRET_KEY", defaultUserSecretAccessKey)
 )
@@ -90,6 +90,10 @@ func roundTrip(t *testing.T, backend *Backend) {
 	test.Ok(t, err)
 
 	test.Equals(t, true, exists)
+
+	entries, err := backend.List(context.TODO(), "")
+	test.Ok(t, err)
+	test.Equals(t, 1, len(entries))
 }
 
 // Helpers
