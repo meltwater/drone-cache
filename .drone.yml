@@ -204,6 +204,22 @@ steps:
     environment:
       AWS_ACCESS_KEY_ID: AKIAIOSFODNN7EXAMPLE
       AWS_SECRET_ACCESS_KEY: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+  
+  - name: docker
+    image: plugins/cache
+    settings:
+      repo: plugins/drone-meltwater-cache
+      auto_tag: true
+      auto_tag_suffix: linux-amd64
+      dockerfile: Dockerfile
+      username:
+        from_secret: docker_username
+      password:
+        from_secret: docker_password
+    when:
+      event:
+      - push
+      - tag
 
 services:
   - name: minio
