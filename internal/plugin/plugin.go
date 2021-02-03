@@ -96,7 +96,7 @@ func (p *Plugin) Exec() error { // nolint:funlen
 	}
 
 	options = append(options, cache.WithOverride(p.Config.Override),
-		cache.WithFailRestoreOnNonExistentKey(p.Config.FailRestoreOnNonExistentKey))
+		cache.WithFailRestoreIfKeyNotPresent(p.Config.FailRestoreIfKeyNotPresent))
 
 	// 2. Initialize storage backend.
 	b, err := backend.FromConfig(p.logger, cfg.Backend, backend.Config{

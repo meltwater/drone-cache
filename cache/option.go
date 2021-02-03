@@ -3,10 +3,10 @@ package cache
 import "github.com/meltwater/drone-cache/key"
 
 type options struct {
-	namespace                   string
-	fallbackGenerator           key.Generator
-	override                    bool
-	failRestoreOnNonExistentKey bool
+	namespace                  string
+	fallbackGenerator          key.Generator
+	override                   bool
+	failRestoreIfKeyNotPresent bool
 }
 
 // Option overrides behavior of Archive.
@@ -41,9 +41,9 @@ func WithOverride(override bool) Option {
 	})
 }
 
-// WithFailRestoreOnNonExistentKey sets option to fail restore if key does not exist.
-func WithFailRestoreOnNonExistentKey(b bool) Option {
+// WithFailRestoreIfKeyNotPresent sets option to fail restore if key does not exist.
+func WithFailRestoreIfKeyNotPresent(b bool) Option {
 	return optionFunc(func(o *options) {
-		o.failRestoreOnNonExistentKey = b
+		o.failRestoreIfKeyNotPresent = b
 	})
 }

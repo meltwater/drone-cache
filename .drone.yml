@@ -210,7 +210,6 @@ steps:
     settings:
       repo: plugins/cache
       auto_tag: true
-      auto_tag_suffix: linux-amd64
       dockerfile: Dockerfile
       username:
         from_secret: docker_username

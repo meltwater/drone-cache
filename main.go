@@ -300,11 +300,11 @@ func main() {
 			EnvVars: []string{"PLUGIN_EXIT_CODE", "EXIT_CODE"},
 		},
 		&cli.BoolFlag{
-			Name:    "fail-restore-on-non-existent-key",
+			Name:    "fail-restore-if-key-not-present",
 			Usage:   "fail cache restore if provided key does not exist",
 			Hidden:  true,
 			Value:   false,
-			EnvVars: []string{"PLUGIN_FAIL_RESTORE_ON_NON_EXISTENT_KEY"},
+			EnvVars: []string{"PLUGIN_FAIL_RESTORE_IF_KEY_NOT_PRESENT"},
 		},
 
 		// Backends Configs
@@ -530,18 +530,18 @@ func run(c *cli.Context) error {
 	}
 
 	plg.Config = plugin.Config{
-		ArchiveFormat:               c.String("archive-format"),
-		Backend:                     c.String("backend"),
-		CacheKeyTemplate:            c.String("cache-key"),
-		CompressionLevel:            c.Int("compression-level"),
-		Debug:                       c.Bool("debug"),
-		Mount:                       c.StringSlice("mount"),
-		Rebuild:                     c.Bool("rebuild"),
-		Restore:                     c.Bool("restore"),
-		RemoteRoot:                  c.String("remote-root"),
-		LocalRoot:                   c.String("local-root"),
-		Override:                    c.Bool("override"),
-		FailRestoreOnNonExistentKey: c.Bool("fail-restore-on-non-existent-key"),
+		ArchiveFormat:              c.String("archive-format"),
+		Backend:                    c.String("backend"),
+		CacheKeyTemplate:           c.String("cache-key"),
+		CompressionLevel:           c.Int("compression-level"),
+		Debug:                      c.Bool("debug"),
+		Mount:                      c.StringSlice("mount"),
+		Rebuild:                    c.Bool("rebuild"),
+		Restore:                    c.Bool("restore"),
+		RemoteRoot:                 c.String("remote-root"),
+		LocalRoot:                  c.String("local-root"),
+		Override:                   c.Bool("override"),
+		FailRestoreIfKeyNotPresent: c.Bool("fail-restore-if-key-not-present"),
 
 		StorageOperationTimeout: c.Duration("backend.operation-timeout"),
 		FileSystem: filesystem.Config{
