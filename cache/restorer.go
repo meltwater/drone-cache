@@ -52,24 +52,15 @@ func (r restorer) Restore(dsts []string) error {
 		namespace = filepath.ToSlash(filepath.Clean(r.namespace))
 	)
 
-	if r.failIfKeyNotPresent {
-		prefix := filepath.Join(namespace, key)
-		exists, err := r.s.Exists(prefix)
-
-		if err != nil {
-			return fmt.Errorf("failed to find key: %s with err: %v", prefix, err)
-		}
-
-		if !exists {
-			return fmt.Errorf("key %s does not exist", prefix)
-		}
-	}
-
 	if len(dsts) == 0 {
 		prefix := filepath.Join(namespace, key)
 		entries, err := r.s.List(prefix)
 
 		if err == nil {
+			if r.failIfKeyNotPresent && len(entries) == 0 {
+				return fmt.Errorf("key %s does not exist", prefix)
+			}
+
 			for _, e := range entries {
 				dsts = append(dsts, strings.TrimPrefix(e.Path, prefix+"/"))
 			}
