@@ -54,7 +54,7 @@ func TestCreate(t *testing.T) {
 			name: "non-existing mount paths",
 			tgz:  New(log.NewNopLogger(), testRootMounted, true, flate.DefaultCompression),
 			srcs: []string{
-				"idonotexist",
+				"iamnotexists",
 				"metoo",
 			},
 			written: 0,
@@ -119,7 +119,6 @@ func TestCreate(t *testing.T) {
 				return
 			}
 
-			// Test
 			for _, src := range absSrcs {
 				test.Ok(t, os.RemoveAll(src))
 			}
