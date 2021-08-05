@@ -268,8 +268,9 @@ As the versioning scheme dictates, `drone-cache` respects _backward compatibilit
 
 See the list of [all contributors](https://github.com/meltwater/drone-cache/graphs/contributors).
 
-- [@dim](https://github.com/dim) - Thanks for [original work](https://github.com/bsm/drone-s3-cache)!
+- [@kakkoyun](https://github.com/kakkoyun) - Thank you Kemal for bringing drone-cache to life, and building most of the initial version.
 - [@AdamGlazerMW](https://github.com/AdamGlazerMW) - Special thanks to Adam for the amazing artwork!
+- [@dim](https://github.com/dim) - Thanks for the [original work](https://github.com/bsm/drone-s3-cache) that inspired drone-cache!
 
 ### Inspiration
 
