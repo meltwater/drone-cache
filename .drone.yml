@@ -232,7 +232,7 @@ services:
     commands:
       - /entrypoint foo:pass:::sftp_test bar:pass:::plugin_test
   - name: azurite
-    image: mcr.microsoft.com/azure-storage/azurite
+    image: mcr.microsoft.com/azure-storage/azurite:3.10.0
     commands:
       - azurite-blob --blobHost 0.0.0.0
     ports:

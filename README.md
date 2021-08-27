@@ -4,7 +4,7 @@
 
 [![Go Doc](https://godoc.org/github.com/meltwater/drone-cache?status.svg)](http://godoc.org/github.com/meltwater/drone-cache) [![Go Code reference](https://img.shields.io/badge/code%20reference-go.dev-darkblue.svg)](https://pkg.go.dev/github.com/meltwater/drone-cache?tab=subdirectories) [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/2713/badge)](https://bestpractices.coreinfrastructure.org/projects/2713) [![Go Report Card](https://goreportcard.com/badge/github.com/meltwater/drone-cache)](https://goreportcard.com/report/github.com/meltwater/drone-cache) [![codebeat badge](https://codebeat.co/badges/802c6149-ac2d-4514-8648-f618c63a8d9e)](https://codebeat.co/projects/github-com-meltwater-drone-cache-master)
 
-[![meltwater/drone-cache on DockerHub](https://img.shields.io/badge/docker-ready-blue.svg)](https://hub.docker.com/r/meltwater/drone-cache) [![DockerHub Pulls](https://img.shields.io/docker/pulls/meltwater/drone-cache.svg)](https://hub.docker.com/r/meltwater/drone-cache) [![](https://images.microbadger.com/badges/image/meltwater/drone-cache.svg)](https://microbadger.com/images/meltwater/drone-cache) [![](https://images.microbadger.com/badges/version/meltwater/drone-cache.svg)](https://microbadger.com/images/meltwater/drone-cache)
+[![meltwater/drone-cache on DockerHub](https://img.shields.io/badge/docker-ready-blue.svg)](https://hub.docker.com/r/meltwater/drone-cache) [![DockerHub Pulls](https://img.shields.io/docker/pulls/meltwater/drone-cache.svg)](https://hub.docker.com/r/meltwater/drone-cache)
 
 <p align="center"><img src="images/drone_gopher.png" width="400"></p>
 
