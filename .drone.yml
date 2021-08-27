@@ -1,6 +1,6 @@
 ---
 kind: pipeline
-name: default
+name: amd64
 
 platform:
   os: linux
@@ -243,6 +243,30 @@ volumes:
     temp: {}
   - name: testdata
     temp: {}
+
+trigger:
+  branch:
+    - master
+  event:
+    - push
+    - pull_request
+
+---
+kind: pipeline
+name: arm64
+
+platform:
+  os: linux
+  arch: arm64
+
+steps:
+  - name: build
+    image: golang:1.14.4-alpine3.12
+    commands:
+      - apk add --update make git
+      - make drone-cache
+    environment:
+      CGO_ENABLED: 0
 
 trigger:
   branch:
