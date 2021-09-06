@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	"github.com/go-kit/kit/log"
+	"github.com/go-kit/kit/log/level"
 
 	"github.com/meltwater/drone-cache/internal"
 )
@@ -85,7 +86,13 @@ func writeToArchive(tw *tar.Writer, root string, skipSymlinks bool, written *int
 			}
 		}
 
-		name, err := relative(root, path)
+		var name string
+		if strings.HasPrefix(path, "/") {
+			name, err = filepath.Abs(path)
+		} else {
+			name, err = relative(root, path)
+		}
+
 		if err != nil {
 			return fmt.Errorf("relative name <%s>: <%s>, %w", path, root, err)
 		}
@@ -182,7 +189,7 @@ func (a *Archive) Extract(dst string, r io.Reader) (int64, error) {
 		}
 
 		var target string
-		if dst == h.Name {
+		if dst == h.Name || strings.HasPrefix(h.Name, "/") {
 			target = h.Name
 		} else {
 			name, err := relative(dst, h.Name)
@@ -192,6 +199,8 @@ func (a *Archive) Extract(dst string, r io.Reader) (int64, error) {
 
 			target = filepath.Join(dst, name)
 		}
+
+		level.Info(a.logger).Log("msg", "extracting archive", "path", target)
 
 		if err := os.MkdirAll(filepath.Dir(target), defaultDirPermission); err != nil {
 			return 0, fmt.Errorf("ensure directory <%s>, %w", target, err)

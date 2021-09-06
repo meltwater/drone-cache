@@ -50,7 +50,7 @@ type setupBackend func(*testing.T, *Config, string)
 
 var (
 	backends = map[string]setupBackend{
-		backend.Azure:      setupAzure,
+		// backend.Azure:      setupAzure,
 		backend.FileSystem: setupFileSystem,
 		backend.GCS:        setupGCS,
 		backend.S3:         setupS3,
