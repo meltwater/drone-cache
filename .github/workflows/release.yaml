@@ -4,10 +4,7 @@ on:
   push:
     tags:
       - "v*.*.*"
-    branches:
-      - -master
-      - release-*
-
+      
 jobs:
   goreleaser:
     runs-on: ubuntu-latest
