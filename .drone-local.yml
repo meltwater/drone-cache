@@ -1,6 +1,7 @@
 ---
+# This is an example of a Drone pipeline that can be run locally
 kind: pipeline
-name: default
+name: local-pipeline
 
 platform:
   os: linux
@@ -14,7 +15,7 @@ steps:
   - name: fetch
     image: docker:git
     commands:
-      - git fetch --tags
+      - git fetch --tags -f
 
   - name: configure-buckets
     image: minio/mc:RELEASE.2020-10-03T02-54-56Z
@@ -58,18 +59,9 @@ steps:
       - name: testdata
         path: /drone/src/tmp/testdata/cache
 
-  - name: generate
-    image: golang:1.14.1-alpine3.11
-    commands:
-      - apk add --update make git
-      # Following environment tricks are because of unintended variable capture by flag library.
-      # This mitigates contamination happens when generating CLI flag documentation.
-      - env -i make PATH=$(which go):$PATH HOME=$HOME PWD=$PWD GO=$(which go) GOPATH=$(go env GOPATH) generate
-      - git diff --exit-code
-
   - name: rebuild-cache
-    image: meltwater/drone-cache:v1.1.0-rc1
-    pull: always
+    image: drone-cache:MyTestTag
+    pull: if-not-exists
     settings:
       bucket: drone-cache-bucket
       mount:
@@ -84,8 +76,8 @@ steps:
       AWS_SECRET_ACCESS_KEY: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
 
   - name: rebuild-cache-with-key
-    image: meltwater/drone-cache:v1.1.0-rc1
-    pull: always
+    image: drone-cache:MyTestTag
+    pull: if-not-exists
     settings:
       bucket: drone-cache-bucket
       cache_key: "{{ .Repo.Name }}_{{ checksum \"go.mod\" }}_{{ checksum \"go.sum\" }}_{{ arch }}_{{ os }}"
@@ -101,8 +93,8 @@ steps:
       AWS_SECRET_ACCESS_KEY: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
 
   - name: rebuild-cache-with-gzip
-    image: meltwater/drone-cache:v1.1.0-rc1
-    pull: always
+    image: drone-cache:MyTestTag
+    pull: if-not-exists
     settings:
       archive_format: gzip
       bucket: drone-cache-bucket
@@ -119,8 +111,8 @@ steps:
       AWS_SECRET_ACCESS_KEY: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
 
   - name: rebuild-cache-with-filesystem
-    image: meltwater/drone-cache:v1.1.0-rc1
-    pull: always
+    image: drone-cache:MyTestTag
+    pull: if-not-exists
     settings:
       archive_format: gzip
       backend: filesystem
@@ -134,8 +126,8 @@ steps:
         path: /tmp/cache
 
   - name: restore-cache-with-key
-    image: meltwater/drone-cache:v1.1.0-rc1
-    pull: always
+    image: drone-cache:MyTestTag
+    pull: if-not-exists
     settings:
       bucket: drone-cache-bucket
       cache_key: "{{ .Repo.Name }}_{{ checksum \"go.mod\" }}_{{ checksum \"go.sum\" }}_{{ arch }}_{{ os }}"
@@ -152,8 +144,8 @@ steps:
       AWS_SECRET_ACCESS_KEY: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
 
   - name: restore-cache-with-gzip
-    image: meltwater/drone-cache:v1.1.0-rc1
-    pull: always
+    image: drone-cache:MyTestTag
+    pull: if-not-exists
     settings:
       archive_format: gzip
       bucket: drone-cache-bucket
@@ -170,8 +162,8 @@ steps:
       AWS_SECRET_ACCESS_KEY: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
 
   - name: restore-cache-with-filesystem
-    image: meltwater/drone-cache:v1.1.0-rc1
-    pull: always
+    image: drone-cache:MyTestTag
+    pull: if-not-exists
     settings:
       archive_format: gzip
       backend: filesystem
@@ -185,16 +177,16 @@ steps:
         path: /tmp/cache
 
   - name: restore-cache-debug
-    image: meltwater/drone-cache:v1.1.0-rc1
-    pull: always
+    image: drone-cache:MyTestTag
+    pull: if-not-exists
     settings:
       debug: true
       restore: true
       pull: always
 
   - name: restore-cache
-    image: meltwater/drone-cache:v1.1.0-rc1
-    pull: always
+    image: drone-cache:MyTestTag
+    pull: if-not-exists
     settings:
       bucket: drone-cache-bucket
       mount:
@@ -248,7 +240,5 @@ trigger:
   branch:
     - master
   event:
-    - push
-    - pull_request
-
+    - 
 ...
