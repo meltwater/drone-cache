@@ -70,7 +70,7 @@ the requirements below.
 Want to test locally without opening a PR?  Follow the steps below to build a local image of drone-cache and run the Drone pipeline against it.
 
 0. Make sure you have the [Drone CLI](https://docs.drone.io/cli/install/),  [Docker](https://docs.docker.com/get-docker/), and [GoReleaser](https://goreleaser.com/install/) installed locally.
-1. Update the `image_templates` key in `drone-cache/.goreleaser-local.yml`  to reflect the name you'd like your image to have, then run `release --config=.goreleaser-local.yml --snapshot --skip-publish --rm-dist` to build the image.
+1. Update the `image_templates` key in `drone-cache/.goreleaser-local.yml`  to reflect the name you'd like your image to have, then run `goreleaser release --config=.goreleaser-local.yml --snapshot --skip-publish --rm-dist` to build the image.
 2. Update the `image: drone-cache:MyTestTag` entries in the `local-pipeline` pipeline in the `.drone.yml` with the name of the image that you created (there are several of these).
 3. Run the Drone pipeline locally with `drone exec ./.drone-local.yml --branch MyBranchName`
 
