@@ -33,7 +33,7 @@ jobs:
         name: Run GoReleaser for Snapshot
         uses: goreleaser/goreleaser-action@v1
         with:
-          version: v0.137.0
+          version: v0.180.3
           # not using --snapshot because we want to push images for snapshots
           args: release --rm-dist --config=.goreleaser-snapshot.yml
         env:
