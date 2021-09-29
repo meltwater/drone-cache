@@ -126,7 +126,3 @@ docker_manifests:
   image_templates:
   - 'meltwater/drone-cache:{{ .Tag }}-linux-amd64'
   - 'meltwater/drone-cache:{{ .Tag }}-linux-arm64'
-- name_template: 'meltwater/drone-cache:latest'
-  image_templates:
-  - 'meltwater/drone-cache:{{ .Tag }}-linux-amd64'
-  - 'meltwater/drone-cache:{{ .Tag }}-linux-arm64'
