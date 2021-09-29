@@ -83,7 +83,9 @@ changelog:
 dockers:
   -
     goos: linux
-    goarch: amd64
+    goarch:
+    - amd64
+    - arm64
     goarm: ''
     binaries:
     - drone-cache
