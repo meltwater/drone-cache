@@ -83,9 +83,7 @@ changelog:
 dockers:
   -
     goos: linux
-    goarch:
-    - amd64
-    - arm64
+    goarch: amd64
     goarm: ''
     binaries:
     - drone-cache
@@ -94,6 +92,29 @@ dockers:
     skip_push: false
     dockerfile: Dockerfile
     build_flag_templates:
+    - "--label=org.label-schema.schema-version=1.0"
+    - "--label=version={{.Version}}"
+    - "--label=org.label-schema.name={{.ProjectName}}"
+    - "--label=org.label-schema.version={{.Version}}"
+    - "--label=org.label-schema.build-date={{.Date}}"
+    - "--label=org.label-schema.vcs-ref={{.FullCommit}}"
+    - "--label=org.label-schema.docker.dockerfile=Dockerfile"
+    - "--label=org.opencontainers.image.name={{.ProjectName}}"
+    - "--label=org.opencontainers.image.version={{.Version}}"
+    - "--label=org.opencontainers.image.created={{.Date}}"
+    - "--label=org.opencontainers.image.revision={{.FullCommit}}"
+  -
+    goos: linux
+    goarch: arm64
+    goarm: ''
+    binaries:
+    - drone-cache
+    image_templates:
+    - "meltwater/drone-cache:{{ .Tag }}"
+    skip_push: false
+    dockerfile: Dockerfile
+    build_flag_templates:
+    - "--platform=linux/arm64/v8"
     - "--label=org.label-schema.schema-version=1.0"
     - "--label=version={{.Version}}"
     - "--label=org.label-schema.name={{.ProjectName}}"
