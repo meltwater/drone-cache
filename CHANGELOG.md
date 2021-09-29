@@ -7,16 +7,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
-- [#99](https://github.com/meltwater/drone-cache/issues/99) Document building images and pushing locally for PR testing
-- [#133](https://github.com/meltwater/drone-cache/pull/133) backend/s3: Fixed Anonymous Credentials Error on public buckets. 
-  - Fixes [#132](https://github.com/meltwater/drone-cache/issues/132)
-- [#138](https://github.com/meltwater/drone-cache/pull/138) backend/gcs: Fix GCS to pass credentials correctly when `GCS_ENDPOINT` is not set.
-- [#135](https://github.com/meltwater/drone-cache/issues/135) backend/gcs: Fixed parsing of GCS JSON key.
-- [#142](https://github.com/meltwater/drone-cache/issues/142) backend/s3: Add option to assume AWS IAM role
-- [#151](https://github.com/meltwater/drone-cache/issues/151) backend/s3: Fix assume role parameter passing
-- [#164](https://github.com/meltwater/drone-cache/issues/164) tests: lock azurite image to 3.10.0
 ### Added
 
+- Nothing.
+
+### Changed
+
+- Nothing.
+
+### Removed
+
+- Nothing.
+
+### Deprecated
+
+- Nothing.
+
+## [1.2.0] - 2021-09-29
+
+### Added
+
+- [#146](https://github.com/meltwater/drone-cache/issues/146) Provide an arm image
+  - Multiple PRs
+- [#99](https://github.com/meltwater/drone-cache/issues/99) Document building images and pushing locally for PR testing
+- [#142](https://github.com/meltwater/drone-cache/issues/142) backend/s3: Add option to assume AWS IAM role
 - [#102](https://github.com/meltwater/drone-cache/pull/102) Implement option to disable cache rebuild if it already exists in storage.
 - [#86](https://github.com/meltwater/drone-cache/pull/86) Add backend operation timeout option that cancels request if they take longer than given duration. `BACKEND_OPERATION_TIMEOUT`, `backend.operation-timeot`. Default value is `3 minutes`.
 - [#86](https://github.com/meltwater/drone-cache/pull/86) Customize the cache key in the path. Adds a new `remote_root` option to customize it. Defaults to `repo.name`.
@@ -29,11 +43,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- [#86](https://github.com/meltwater/drone-cache/pull/86) Support multipart uploads.
-  - Fixes [#55](https://github.com/meltwater/drone-cache/issues/55).
-  - Fixes [#88](https://github.com/meltwater/drone-cache/issues/88).
-- [#86](https://github.com/meltwater/drone-cache/pull/86) Fixed rebuild errors when a nested path given in mount.
-  - Fixes [#87](https://github.com/meltwater/drone-cache/issues/87).
+- [#138](https://github.com/meltwater/drone-cache/pull/138) backend/gcs: Fix GCS to pass credentials correctly when `GCS_ENDPOINT` is not set.
+- [#135](https://github.com/meltwater/drone-cache/issues/135) backend/gcs: Fixed parsing of GCS JSON key.
+- [#151](https://github.com/meltwater/drone-cache/issues/151) backend/s3: Fix assume role parameter passing
+- [#164](https://github.com/meltwater/drone-cache/issues/164) tests: lock azurite image to 3.10.0
+- [#133](https://github.com/meltwater/drone-cache/pull/133) backend/s3: Fixed Anonymous Credentials Error on public buckets. 
+  - Fixes [#132](https://github.com/meltwater/drone-cache/issues/132)
 
 ### Removed
 
@@ -60,6 +75,44 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Deprecated
 
 - Nothing.
+
+## [1.1.0] - 2020-06-11
+
+### Changed
+
+- Docker login on CI
+- Fix branch matchers
+- Fix github actions
+- Fix snapshot tag matcher
+- [#121](https://github.com/meltwater/drone-cache/pull/121) Fix tests
+- Generated missing embedded piece
+- [#112](https://github.com/meltwater/drone-cache/pull/112) Improve documentation and development tooling
+- [#125](https://github.com/meltwater/drone-cache/pull/125) Merge release v1.1
+- [#124](https://github.com/meltwater/drone-cache/pull/124) Push images for snapshots
+- Remove branch trigger
+- Remove draft from releases prevents publishing
+- Remove snapshot flag from goreleaser
+- [#117](https://github.com/meltwater/drone-cache/pull/117) Removing leading newline in code block
+- Revert snapshot simplifications
+- Simplify snapshot releaser config
+- [#111](https://github.com/meltwater/drone-cache/pull/111) Update docs for CLI args with new override flag
+- [#126](https://github.com/meltwater/drone-cache/pull/126) Use bingo for tool dependencies
+- [#127](https://github.com/meltwater/drone-cache/pull/127) Use latest release candidate in CI
+- User docker token
+
+### Removed
+
+- Nothing.
+
+### Deprecated
+
+- Nothing.
+
+## [1.0.4] - 2019-06-14
+
+### Added
+
+- [#42](https://github.com/meltwater/drone-cache/pull/42) Add symlinks to archive
 
 ## [1.0.3] - 2019-06-11
 
