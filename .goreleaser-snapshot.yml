@@ -106,6 +106,7 @@ dockers:
     skip_push: false
     dockerfile: Dockerfile
     use: buildx
+    goarch: arm64
     build_flag_templates:
     - "--platform=linux/arm64"
     - "--label=org.label-schema.schema-version=1.0"
