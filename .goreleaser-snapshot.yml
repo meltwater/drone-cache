@@ -119,3 +119,13 @@ dockers:
     - "--label=org.opencontainers.image.version={{.Version}}"
     - "--label=org.opencontainers.image.created={{.Date}}"
     - "--label=org.opencontainers.image.revision={{.FullCommit}}"
+
+docker_manifests:
+- name_template: 'meltwater/drone-cache:{{ .Tag }}'
+  image_templates:
+  - 'meltwater/drone-cache:{{ .Tag }}-amd64'
+  - 'meltwater/drone-cache:{{ .Tag }}-arm64'
+- name_template: 'meltwater/drone-cache:latest'
+  image_templates:
+  - 'meltwater/drone-cache:{{ .Tag }}-amd64'
+  - 'meltwater/drone-cache:{{ .Tag }}-arm64'
