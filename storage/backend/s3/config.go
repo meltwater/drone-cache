@@ -15,6 +15,7 @@ type Config struct {
 	Encryption  string // if not "", enables server-side encryption. valid values are: AES256, aws:kms.
 	Endpoint    string
 	Key         string
+	Public      bool
 	StsEndpoint string
 	RoleArn     string // if "", do not assume IAM role i.e. use the IAM user.
 
