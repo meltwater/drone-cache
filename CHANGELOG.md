@@ -23,7 +23,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Nothing.
 
+## [1.2.1] - 2021-09-30
+
+### Added
+
+- [#183](https://github.com/meltwater/drone-cache/pull/183) set goarch for arm64 goreleaser
+
 ## [1.2.0] - 2021-09-29
+
+**Warning** arm64 docker images are broken in this release, please use to 1.2.1
 
 ### Added
 
