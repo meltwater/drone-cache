@@ -77,7 +77,7 @@ Want to test locally without opening a PR?  Follow the steps below to build a lo
 ## Response Times
 
 **Please note the below timeframes are response windows we strive to meet. Please understand we may not always be able to respond in the exact timeframes outlined below**
-- Issues/pull requests will be reviewed and acknowledged with a message sent to the submitter within two business days
+- New issues/pull requests will be reviewed and acknowledged with a message sent to the submitter within two business days
 - The ticket will then be groomed and planned as regular sprint work and an estimated timeframe of completion will be communicated to the submitter.
 - Once the ticket is complete, a final message will be sent to the submitter letting them know work is complete.
 
