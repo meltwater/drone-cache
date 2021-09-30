@@ -12,6 +12,7 @@ steps:
       - apk update
       - apk add file
       - file /bin/busybox
+      - touch vendor/emptyfile
       
   - name: rebuild-cache
     image: meltwater/drone-cache
