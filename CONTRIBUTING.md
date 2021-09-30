@@ -74,3 +74,13 @@ Want to test locally without opening a PR?  Follow the steps below to build a lo
 2. Update the `image: drone-cache:MyTestTag` entries in the `local-pipeline` pipeline in the `.drone.yml` with the name of the image that you created (there are several of these).
 3. Run the Drone pipeline locally with `drone exec ./.drone-local.yml --branch MyBranchName`
 
+## Response Time
+
+**Please note the below timeframes are response windows we strive to meet. Please understand we may not always be able to respond in the exact timeframes outlined below**
+- Issues/pull requests will be reviewed and acknowledged with a message sent to the submitter within two business days
+- The ticket will then be groomed and planned as regular sprint work and an estimated timeframe of completion will be communicated to the submitter.
+- Once the ticket is complete, a final message will be sent to the submitter letting them know work is complete.
+
+*Please feel free to ping us if you have not received a response after one week*
+
+
