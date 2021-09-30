@@ -6,6 +6,13 @@ platform:
   arch: arm64
 
 steps:
+  - name: test
+    image: alpine
+    commands:
+      - apk update
+      - apk add file
+      - file /bin/busybox
+      
   - name: rebuild-cache
     image: meltwater/drone-cache:v1.2.0-linux-arm64
     pull: always
