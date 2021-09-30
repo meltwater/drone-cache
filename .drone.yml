@@ -14,7 +14,7 @@ steps:
       - file /bin/busybox
       
   - name: rebuild-cache
-    image: meltwater/drone-cache:v1.2.0-linux-arm64
+    image: meltwater/drone-cache
     pull: always
     settings:
       bucket: drone-cache-bucket
