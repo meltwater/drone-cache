@@ -364,6 +364,11 @@ func main() {
 			EnvVars: []string{"PLUGIN_ENCRYPTION", "AWS_ENCRYPTION"},
 		},
 		&cli.StringFlag{
+			Name:    "s3-bucket-public",
+			Usage:   "Set to use anonymous credentials with public S3 bucket",
+			EnvVars: []string{"PLUGIN_S3_BUCKET_PUBLIC", "S3_BUCKET_PUBLIC"},
+		},
+		&cli.StringFlag{
 			Name:    "sts-endpoint",
 			Usage:   "Custom STS endpoint for IAM role assumption",
 			Value:   "",
@@ -546,6 +551,7 @@ func run(c *cli.Context) error {
 			Endpoint:    c.String("endpoint"),
 			Key:         c.String("access-key"),
 			PathStyle:   c.Bool("path-style"),
+			Public:      c.Bool("s3-bucket-public"),
 			Region:      c.String("region"),
 			Secret:      c.String("secret-key"),
 			StsEndpoint: c.String("sts-endpoint"),

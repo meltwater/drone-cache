@@ -30,4 +30,5 @@ type Config struct {
 	Secret string
 
 	PathStyle bool // Use path style instead of domain style. Should be true for minio and false for AWS.
+	Public    bool
 }

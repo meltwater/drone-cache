@@ -23,6 +23,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Nothing.
 
+## [1.2.2] - 2021-10-01
+
+- [#188](https://github.com/meltwater/drone-cache/pull/188) v1.2.0 breaks EC2 IAM role bucket access
+
 ## [1.2.1] - 2021-09-30
 
 ### Added
