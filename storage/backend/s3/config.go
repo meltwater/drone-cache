@@ -15,7 +15,6 @@ type Config struct {
 	Encryption  string // if not "", enables server-side encryption. valid values are: AES256, aws:kms.
 	Endpoint    string
 	Key         string
-	Public      bool
 	StsEndpoint string
 	RoleArn     string // if "", do not assume IAM role i.e. use the IAM user.
 
@@ -31,4 +30,5 @@ type Config struct {
 	Secret string
 
 	PathStyle bool // Use path style instead of domain style. Should be true for minio and false for AWS.
+	Public    bool
 }
