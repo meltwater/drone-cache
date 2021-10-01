@@ -180,6 +180,7 @@ GLOBAL OPTIONS:
    --path-style                          AWS path style to use for bucket paths. (true for minio, false for aws) (default: false) [$PLUGIN_PATH_STYLE, $AWS_PLUGIN_PATH_STYLE]
    --acl value                           upload files with acl (private, public-read, ...) (default: "private") [$PLUGIN_ACL, $AWS_ACL]
    --encryption value                    server-side encryption algorithm, defaults to none. (AES256, aws:kms) [$PLUGIN_ENCRYPTION, $AWS_ENCRYPTION]
+   --s3-bucket-public value              Set to use anonymous credentials with public S3 bucket [$PLUGIN_S3_BUCKET_PUBLIC, $S3_BUCKET_PUBLIC]
    --sts-endpoint value                  Custom STS endpoint for IAM role assumption [$PLUGIN_STS_ENDPOINT, $AWS_STS_ENDPOINT]
    --role-arn value                      AWS IAM role ARN to assume [$PLUGIN_ASSUME_ROLE_ARN, $AWS_ASSUME_ROLE_ARN]
    --gcs.api-key value                   Google service account API key [$PLUGIN_API_KEY, $GCP_API_KEY]
