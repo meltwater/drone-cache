@@ -12,7 +12,7 @@ name: default
 
 steps:
   - name: restore-cache
-    image: meltwater/drone-cache:dev
+    image: meltwater/drone-cache
     environment:
       AWS_ACCESS_KEY_ID:
         from_secret: aws_access_key_id
@@ -34,7 +34,7 @@ steps:
       - make drone-cache
 
   - name: rebuild-cache
-    image: meltwater/drone-cache:dev
+    image: meltwater/drone-cache
     pull: true
     environment:
       AWS_ACCESS_KEY_ID:
@@ -59,7 +59,7 @@ name: default
 
 steps:
   - name: restore-cache-with-filesystem
-    image: meltwater/drone-cache:dev
+    image: meltwater/drone-cache
     pull: true
     settings:
       backend: "filesystem"
@@ -81,7 +81,7 @@ steps:
       - make drone-cache
 
   - name: rebuild-cache-with-filesystem
-    image: meltwater/drone-cache:dev
+    image: meltwater/drone-cache
     pull: true
     settings:
       backend: "filesystem"
@@ -111,7 +111,7 @@ name: default
 
 steps:
   - name: restore-cache-with-key
-    image: meltwater/drone-cache:dev
+    image: meltwater/drone-cache
     environment:
       AWS_ACCESS_KEY_ID:
         from_secret: aws_access_key_id
@@ -134,7 +134,7 @@ steps:
       - make drone-cache
 
   - name: rebuild-cache-with-key
-    image: meltwater/drone-cache:dev
+    image: meltwater/drone-cache
     pull: true
     environment:
       AWS_ACCESS_KEY_ID:
@@ -158,7 +158,7 @@ name: default
 
 steps:
   - name: restore-cache-with-gzip
-    image: meltwater/drone-cache:dev
+    image: meltwater/drone-cache
     pull: true
     environment:
       AWS_ACCESS_KEY_ID:
@@ -182,7 +182,7 @@ steps:
       - make drone-cache
 
   - name: rebuild-cache-with-gzip
-    image: meltwater/drone-cache:dev
+    image: meltwater/drone-cache
     pull: true
     environment:
       AWS_ACCESS_KEY_ID:
@@ -207,7 +207,7 @@ name: default
 
 steps:
   - name: restore-cache-debug
-    image: meltwater/drone-cache:dev
+    image: meltwater/drone-cache
     settings:
       pull: true
       restore: true
@@ -221,7 +221,7 @@ steps:
       - make drone-cache
 
   - name: restore-cache-debug
-    image: meltwater/drone-cache:dev
+    image: meltwater/drone-cache
     settings:
       pull: true
       rebuild: true
