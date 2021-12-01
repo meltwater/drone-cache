@@ -9,7 +9,7 @@ import (
 
 	"github.com/go-kit/kit/log"
 	"github.com/klauspost/compress/flate"
-	"github.com/klauspost/compress/gzip"
+	gzip "github.com/klauspost/pgzip"
 
 	"github.com/meltwater/drone-cache/archive/tar"
 	"github.com/meltwater/drone-cache/test"

@@ -8,7 +8,7 @@ import (
 	"github.com/meltwater/drone-cache/internal"
 
 	"github.com/go-kit/kit/log"
-	"github.com/klauspost/compress/gzip"
+	gzip "github.com/klauspost/pgzip"
 )
 
 // Archive implements archive for gzip.
