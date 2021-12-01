@@ -1,7 +1,6 @@
 package gzip
 
 import (
-	"compress/gzip"
 	"fmt"
 	"io"
 
@@ -9,6 +8,7 @@ import (
 	"github.com/meltwater/drone-cache/internal"
 
 	"github.com/go-kit/kit/log"
+	"github.com/klauspost/compress/gzip"
 )
 
 // Archive implements archive for gzip.

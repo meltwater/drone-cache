@@ -1,8 +1,6 @@
 package gzip
 
 import (
-	"compress/flate"
-	"compress/gzip"
 	"io"
 	"io/ioutil"
 	"os"
@@ -10,6 +8,8 @@ import (
 	"testing"
 
 	"github.com/go-kit/kit/log"
+	"github.com/klauspost/compress/flate"
+	"github.com/klauspost/compress/gzip"
 
 	"github.com/meltwater/drone-cache/archive/tar"
 	"github.com/meltwater/drone-cache/test"
