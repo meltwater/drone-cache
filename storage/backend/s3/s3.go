@@ -69,7 +69,13 @@ func New(l log.Logger, c Config, debug bool) (*Backend, error) {
 		conf.WithLogLevel(aws.LogDebugWithHTTPBody)
 	}
 
-	client := s3.New(session.Must(session.NewSessionWithOptions(session.Options{})), conf)
+	sess, err := session.NewSession(conf)
+	if err != nil {
+		level.Warn(l).Log("msg", "could not instantiate session", "error", err)
+		return nil, err
+	}
+
+	client := s3.New(sess)
 
 	return &Backend{
 		logger:     l,

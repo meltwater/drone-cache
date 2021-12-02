@@ -23,9 +23,8 @@ steps:
       - "echo '{\"Version\": \"2012-10-17\", \"Statement\": [ { \"Action\": [ \"s3:GetObject\", \"s3:PutObject\", \"s3:DeleteObject\", \"s3:CreateBucket\", \"s3:DeleteBucket\", \"s3:ListBucket\" ], \"Effect\": \"Allow\", \"Resource\": [ \"arn:aws:s3:::s3-round-trip-with-role/*\", \"arn:aws:s3:::s3-round-trip-with-role\" ], \"Sid\": \"\" } ] }' >> /tmp/policy.json"
       - mc admin policy add minio userpolicy /tmp/policy.json
       - mc admin policy set minio userpolicy user=foo
-
   - name: build
-    image: golang:1.14.4-alpine3.12
+    image: golang:1.17.3-alpine3.13
     commands:
       - apk add --update make git
       - make drone-cache
@@ -33,7 +32,7 @@ steps:
       CGO_ENABLED: 0
 
   - name: lint
-    image: golang:1.14.4-alpine3.12
+    image: golang:1.17.3-alpine3.13
     commands:
       - apk add --update make git curl
       - make lint
@@ -41,7 +40,7 @@ steps:
       CGO_ENABLED: 0
 
   - name: test
-    image: golang:1.14.4-alpine3.12
+    image: golang:1.17.3-alpine3.13
     commands:
       - go test -mod=vendor -short -cover -tags=integration ./...
     environment:

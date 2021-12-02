@@ -11,10 +11,9 @@ linters:
   enable-all: true
   disable:
     - goerr113
+    - errcheck
 
 linters-settings:
-  errcheck:
-    exclude: .errcheck_excludes
   lll:
     line-length: 120
   funlen:
