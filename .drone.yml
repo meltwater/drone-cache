@@ -1,7 +1,7 @@
 ---
 kind: pipeline
 type: docker
-name: default
+name: testing
 
 clone:
   depth: 50
@@ -203,21 +203,6 @@ steps:
     environment:
       AWS_ACCESS_KEY_ID: AKIAIOSFODNN7EXAMPLE
       AWS_SECRET_ACCESS_KEY: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
-  
-  - name: docker
-    image: plugins/docker
-    settings:
-      repo: plugins/cache
-      auto_tag: true
-      dockerfile: Dockerfile
-      username:
-        from_secret: docker_username
-      password:
-        from_secret: docker_password
-    when:
-      event:
-      - push
-      - tag
 
 services:
   - name: minio
@@ -255,4 +240,342 @@ volumes:
   - name: testdata
     temp: {}
 
+---
+kind: pipeline
+name: linux-amd64
+
+platform:
+  os: linux
+  arch: amd64
+
+steps:
+- name: build-push
+  pull: always
+  image: golang:1.17.3
+  commands:
+  - "go build -v -ldflags \"-X main.build=${DRONE_BUILD_NUMBER}\" -a -o release/linux/amd64/drone-cache"
+  environment:
+    CGO_ENABLED: 0
+    GO111MODULE: on
+  when:
+    event:
+    - push
+    - pull_request
+
+- name: build-tag
+  pull: always
+  image: golang:1.17.3
+  commands:
+  - "go build -v -ldflags \"-X main.version=${DRONE_TAG##v} -X main.build=${DRONE_BUILD_NUMBER}\" -a -o release/linux/amd64/drone-cache"
+  environment:
+    CGO_ENABLED: 0
+    GO111MODULE: on
+  when:
+    event:
+    - tag
+
+- name: publish
+  pull: always
+  image: plugins/docker:linux-amd64
+  settings:
+    auto_tag: true
+    auto_tag_suffix: linux-amd64
+    dockerfile: docker/Dockerfile.linux.amd64
+    password:
+      from_secret: docker_password
+    repo: plugins/cache
+    username:
+      from_secret: docker_username
+  when:
+    event:
+    - push
+    - tag
+
+trigger:
+  branch:
+  - master
+
+depends_on:
+- testing
+
+---
+kind: pipeline
+name: linux-arm64
+
+platform:
+  os: linux
+  arch: arm64
+
+steps:
+- name: build-push
+  pull: always
+  image: golang:1.17.3
+  commands:
+  - "go build -v -ldflags \"-X main.build=${DRONE_BUILD_NUMBER}\" -a -o release/linux/arm64/drone-cache"
+  environment:
+    CGO_ENABLED: 0
+    GO111MODULE: on
+  when:
+    event:
+    - push
+    - pull_request
+
+- name: build-tag
+  pull: always
+  image: golang:1.17.3
+  commands:
+  - "go build -v -ldflags \"-X main.version=${DRONE_TAG##v} -X main.build=${DRONE_BUILD_NUMBER}\" -a -o release/linux/arm64/drone-cache"
+  environment:
+    CGO_ENABLED: 0
+    GO111MODULE: on
+  when:
+    event:
+    - tag
+
+- name: publish
+  pull: always
+  image: plugins/docker:linux-arm64
+  settings:
+    auto_tag: true
+    auto_tag_suffix: linux-arm64
+    dockerfile: docker/Dockerfile.linux.arm64
+    password:
+      from_secret: docker_password
+    repo: plugins/cache
+    username:
+      from_secret: docker_username
+  when:
+    event:
+    - push
+    - tag
+
+trigger:
+  branch:
+  - master
+
+depends_on:
+- testing
+
+---
+kind: pipeline
+name: linux-arm
+
+platform:
+  os: linux
+  arch: arm
+
+steps:
+- name: build
+  pull: always
+  image: golang:1.17.3
+  commands:
+  - "go build -v -ldflags \"-X main.build=${DRONE_BUILD_NUMBER}\" -a -o release/linux/arm/drone-cache"
+  environment:
+    CGO_ENABLED: 0
+    GO111MODULE: on
+  when:
+    event:
+    - push
+    - pull_request
+
+- name: build-tag
+  pull: always
+  image: golang:1.17.3
+  commands:
+  - "go build -v -ldflags \"-X main.version=${DRONE_TAG##v} -X main.build=${DRONE_BUILD_NUMBER}\" -a -o release/linux/arm/drone-cache"
+  environment:
+    CGO_ENABLED: 0
+    GO111MODULE: on
+  when:
+    event:
+    - tag
+
+- name: publish
+  pull: always
+  image: plugins/docker:linux-arm
+  settings:
+    auto_tag: true
+    auto_tag_suffix: linux-arm
+    dockerfile: docker/Dockerfile.linux.arm
+    password:
+      from_secret: docker_password
+    repo: plugins/cache
+    username:
+      from_secret: docker_username
+  when:
+    event:
+    - push
+    - tag
+
+trigger:
+  branch:
+  - master
+
+depends_on:
+- testing
+
+---
+kind: pipeline
+type: ssh
+name: windows-1809-amd64
+
+platform:
+  os: windows
+
+server:
+  host: windows.1809.amd64.plugins.drone.ci
+  password:
+    from_secret: windows_password
+  user:
+    from_secret: windows_username
+
+steps:
+- name: build
+  commands:
+  - echo $env:DRONE_SEMVER_SHORT
+  - go build -o release/windows/amd64/drone-cache.exe
+  - docker login -u $env:USERNAME -p $env:PASSWORD
+  - |
+    $tag="windows-1809-amd64"
+    if (Test-Path env:DRONE_SEMVER_SHORT) {
+      $tag="$env:DRONE_SEMVER_SHORT-windows-1809-amd64"
+    }
+    docker build -f docker/Dockerfile.windows.1809 -t plugins/cache:$tag .
+    docker push plugins/cache:$tag
+  environment:
+    CGO_ENABLED: "0"
+    USERNAME:
+      from_secret: docker_username
+    PASSWORD:
+      from_secret: docker_password
+
+trigger:
+  event:
+  - push
+  - tag
+
+depends_on:
+- testing
+
+---
+kind: pipeline
+type: ssh
+name: windows-1903-amd64
+
+platform:
+  os: windows
+
+server:
+  host: windows.1903.amd64.plugins.drone.ci
+  password:
+    from_secret: windows_password
+  user:
+    from_secret: windows_username
+
+steps:
+- name: build
+  commands:
+  - echo $env:DRONE_SEMVER_SHORT
+  - go build -o release/windows/amd64/drone-cache.exe
+  - docker login -u $env:USERNAME -p $env:PASSWORD
+  - |
+    $tag="windows-1903-amd64"
+    if (Test-Path env:DRONE_SEMVER_SHORT) {
+      $tag="$env:DRONE_SEMVER_SHORT-windows-1903-amd64"
+    }
+    docker build -f docker/Dockerfile.windows.1903 -t plugins/cache:$tag .
+    docker push plugins/cache:$tag
+  environment:
+    CGO_ENABLED: "0"
+    USERNAME:
+      from_secret: docker_username
+    PASSWORD:
+      from_secret: docker_password
+
+trigger:
+  event:
+  - push
+  - tag
+
+depends_on:
+- testing
+
+---
+kind: pipeline
+type: ssh
+name: windows-1909-amd64
+
+platform:
+  os: windows
+
+server:
+  host: windows.1909.amd64.plugins.drone.ci
+  password:
+    from_secret: windows_password
+  user:
+    from_secret: windows_username
+
+steps:
+- name: build
+  commands:
+  - echo $env:DRONE_SEMVER_SHORT
+  - go build -o release/windows/amd64/drone-cache.exe
+  - docker login -u $env:USERNAME -p $env:PASSWORD
+  - |
+    $tag="windows-1909-amd64"
+    if (Test-Path env:DRONE_SEMVER_SHORT) {
+      $tag="$env:DRONE_SEMVER_SHORT-windows-1909-amd64"
+    }
+    docker build -f docker/Dockerfile.windows.1909 -t plugins/cache:$tag .
+    docker push plugins/cache:$tag
+  environment:
+    CGO_ENABLED: "0"
+    USERNAME:
+      from_secret: docker_username
+    PASSWORD:
+      from_secret: docker_password
+
+trigger:
+  event:
+  - push
+  - tag
+
+depends_on:
+- testing
+
+---
+kind: pipeline
+name: notifications
+
+platform:
+  os: linux
+  arch: amd64
+
+steps:
+- name: manifest
+  pull: always
+  image: plugins/manifest
+  settings:
+    ignore_missing: "true"
+    auto_tag: "true"
+    password:
+      from_secret: docker_password
+    spec: docker/manifest.tmpl
+    username:
+      from_secret: docker_username
+
+trigger:
+  branch:
+  - master
+  event:
+  - push
+  - tag
+
+depends_on:
+- linux-amd64
+- linux-arm64
+- linux-arm
+- windows-1809-amd64
+- windows-1903-amd64
+- windows-1909-amd64
 ...
