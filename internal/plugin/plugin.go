@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"time"
 
 	"github.com/go-kit/log"
 	"github.com/go-kit/log/level"
@@ -83,7 +84,7 @@ func (p *Plugin) Exec() error { // nolint: funlen,cyclop
 
 	var generator key.Generator
 	if cfg.CacheKeyTemplate != "" {
-		generator = keygen.NewMetadata(p.logger, cfg.CacheKeyTemplate, p.Metadata)
+		generator = keygen.NewMetadata(p.logger, cfg.CacheKeyTemplate, p.Metadata, time.Now)
 		if err := generator.Check(); err != nil {
 			return fmt.Errorf("parse failed, falling back to default, %w", err)
 		}

@@ -5,6 +5,7 @@ Cache key template syntax is very basic. You just need to provide a string. In t
 Also following helper functions provided for your use:
 
 * `checksum`: Provides md5 hash of a file for given path
+* `hashFiles`: Provides md5 hash after md5 hashing each single file
 * `epoch`: Provides Unix epoch
 * `arch`: Provides Architecture of running system
 * `os`: Provides Operation system of running system
@@ -16,6 +17,10 @@ For further information about this syntax please see [official docs](https://gol
 `"{{ .Repo.Name }}-{{ .Commit.Branch }}-{{ checksum "go.mod" }}-yadayadayada"`
 
 `"{{ .Repo.Name }}_{{ checksum "go.mod" }}_{{ checksum "go.sum" }}_{{ arch }}_{{ os }}"`
+
+`"{{ .Repo.Name }}_{{ hashFiles "go.mod" "go.sum" }}_{{ arch }}_{{ os }}"`
+
+`"{{ .Repo.Name }}_{{ hashFiles "go.*" }}_{{ arch }}_{{ os }}"`
 
 ## Metadata
 

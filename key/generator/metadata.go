@@ -1,8 +1,10 @@
 package generator
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -31,16 +33,17 @@ type Metadata struct {
 }
 
 // NewMetadata creates a new Key Generator.
-func NewMetadata(logger log.Logger, tmpl string, data metadata.Metadata) *Metadata {
+func NewMetadata(logger log.Logger, tmpl string, data metadata.Metadata, nowFunc func() time.Time) *Metadata {
 	return &Metadata{
 		logger: logger,
 		tmpl:   tmpl,
 		data:   data,
 		funcMap: template.FuncMap{
-			"checksum": checksumFunc(logger),
-			"epoch":    func() string { return strconv.FormatInt(time.Now().Unix(), EpochNumBase) },
-			"arch":     func() string { return runtime.GOARCH },
-			"os":       func() string { return runtime.GOOS },
+			"checksum":  checksumFunc(logger),
+			"hashFiles": hashFilesFunc(logger),
+			"epoch":     func() string { return strconv.FormatInt(nowFunc().Unix(), EpochNumBase) },
+			"arch":      func() string { return runtime.GOARCH },
+			"os":        func() string { return runtime.GOOS },
 		},
 	}
 }
@@ -89,29 +92,63 @@ func (g *Metadata) parseTemplate() (*template.Template, error) {
 
 func checksumFunc(logger log.Logger) func(string) string {
 	return func(p string) string {
-		path, err := filepath.Abs(filepath.Clean(p))
-		if err != nil {
-			level.Error(logger).Log("cache key template/checksum could not find file")
-
-			return ""
-		}
-
-		f, err := os.Open(path)
-		if err != nil {
-			level.Error(logger).Log("cache key template/checksum could not open file")
-
-			return ""
-		}
-
-		defer internal.CloseWithErrLogf(logger, f, "checksum close defer")
-
-		str, err := readerHasher(f)
-		if err != nil {
-			level.Error(logger).Log("cache key template/checksum could not generate hash")
-
-			return ""
-		}
-
-		return str
+		return fmt.Sprintf("%x", getFileHash(p, logger))
 	}
+}
+
+func hashFilesFunc(logger log.Logger) func(...string) string {
+	return func(patterns ...string) string {
+		var readers []io.Reader
+
+		for _, pattern := range patterns {
+			paths, err := filepath.Glob(pattern)
+			if err != nil {
+				level.Error(logger).Log("could not parse file path as a glob pattern")
+				continue
+			}
+
+			for _, p := range paths {
+				readers = append(readers, bytes.NewReader(getFileHash(p, logger)))
+			}
+		}
+
+		if len(readers) == 0 {
+			level.Debug(logger).Log("no matches found for glob")
+			return ""
+		}
+
+		level.Debug(logger).Log("found %d files to hash", len(readers))
+
+		h, err := readerHasher(readers...)
+		if err != nil {
+			level.Error(logger).Log("could not generate the hash of the input files: %s", err.Error())
+			return ""
+		}
+
+		return fmt.Sprintf("%x", h)
+	}
+}
+
+func getFileHash(path string, logger log.Logger) []byte {
+	path, err := filepath.Abs(filepath.Clean(path))
+	if err != nil {
+		level.Error(logger).Log("cache key template/checksum could not find file")
+		return []byte{}
+	}
+
+	f, err := os.Open(path)
+	if err != nil {
+		level.Error(logger).Log("cache key template/checksum could not open file")
+		return []byte{}
+	}
+
+	defer internal.CloseWithErrLogf(logger, f, "checksum close defer")
+
+	str, err := readerHasher(f)
+	if err != nil {
+		level.Error(logger).Log("cache key template/checksum could not generate hash")
+		return []byte{}
+	}
+
+	return str
 }
