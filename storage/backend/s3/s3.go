@@ -35,7 +35,7 @@ func New(l log.Logger, c Config, debug bool) (*Backend, error) {
 	conf := &aws.Config{
 		Region:           aws.String(c.Region),
 		Endpoint:         &c.Endpoint,
-		DisableSSL:       aws.Bool(!strings.HasPrefix(c.Endpoint, "https://")),
+		DisableSSL:       aws.Bool(strings.HasPrefix(c.Endpoint, "http://")),
 		S3ForcePathStyle: aws.Bool(c.PathStyle),
 	}
 

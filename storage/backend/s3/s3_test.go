@@ -1,3 +1,4 @@
+//go:build integration
 // +build integration
 
 package s3
@@ -20,7 +21,7 @@ import (
 )
 
 const (
-	defaultEndpoint            = "127.0.0.1:9000"
+	defaultEndpoint            = "http://127.0.0.1:9000"
 	defaultAccessKey           = "AKIAIOSFODNN7EXAMPLE"
 	defaultSecretAccessKey     = "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
 	defaultRegion              = "eu-west-1"
@@ -125,7 +126,7 @@ func newClient(config Config) *s3.S3 {
 	conf := &aws.Config{
 		Region:           aws.String(defaultRegion),
 		Endpoint:         aws.String(endpoint),
-		DisableSSL:       aws.Bool(!strings.HasPrefix(endpoint, "https://")),
+		DisableSSL:       aws.Bool(strings.HasPrefix(endpoint, "http://")),
 		S3ForcePathStyle: aws.Bool(true),
 		Credentials:      credentials.NewStaticCredentials(config.Key, config.Secret, ""),
 	}
