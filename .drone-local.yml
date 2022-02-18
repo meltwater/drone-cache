@@ -111,6 +111,24 @@ steps:
       AWS_ACCESS_KEY_ID: AKIAIOSFODNN7EXAMPLE
       AWS_SECRET_ACCESS_KEY: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
 
+  - name: rebuild-cache-with-zstd
+    image: drone-cache:MyTestTag
+    pull: if-not-exists
+    settings:
+      archive_format: zstd
+      bucket: drone-cache-bucket
+      cache_key: zstd
+      mount:
+        - vendor
+      rebuild: true
+      region: eu-west-1
+      path_style: true
+      endpoint: minio:9000
+      exit_code: true
+    environment:
+      AWS_ACCESS_KEY_ID: AKIAIOSFODNN7EXAMPLE
+      AWS_SECRET_ACCESS_KEY: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+
   - name: rebuild-cache-with-filesystem
     image: drone-cache:MyTestTag
     pull: if-not-exists
@@ -151,6 +169,24 @@ steps:
       archive_format: gzip
       bucket: drone-cache-bucket
       cache_key: gzip
+      mount:
+        - vendor
+      region: eu-west-1
+      restore: true
+      path_style: true
+      endpoint: minio:9000
+      exit_code: true
+    environment:
+      AWS_ACCESS_KEY_ID: AKIAIOSFODNN7EXAMPLE
+      AWS_SECRET_ACCESS_KEY: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+
+  - name: restore-cache-with-zstd
+    image: drone-cache:MyTestTag
+    pull: if-not-exists
+    settings:
+      archive_format: zstd
+      bucket: drone-cache-bucket
+      cache_key: zstd
       mount:
         - vendor
       region: eu-west-1

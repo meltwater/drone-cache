@@ -332,7 +332,7 @@ cache_key
 : cache key to use for the cache directories
 
 archive_format
-: archive format to use to store the cache directories (`tar`, `gzip`) (default: `tar`)
+: archive format to use to store the cache directories (`tar`, `gzip`, `zstd`) (default: `tar`)
 
 override
 : override already existing cache files (default: `true`)

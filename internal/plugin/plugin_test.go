@@ -1,3 +1,4 @@
+//go:build integration
 // +build integration
 
 package plugin
@@ -60,6 +61,7 @@ var (
 	formats = []string{
 		archive.Gzip,
 		archive.Tar,
+		archive.Zstd,
 	}
 )
 
