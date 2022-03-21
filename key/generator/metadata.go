@@ -92,7 +92,7 @@ func (g *Metadata) parseTemplate() (*template.Template, error) {
 
 func checksumFunc(logger log.Logger) func(string) string {
 	return func(p string) string {
-		return fmt.Sprintf("%x", getFileHash(p, logger))
+		return fmt.Sprintf("%x", fileHash(p, logger))
 	}
 }
 
@@ -108,7 +108,7 @@ func hashFilesFunc(logger log.Logger) func(...string) string {
 			}
 
 			for _, p := range paths {
-				readers = append(readers, bytes.NewReader(getFileHash(p, logger)))
+				readers = append(readers, bytes.NewReader(fileHash(p, logger)))
 			}
 		}
 
@@ -129,7 +129,7 @@ func hashFilesFunc(logger log.Logger) func(...string) string {
 	}
 }
 
-func getFileHash(path string, logger log.Logger) []byte {
+func fileHash(path string, logger log.Logger) []byte {
 	path, err := filepath.Abs(filepath.Clean(path))
 	if err != nil {
 		level.Error(logger).Log("cache key template/checksum could not find file")
@@ -144,11 +144,11 @@ func getFileHash(path string, logger log.Logger) []byte {
 
 	defer internal.CloseWithErrLogf(logger, f, "checksum close defer")
 
-	str, err := readerHasher(f)
+	h, err := readerHasher(f)
 	if err != nil {
 		level.Error(logger).Log("cache key template/checksum could not generate hash")
 		return []byte{}
 	}
 
-	return str
+	return h
 }
