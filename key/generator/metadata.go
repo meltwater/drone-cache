@@ -132,13 +132,13 @@ func hashFilesFunc(logger log.Logger) func(...string) string {
 func fileHash(path string, logger log.Logger) []byte {
 	path, err := filepath.Abs(filepath.Clean(path))
 	if err != nil {
-		level.Error(logger).Log("cache key template/checksum could not find file")
+		level.Error(logger).Log("could not compute the absolute file path: %s", err.Error())
 		return []byte{}
 	}
 
 	f, err := os.Open(path)
 	if err != nil {
-		level.Error(logger).Log("cache key template/checksum could not open file")
+		level.Error(logger).Log("could not open the file: %s", err.Error())
 		return []byte{}
 	}
 
@@ -146,7 +146,7 @@ func fileHash(path string, logger log.Logger) []byte {
 
 	h, err := readerHasher(f)
 	if err != nil {
-		level.Error(logger).Log("cache key template/checksum could not generate hash")
+		level.Error(logger).Log("could not generate the hash of the input file: %s", err.Error())
 		return []byte{}
 	}
 
