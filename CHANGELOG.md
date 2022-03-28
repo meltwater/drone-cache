@@ -7,8 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
-- [#191](https://github.com/meltwater/drone-cache/issues/191) Update examples to reference non-dev images
-- [#197](https://github.com/meltwater/drone-cache/pull/197) Zstd support
+- Nothing.
 
 ### Added
 
@@ -25,6 +24,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Deprecated
 
 - Nothing.
+
+## [1.2.3] - 2022-03-28
+
+### Added
+
+- [#197](https://github.com/meltwater/drone-cache/pull/197) Zstd support
+
+### Changed
+
+- [#191](https://github.com/meltwater/drone-cache/issues/191) Update examples to reference non-dev images
 
 ## [1.2.2] - 2021-10-01
 
