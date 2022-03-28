@@ -272,14 +272,15 @@ func main() {
 		// RESTORE-KEYS
 		&cli.StringFlag{
 			Name:    "archive-format, arcfmt",
-			Usage:   "archive format to use to store the cache directories (tar, gzip)",
+			Usage:   "archive format to use to store the cache directories (tar, gzip, zstd)",
 			Value:   archive.DefaultArchiveFormat,
 			EnvVars: []string{"PLUGIN_ARCHIVE_FORMAT"},
 		},
 		&cli.IntFlag{
 			Name: "compression-level, cpl",
-			Usage: `compression level to use for gzip compression when archive-format specified as gzip
-			(check https://godoc.org/compress/flate#pkg-constants for available options)`,
+			Usage: `compression level to use for gzip/zstd compression when archive-format specified as gzip/zstd
+			(check https://godoc.org/compress/flate#pkg-constants for available options for gzip
+			and https://pkg.go.dev/github.com/klauspost/compress/zstd#EncoderLevelFromZstd for zstd)`,
 			Value:   archive.DefaultCompressionLevel,
 			EnvVars: []string{"PLUGIN_COMPRESSION_LEVEL"},
 		},

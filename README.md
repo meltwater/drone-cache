@@ -165,9 +165,10 @@ GLOBAL OPTIONS:
    --remote-root value                   remote root directory to contain all the cache files created (default repo.name) [$PLUGIN_REMOTE_ROOT]
    --local-root value                    local root directory to base given mount paths (default pwd [present working directory]) [$PLUGIN_LOCAL_ROOT]
    --override                            override even if cache key already exists in backend (default: true) [$PLUGIN_OVERRIDE]
-   --archive-format value                archive format to use to store the cache directories (tar, gzip) (default: "tar") [$PLUGIN_ARCHIVE_FORMAT]
-   --compression-level value             compression level to use for gzip compression when archive-format specified as gzip
-                                             (check https://godoc.org/compress/flate#pkg-constants for available options) (default: -1) [$PLUGIN_COMPRESSION_LEVEL]
+   --archive-format value                archive format to use to store the cache directories (tar, gzip, zstd) (default: "tar") [$PLUGIN_ARCHIVE_FORMAT]
+   --compression-level value             compression level to use for gzip/zstd compression when archive-format specified as gzip/zstd
+                                             (check https://godoc.org/compress/flate#pkg-constants for available options for gzip
+                                             and https://pkg.go.dev/github.com/klauspost/compress/zstd#EncoderLevelFromZstd for zstd) (default: -1) [$PLUGIN_COMPRESSION_LEVEL]
    --skip-symlinks                       skip symbolic links in archive (default: false) [$PLUGIN_SKIP_SYMLINKS, $SKIP_SYMLINKS]
    --debug                               debug (default: false) [$PLUGIN_DEBUG, $DEBUG]
    --backend.operation-timeout value     timeout value to use for each storage operations (default: 3m0s) [$PLUGIN_BACKEND_OPERATION_TIMEOUT, $BACKEND_OPERATION_TIMEOUT]
