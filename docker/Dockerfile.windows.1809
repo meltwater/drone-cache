@@ -1,8 +1,13 @@
 # escape=`
+
+FROM mcr.microsoft.com/windows/servercore:ltsc2019 as core
+
+
 FROM mcr.microsoft.com/windows/nanoserver:1809
 USER ContainerAdministrator
 
 ENV GODEBUG=netdns=go
+COPY --from=core /windows/system32/netapi32.dll /windows/system32/netapi32.dll
 
 ADD release/windows/amd64/drone-cache.exe C:/drone-cache.exe
 ENTRYPOINT [ "C:\\drone-cache.exe" ]
