@@ -28,7 +28,7 @@ steps:
       - mc admin policy set minio userpolicy user=foo
 
   - name: build
-    image: golang:1.14.4-alpine3.12
+    image: golang:1.18.4
     commands:
       - apk add --update make git
       - make drone-cache
@@ -36,7 +36,7 @@ steps:
       CGO_ENABLED: 0
 
   - name: lint
-    image: golang:1.14.4-alpine3.12
+    image: golang:1.18.4
     commands:
       - apk add --update make git curl
       - make lint
@@ -44,7 +44,7 @@ steps:
       CGO_ENABLED: 0
 
   - name: test
-    image: golang:1.14.4-alpine3.12
+    image: golang:1.18.4
     commands:
       - go test -mod=vendor -short -cover -tags=integration ./...
     environment:
@@ -59,7 +59,7 @@ steps:
         path: /drone/src/tmp/testdata/cache
 
   - name: generate
-    image: golang:1.14.1-alpine3.11
+    image: golang:1.18.4
     commands:
       - apk add --update make git
       # Following environment tricks are because of unintended variable capture by flag library.
@@ -117,7 +117,7 @@ steps:
     environment:
       AWS_ACCESS_KEY_ID: AKIAIOSFODNN7EXAMPLE
       AWS_SECRET_ACCESS_KEY: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
-  
+
   - name: rebuild-cache-with-zstd
     image: meltwater/drone-cache:v1.2.2
     pull: always

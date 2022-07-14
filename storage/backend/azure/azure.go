@@ -87,7 +87,7 @@ func (b *Backend) Get(ctx context.Context, p string, w io.Writer) (err error) {
 
 		blobURL := b.containerURL.NewBlockBlobURL(p)
 
-		resp, err := blobURL.Download(ctx, 0, azblob.CountToEnd, azblob.BlobAccessConditions{}, false)
+		resp, err := blobURL.Download(ctx, 0, azblob.CountToEnd, azblob.BlobAccessConditions{}, false, azblob.ClientProvidedKeyOptions{})
 		if err != nil {
 			errCh <- fmt.Errorf("get the object, %w", err)
 			return
@@ -133,7 +133,7 @@ func (b *Backend) Exists(ctx context.Context, p string) (bool, error) {
 
 	blobURL := b.containerURL.NewBlockBlobURL(p)
 
-	get, err := blobURL.GetProperties(ctx, azblob.BlobAccessConditions{})
+	get, err := blobURL.GetProperties(ctx, azblob.BlobAccessConditions{}, azblob.ClientProvidedKeyOptions{})
 	if err != nil {
 		return false, fmt.Errorf("check if object exists, %w", err)
 	}

@@ -1,27 +1,25 @@
 module github.com/meltwater/drone-cache
 
 require (
-	cloud.google.com/go/storage v1.1.0
-	github.com/Azure/azure-storage-blob-go v0.8.0
-	github.com/Azure/go-autorest/autorest/adal v0.8.1 // indirect
-	github.com/aws/aws-sdk-go v1.36.29
-	github.com/davecgh/go-spew v1.1.1 // indirect
+	cloud.google.com/go v0.103.0 // indirect
+	cloud.google.com/go/storage v1.23.0
+	github.com/Azure/azure-storage-blob-go v0.15.0
+	github.com/aws/aws-sdk-go v1.44.55
 	github.com/dustin/go-humanize v1.0.0
-	github.com/go-kit/kit v0.9.0
-	github.com/go-logfmt/logfmt v0.4.0 // indirect
-	github.com/go-stack/stack v1.8.0 // indirect
-	github.com/google/go-cmp v0.4.0
-	github.com/klauspost/compress v1.13.5
-	github.com/pkg/sftp v1.10.1
-	github.com/urfave/cli/v2 v2.1.1
-	golang.org/x/crypto v0.0.0-20200622213623-75b288015ac9
-	golang.org/x/mod v0.2.0 // indirect
-	golang.org/x/oauth2 v0.0.0-20190604053449-0f29369cfe45
-	golang.org/x/sync v0.0.0-20190911185100-cd5d95a43a6e // indirect
-	golang.org/x/tools v0.0.0-20200204192400-7124308813f3 // indirect
-	google.golang.org/api v0.9.0
-	gopkg.in/check.v1 v1.0.0-20190902080502-41f04d3bba15 // indirect
-	honnef.co/go/tools v0.0.1-2020.1.3 // indirect
+	github.com/go-kit/kit v0.12.0
+	github.com/go-kit/log v0.2.1 // indirect
+	github.com/google/go-cmp v0.5.8
+	github.com/klauspost/compress v1.15.8
+	github.com/mattn/go-ieproxy v0.0.7 // indirect
+	github.com/pkg/sftp v1.13.5
+	github.com/urfave/cli/v2 v2.11.0
+	golang.org/x/crypto v0.0.0-20220622213112-05595931fe9d
+	golang.org/x/net v0.0.0-20220708220712-1185a9018129 // indirect
+	golang.org/x/oauth2 v0.0.0-20220630143837-2104d58473e0
+	golang.org/x/sys v0.0.0-20220712014510-0a85c31ab51e // indirect
+	google.golang.org/api v0.87.0
+	google.golang.org/genproto v0.0.0-20220714152414-ccd2914cffd4 // indirect
+	google.golang.org/grpc v1.48.0 // indirect
 )
 
 go 1.14
