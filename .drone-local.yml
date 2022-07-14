@@ -32,7 +32,6 @@ steps:
   - name: build
     image: golang:1.18.4
     commands:
-      - apk add --update make git
       - make drone-cache
     environment:
       CGO_ENABLED: 0
@@ -40,7 +39,6 @@ steps:
   - name: lint
     image: golang:1.18.4
     commands:
-      - apk add --update make git curl
       - make lint
     environment:
       CGO_ENABLED: 0
@@ -277,5 +275,5 @@ trigger:
   branch:
     - master
   event:
-    - 
+    -
 ...

@@ -30,7 +30,6 @@ steps:
     image: golang:1.18.4
     pull: true
     commands:
-      - apk add --update make git
       - make drone-cache
 
   - name: rebuild-cache
@@ -77,7 +76,6 @@ steps:
     image: golang:1.18.4
     pull: true
     commands:
-      - apk add --update make git
       - make drone-cache
 
   - name: rebuild-cache-with-filesystem
@@ -130,7 +128,6 @@ steps:
     image: golang:1.18.4
     pull: true
     commands:
-      - apk add --update make git
       - make drone-cache
 
   - name: rebuild-cache-with-key
@@ -178,7 +175,6 @@ steps:
     image: golang:1.18.4
     pull: true
     commands:
-      - apk add --update make git
       - make drone-cache
 
   - name: rebuild-cache-with-gzip
@@ -217,7 +213,6 @@ steps:
     image: golang:1.18.4
     pull: true
     commands:
-      - apk add --update make git
       - make drone-cache
 
   - name: restore-cache-debug

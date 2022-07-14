@@ -80,7 +80,6 @@ steps:
     image: golang:1.18.4
     pull: true
     commands:
-      - apk add --update make git
       - make drone-cache
 
   - name: rebuild-cache
