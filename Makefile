@@ -41,7 +41,7 @@ all: drone-cache
 .PHONY: setup
 setup: ## Setups dev environment
 setup: vendor ; $(info $(M) running setup for development )
-	$(Q) make $(GOTEST) $(EMBEDMD) $(LICHE) $(GOLANGCI_LINT) $(BINGO)
+	$(Q) make $(GOTEST) $(EMBEDMD) $(LICHE) $(GOLANGCI_LINT)
 
 drone-cache: ## Runs drone-cache target
 drone-cache: vendor main.go $(wildcard *.go) $(wildcard */*.go) ; $(info $(M) running drone-cache )
