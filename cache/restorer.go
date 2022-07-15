@@ -78,6 +78,8 @@ func (r restorer) Restore(dsts []string) error {
 
 // restore fetches the archived file from the cache and restores to the host machine's file system.
 func (r restorer) restore(src, dst string) error {
+	var err error
+
 	pr, pw := io.Pipe()
 	defer internal.CloseWithErrCapturef(&err, pr, "rebuild, pr close <%s>", dst)
 
