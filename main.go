@@ -2,9 +2,12 @@ package main
 
 import (
 	"errors"
+	"fmt"
 	stdlog "log"
 	"os"
 
+	"github.com/go-kit/log"
+	"github.com/go-kit/log/level"
 	"github.com/meltwater/drone-cache/archive"
 	"github.com/meltwater/drone-cache/internal"
 	"github.com/meltwater/drone-cache/internal/metadata"
@@ -16,9 +19,6 @@ import (
 	"github.com/meltwater/drone-cache/storage/backend/gcs"
 	"github.com/meltwater/drone-cache/storage/backend/s3"
 	"github.com/meltwater/drone-cache/storage/backend/sftp"
-
-	"github.com/go-kit/kit/log"
-	"github.com/go-kit/kit/log/level"
 	"github.com/urfave/cli/v2"
 )
 
@@ -483,7 +483,7 @@ func main() {
 
 // nolint:funlen
 func run(c *cli.Context) error {
-	var logLevel = c.String("log.level")
+	logLevel := c.String("log.level")
 	if c.Bool("debug") {
 		logLevel = internal.LogLevelDebug
 	}
@@ -599,7 +599,7 @@ func run(c *cli.Context) error {
 		// If it is exit-code enabled, always exit with error.
 		level.Warn(logger).Log("msg", "silent fails disabled, exiting with status code on error")
 
-		return err
+		return fmt.Errorf("status code exit, %w", err)
 	}
 
 	var e plugin.Error
@@ -610,5 +610,5 @@ func run(c *cli.Context) error {
 		return nil
 	}
 
-	return err
+	return fmt.Errorf("uncaught error, %w", err)
 }

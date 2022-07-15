@@ -9,9 +9,8 @@ import (
 	"net/url"
 
 	"github.com/Azure/azure-storage-blob-go/azblob"
-	"github.com/go-kit/kit/log"
-	"github.com/go-kit/kit/log/level"
-
+	"github.com/go-kit/log"
+	"github.com/go-kit/log/level"
 	"github.com/meltwater/drone-cache/internal"
 )
 
@@ -65,6 +64,7 @@ func New(l log.Logger, c Config) (*Backend, error) {
 
 	_, err = containerURL.Create(ctx, azblob.Metadata{}, azblob.PublicAccessNone)
 	if err != nil {
+		// nolint: errorlint
 		ret, ok := err.(azblob.StorageError)
 		if !ok {
 			return nil, fmt.Errorf("azure, unexpected error, %w", err)
@@ -79,7 +79,7 @@ func New(l log.Logger, c Config) (*Backend, error) {
 }
 
 // Get writes downloaded content to the given writer.
-func (b *Backend) Get(ctx context.Context, p string, w io.Writer) (err error) {
+func (b *Backend) Get(ctx context.Context, p string, w io.Writer) error {
 	errCh := make(chan error)
 
 	go func() {
@@ -87,9 +87,11 @@ func (b *Backend) Get(ctx context.Context, p string, w io.Writer) (err error) {
 
 		blobURL := b.containerURL.NewBlockBlobURL(p)
 
+		// nolint: lll
 		resp, err := blobURL.Download(ctx, 0, azblob.CountToEnd, azblob.BlobAccessConditions{}, false, azblob.ClientProvidedKeyOptions{})
 		if err != nil {
 			errCh <- fmt.Errorf("get the object, %w", err)
+
 			return
 		}
 
@@ -106,6 +108,7 @@ func (b *Backend) Get(ctx context.Context, p string, w io.Writer) (err error) {
 	case err := <-errCh:
 		return err
 	case <-ctx.Done():
+		// nolint: wrapcheck
 		return ctx.Err()
 	}
 }

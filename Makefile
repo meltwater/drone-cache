@@ -132,7 +132,7 @@ test-e2e: $(GOTEST) ; $(info $(M) running test-e2e )
 lint: ## Runs golangci-lint analysis
 lint:
 	# Check .golangci.yml for configuration
-	$(Q) $(GOLANGCI_LINT) run -v --enable-all --skip-dirs tmp -c .golangci.yml
+	$(Q) $(GOLANGCI_LINT) run -v --skip-dirs tmp -c .golangci.yml
 
 .PHONY: fix
 fix: ## Runs golangci-lint fix

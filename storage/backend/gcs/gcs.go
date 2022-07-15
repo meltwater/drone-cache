@@ -3,16 +3,16 @@ package gcs
 import (
 	"context"
 	"crypto/tls"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
 	"strings"
 
-	"github.com/meltwater/drone-cache/internal"
-
 	gcstorage "cloud.google.com/go/storage"
-	"github.com/go-kit/kit/log"
-	"github.com/go-kit/kit/log/level"
+	"github.com/go-kit/log"
+	"github.com/go-kit/log/level"
+	"github.com/meltwater/drone-cache/internal"
 	"golang.org/x/oauth2/google"
 	"google.golang.org/api/option"
 )
@@ -80,6 +80,7 @@ func (b *Backend) Get(ctx context.Context, p string, w io.Writer) error {
 		r, err := obj.NewReader(ctx)
 		if err != nil {
 			errCh <- fmt.Errorf("get the object, %w", err)
+
 			return
 		}
 
@@ -95,6 +96,7 @@ func (b *Backend) Get(ctx context.Context, p string, w io.Writer) error {
 	case err := <-errCh:
 		return err
 	case <-ctx.Done():
+		// nolint: wrapcheck
 		return ctx.Err()
 	}
 }
@@ -136,6 +138,7 @@ func (b *Backend) Put(ctx context.Context, p string, r io.Reader) error {
 	case err := <-errCh:
 		return err
 	case <-ctx.Done():
+		// nolint: wrapcheck
 		return ctx.Err()
 	}
 }
@@ -160,8 +163,9 @@ func (b *Backend) Exists(ctx context.Context, p string) (bool, error) {
 		}
 
 		attrs, err := obj.Attrs(ctx)
-		if err != nil && err != gcstorage.ErrObjectNotExist {
+		if err != nil && !errors.Is(err, gcstorage.ErrObjectNotExist) {
 			resCh <- &result{err: fmt.Errorf("get the object attrs, %w", err)}
+
 			return
 		}
 
@@ -172,6 +176,7 @@ func (b *Backend) Exists(ctx context.Context, p string) (bool, error) {
 	case res := <-resCh:
 		return res.val, res.err
 	case <-ctx.Done():
+		// nolint: wrapcheck
 		return false, ctx.Err()
 	}
 }
@@ -181,12 +186,14 @@ func (b *Backend) Exists(ctx context.Context, p string) (bool, error) {
 func setAuthenticationMethod(l log.Logger, c Config, opts []option.ClientOption) []option.ClientOption {
 	if c.APIKey != "" {
 		opts = append(opts, option.WithAPIKey(c.APIKey))
+
 		return opts
 	}
 
 	creds, err := credentials(l, c)
 	if err == nil {
 		opts = append(opts, option.WithCredentials(creds))
+
 		return opts
 	}
 
@@ -211,7 +218,7 @@ func credentials(l log.Logger, c Config) (*google.Credentials, error) {
 
 	creds, err = google.FindDefaultCredentials(ctx, gcstorage.ScopeFullControl)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("gcs credentials not found, %w", err)
 	}
 
 	return creds, nil

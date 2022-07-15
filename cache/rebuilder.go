@@ -8,14 +8,13 @@ import (
 	"sync"
 	"time"
 
+	"github.com/dustin/go-humanize"
+	"github.com/go-kit/log"
+	"github.com/go-kit/log/level"
 	"github.com/meltwater/drone-cache/archive"
 	"github.com/meltwater/drone-cache/internal"
 	"github.com/meltwater/drone-cache/key"
 	"github.com/meltwater/drone-cache/storage"
-
-	"github.com/dustin/go-humanize"
-	"github.com/go-kit/kit/log"
-	"github.com/go-kit/kit/log/level"
 )
 
 type rebuilder struct {
@@ -133,7 +132,7 @@ func (r rebuilder) rebuild(src, dst string) error {
 			level.Error(r.logger).Log("msg", "pr close", "err", err)
 		}
 
-		return err
+		return fmt.Errorf("rebuilder rebuild put file, %w", err)
 	}
 
 	level.Debug(r.logger).Log(
@@ -165,5 +164,5 @@ func (r rebuilder) generateKey(parts ...string) (string, error) {
 		}
 	}
 
-	return "", err
+	return "", fmt.Errorf("rebuilder generate key, %w", err)
 }

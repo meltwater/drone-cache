@@ -4,8 +4,7 @@ package cache
 import (
 	"time"
 
-	"github.com/go-kit/kit/log"
-
+	"github.com/go-kit/log"
 	"github.com/meltwater/drone-cache/archive"
 	"github.com/meltwater/drone-cache/key"
 	"github.com/meltwater/drone-cache/storage"

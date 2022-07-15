@@ -58,5 +58,5 @@ func closeIo(closer io.Closer) error {
 		return nil
 	}
 
-	return err
+	return fmt.Errorf("error closing io.Closer: %w", err)
 }

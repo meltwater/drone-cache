@@ -20,7 +20,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
 	awss3 "github.com/aws/aws-sdk-go/service/s3"
-	"github.com/go-kit/kit/log"
+	"github.com/go-kit/log"
 	pkgsftp "github.com/pkg/sftp"
 	"golang.org/x/crypto/ssh"
 	"google.golang.org/api/option"
