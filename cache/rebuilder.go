@@ -96,7 +96,7 @@ func (r rebuilder) Rebuild(srcs []string) error {
 }
 
 // rebuild pushes the archived file to the cache.
-func (r rebuilder) rebuild(src, dst string) (err error) {
+func (r rebuilder) rebuild(src, dst string) error {
 	src, err = filepath.Abs(filepath.Clean(src))
 	if err != nil {
 		return fmt.Errorf("clean source path, %w", err)

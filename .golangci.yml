@@ -11,6 +11,7 @@ linters:
   enable-all: true
   disable:
     - goerr113
+    - varnamelen
 
 linters-settings:
   errcheck:
