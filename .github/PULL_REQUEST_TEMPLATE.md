@@ -43,4 +43,4 @@ Fixes #
     - [ ] All new and existing tests passed.
 - [ ] Add your changes to `Unreleased` section of [CHANGELOG](/CHANGELOG.md).
 - [ ] Improve and update the [README](/README.md) (if necessary).
-- [ ] Ensure [documentation](/DOCS.md) is up-to-date. The same file will be updated in [plugin index](https://github.com/drone/drone-plugin-index/blob/master/content/meltwater/drone-cache/index.md) when your PR is accepted, so it will be available for end-users at http://plugins.drone.io.
+- [ ] Ensure [documentation](/DOCS.md) is up-to-date.

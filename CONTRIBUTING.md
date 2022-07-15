@@ -38,8 +38,8 @@ the requirements below.
     - [ ] Created tests which fail without the change (if possible).
     - [ ] All new and existing tests passed.
 - [ ] Add your changes to `Unreleased` section of [CHANGELOG](CHANGELOG.md).
-- [ ] Improve and update the [README](README.md) (if necessary).
-- [ ] Ensure [documentation](./DOCS.md) is up-to-date. The same file will be updated in [plugin index](https://github.com/drone/drone-plugin-index/blob/master/content/meltwater/drone-cache/index.md) when your PR is accepted, so it will be available for end-users at http://plugins.drone.io.
+- [ ] Improve and update the [README](README.md) (if necessary). The same file will be updated in [plugin index](https://github.com/drone/drone-plugin-index/blob/master/plugins/cache/original.md) when your PR is accepted, so it will be available for end-users at http://plugins.drone.io.
+- [ ] Ensure [documentation](./DOCS.md) is up-to-date. 
 
 ## Release Process
 
@@ -61,7 +61,7 @@ the requirements below.
     > ...
     ```
 6. Check whether all the generate artifacts in-place properly.
-7. Update [plugin index](https://github.com/drone/drone-plugin-index/blob/master/content/meltwater/drone-cache/index.md) using [DOCS](./DOCS.md).
+7. (OBSOLETE) Update plugin index using [DOCS](./DOCS.md).
 
 > **Keep in mind that users usually use the `latest` tagged images in their pipeline, please make sure you do not interfere with their working workflow.**
 
