@@ -28,12 +28,6 @@ $(EMBEDMD): .bingo/embedmd.mod
 	@echo "(re)installing $(GOBIN)/embedmd-v1.0.0"
 	@cd .bingo && $(GO) build -modfile=embedmd.mod -o=$(GOBIN)/embedmd-v1.0.0 "github.com/campoy/embedmd"
 
-GOLANGCI_LINT := $(GOBIN)/golangci-lint-v1.27.0
-$(GOLANGCI_LINT): .bingo/golangci-lint.mod
-	@# Install binary/ries using Go 1.14+ build command. This is using bwplotka/bingo-controlled, separate go module with pinned dependencies.
-	@echo "(re)installing $(GOBIN)/golangci-lint-v1.27.0"
-	@cd .bingo && $(GO) build -modfile=golangci-lint.mod -o=$(GOBIN)/golangci-lint-v1.27.0 "github.com/golangci/golangci-lint/cmd/golangci-lint"
-
 GOTEST := $(GOBIN)/gotest-v0.0.4
 $(GOTEST): .bingo/gotest.mod
 	@# Install binary/ries using Go 1.14+ build command. This is using bwplotka/bingo-controlled, separate go module with pinned dependencies.

@@ -15,6 +15,7 @@ GOBUILD               := go build -mod=vendor
 GOINSTALL             := go install -mod=vendor
 GOMOD                 := go mod
 GOFMT                 := gofmt
+GOLANGCI_LINT         := golangci-lint
 LDFLAGS               := '-s -w -X main.version=$(VERSION) -X main.commit=$(VCS_REF) -X main.date=$(BUILD_DATE)'
 TAGS                  := netgo
 
@@ -129,7 +130,7 @@ test-e2e: $(GOTEST) ; $(info $(M) running test-e2e )
 
 .PHONY: lint
 lint: ## Runs golangci-lint analysis
-lint: $(GOLANGCI_LINT) ; $(info $(M) running lint )
+lint:
 	# Check .golangci.yml for configuration
 	$(Q) $(GOLANGCI_LINT) run -v --enable-all --skip-dirs tmp -c .golangci.yml
 

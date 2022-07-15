@@ -35,7 +35,7 @@ steps:
       CGO_ENABLED: 0
 
   - name: lint
-    image: golang:1.18.4
+    image: docker.io/golangci/golangci-lint:v1.46.2
     commands:
       - make lint
     environment:
