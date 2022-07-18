@@ -6,6 +6,7 @@ require (
 	cloud.google.com/go/storage v1.23.0
 	github.com/Azure/azure-storage-blob-go v0.15.0
 	github.com/aws/aws-sdk-go v1.44.55
+	github.com/bmatcuk/doublestar v1.3.4
 	github.com/dustin/go-humanize v1.0.0
 	github.com/go-kit/log v0.2.1
 	github.com/google/go-cmp v0.5.8

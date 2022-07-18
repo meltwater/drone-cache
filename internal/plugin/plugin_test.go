@@ -108,6 +108,13 @@ func TestPlugin(t *testing.T) {
 			success: true,
 		},
 		{
+			name: "existing-mount-with-glob-files",
+			mount: func(name string) []string {
+				return exampleNestedFileTreeWithGlob(t, name, make([]byte, 1*1024))
+			},
+			success: true,
+		},
+		{
 			name: "existing-mount-with-cache-key",
 			mount: func(name string) []string {
 				return exampleFileTree(t, name, make([]byte, 1*1024))
@@ -310,6 +317,32 @@ func exampleFileTreeWithSymlinks(t *testing.T, name string, content []byte) []st
 	t.Cleanup(func() { os.Remove(symlink) })
 
 	return []string{file, dir, symDir}
+}
+
+func exampleNestedFileTreeWithGlob(t *testing.T, name string, content []byte) []string {
+	name = sanitize(name)
+	name1 := fmt.Sprintf("%s1", name)
+
+	dir, cleanup := test.CreateTempDir(t, name, testRootMounted)
+	t.Cleanup(cleanup)
+
+	nestedDir, nestedDirClean := test.CreateTempDir(t, name, dir)
+	t.Cleanup(nestedDirClean)
+
+	nestedFile, nestedFileClean := test.CreateTempFile(t, name, content, nestedDir)
+	t.Cleanup(nestedFileClean)
+
+	nestedDir1, nestedDirClean1 := test.CreateTempDir(t, name1, dir)
+	t.Cleanup(nestedDirClean1)
+
+	nestedFile1, nestedFileClean1 := test.CreateTempFile(t, name1, content, nestedDir)
+	t.Cleanup(nestedFileClean1)
+
+	nestedFile2, nestedFileClean2 := test.CreateTempFile(t, name1, content, nestedDir1)
+	t.Cleanup(nestedFileClean2)
+
+	globPath := fmt.Sprintf("%s/**/%s", dir, nestedDir1)
+	return []string{nestedDir, nestedFile, globPath}
 }
 
 // Setup
