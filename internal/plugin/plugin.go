@@ -131,14 +131,12 @@ func (p *Plugin) Exec() error { // nolint: funlen,cyclop
 			p.Config.Mount[i] = p.Config.Mount[mountLen-1]
 			p.Config.Mount = p.Config.Mount[:mountLen-1]
 
-			mountGlob, err := doublestar.Glob(mount)
+			globMounts, err := doublestar.Glob(mount)
 			if err != nil {
 				return fmt.Errorf("glob mount error <%s>, %w", mount, err)
 			}
 
-			for _, match := range mountGlob {
-				p.Config.Mount = append(p.Config.Mount, match)
-			}
+			p.Config.Mount = append(p.Config.Mount, globMounts...)
 		}
 	}
 
