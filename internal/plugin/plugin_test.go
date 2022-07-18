@@ -335,13 +335,10 @@ func exampleNestedFileTreeWithGlob(t *testing.T, name string, content []byte) []
 	nestedDir1, nestedDirClean1 := test.CreateTempDir(t, name1, dir)
 	t.Cleanup(nestedDirClean1)
 
-	_, nestedFileClean1 := test.CreateTempFile(t, name1, content, nestedDir)
+	_, nestedFileClean1 := test.CreateTempFile(t, name1, content, nestedDir1)
 	t.Cleanup(nestedFileClean1)
 
-	_, nestedFileClean2 := test.CreateTempFile(t, name1, content, nestedDir1)
-	t.Cleanup(nestedFileClean2)
-
-	globPath := fmt.Sprintf("%s/**/%s", dir, nestedDir1)
+	globPath := fmt.Sprintf("%s/**/%s", testRootMounted, nestedDir1)
 	return []string{nestedDir, nestedFile, globPath}
 }
 
