@@ -28,23 +28,21 @@ steps:
       - mc admin policy set minio userpolicy user=foo
 
   - name: build
-    image: golang:1.14.4-alpine3.12
+    image: golang:1.18.4
     commands:
-      - apk add --update make git
       - make drone-cache
     environment:
       CGO_ENABLED: 0
 
   - name: lint
-    image: golang:1.14.4-alpine3.12
+    image: docker.io/golangci/golangci-lint:v1.46.2
     commands:
-      - apk add --update make git curl
       - make lint
     environment:
       CGO_ENABLED: 0
 
   - name: test
-    image: golang:1.14.4-alpine3.12
+    image: golang:1.18.4
     commands:
       - go test -mod=vendor -short -cover -tags=integration ./...
     environment:
@@ -59,9 +57,8 @@ steps:
         path: /drone/src/tmp/testdata/cache
 
   - name: generate
-    image: golang:1.14.1-alpine3.11
+    image: golang:1.18.4
     commands:
-      - apk add --update make git
       # Following environment tricks are because of unintended variable capture by flag library.
       # This mitigates contamination happens when generating CLI flag documentation.
       - env -i make PATH=$(which go):$PATH HOME=$HOME PWD=$PWD GO=$(which go) GOPATH=$(go env GOPATH) generate
@@ -117,7 +114,7 @@ steps:
     environment:
       AWS_ACCESS_KEY_ID: AKIAIOSFODNN7EXAMPLE
       AWS_SECRET_ACCESS_KEY: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
-  
+
   - name: rebuild-cache-with-zstd
     image: meltwater/drone-cache:v1.2.2
     pull: always
@@ -246,7 +243,7 @@ steps:
 
 services:
   - name: minio
-    image: minio/minio:RELEASE.2020-11-06T23-17-07Z
+    image: minio/minio:RELEASE.2022-07-15T03-44-22Z
     commands:
       - minio server /data
     environment:
@@ -256,7 +253,7 @@ services:
     ports:
       - 9000
   - name: fakegcs
-    image: fsouza/fake-gcs-server:1.18.3
+    image: fsouza/fake-gcs-server:1.38.3
     ports:
       - 4443
     commands:
@@ -268,7 +265,7 @@ services:
     commands:
       - /entrypoint foo:pass:::sftp_test bar:pass:::plugin_test
   - name: azurite
-    image: mcr.microsoft.com/azure-storage/azurite:3.10.0
+    image: mcr.microsoft.com/azure-storage/azurite:3.18.0
     commands:
       - azurite-blob --blobHost 0.0.0.0
     ports:

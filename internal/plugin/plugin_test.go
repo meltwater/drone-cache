@@ -20,7 +20,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
 	awss3 "github.com/aws/aws-sdk-go/service/s3"
-	"github.com/go-kit/kit/log"
+	"github.com/go-kit/log"
 	pkgsftp "github.com/pkg/sftp"
 	"golang.org/x/crypto/ssh"
 	"google.golang.org/api/option"
@@ -80,35 +80,35 @@ func TestPlugin(t *testing.T) {
 		success  bool
 	}{
 		{
-			name: "existing mount",
+			name: "existing-mount",
 			mount: func(name string) []string {
 				return exampleFileTree(t, name, make([]byte, 1*1024))
 			},
 			success: true,
 		},
 		{
-			name: "non-existing mount",
+			name: "non-existing-mount",
 			mount: func(_ string) []string {
 				return []string{"idonotexist"}
 			},
 			success: false,
 		},
 		{
-			name: "empty mount",
+			name: "empty-mount",
 			mount: func(name string) []string {
 				return []string{exampleDir(t, name)}
 			},
 			success: true,
 		},
 		{
-			name: "existing mount with nested files",
+			name: "existing-mount-with-nested-files",
 			mount: func(name string) []string {
 				return exampleNestedFileTree(t, name, make([]byte, 1*1024))
 			},
 			success: true,
 		},
 		{
-			name: "existing mount with cache key",
+			name: "existing-mount-with-cache-key",
 			mount: func(name string) []string {
 				return exampleFileTree(t, name, make([]byte, 1*1024))
 			},
@@ -116,7 +116,7 @@ func TestPlugin(t *testing.T) {
 			success:  true,
 		},
 		{
-			name: "existing mount with symlink",
+			name: "existing-mount-with-symlink",
 			mount: func(name string) []string {
 				return exampleFileTreeWithSymlinks(t, name, make([]byte, 1*1024))
 			},

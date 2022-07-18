@@ -4,7 +4,7 @@ import (
 	"testing"
 	"text/template"
 
-	"github.com/go-kit/kit/log"
+	"github.com/go-kit/log"
 	"github.com/meltwater/drone-cache/internal/metadata"
 	"github.com/meltwater/drone-cache/test"
 )

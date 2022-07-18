@@ -9,7 +9,7 @@ import (
 
 	"github.com/meltwater/drone-cache/test"
 
-	"github.com/go-kit/kit/log"
+	"github.com/go-kit/log"
 )
 
 var (

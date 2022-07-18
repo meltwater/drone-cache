@@ -7,19 +7,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
-- Nothing.
-
 ### Added
 
 - Nothing.
 
 ### Changed
 
-- Nothing.
+- Bumped base go version from Go 1.14 to 1.18
+- Switched and updated to moved dependency `go-kit/kit@v0.9.0` -> `go-kit/log@v0.2.1`
+- Updated dependency `Azure/azure-storage-blob-go@v0.8.0` -> `v0.15.0`
+- Updated dependency `aws/aws-sdk-go@v1.37.29` -> `v1.44.55`
+- Updated dependency `cloud.google.com/go/storage@v1.1.0` -> `v1.23.0`
+- Updated dependency `google.golang.org/api@v0.9.0` -> `v0.87.0`
+- Updated dependency `google/go-cmp@v0.4.0` -> `v0.5.8`
+- Updated dependency `klauspost/compress@v1.13.5` -> `v1.15.8`
+- Updated dependency `pkg/sftp@v1.10.1` -> `v1.13.5`
+- Updated dependency `urface/cli/v2@v2.1.1` -> `v2.11.0`
+- Updated linting from manual install to official `golangci/golangci-lint:v1.46.2` Docker image 
+- Updated golang base image from `1.14-alpine` to `1.18.4` (debian); issues with alpine `>= 3.13` due to DroneCI Docker Engine version
+- Updated test image `minio/minio:RELEASE.2020-11-06T23-17-07Z` to `RELEASE.2022-07-15T03-44-22Z`
+- Updated test image `fsouza/fake-gcs-server:1.18.3` to `1.38.3`
+- Updated test image `mcr.microsoft.com/azure-storage/azurite:3.10.0` to `3.18.0`
+- Linting fixes for older Go version code style
+- Added missing struct argument for Azure Blob URLs (`azblob.ClientProvidedKeyOptions{}`)
+- Renamed test cases to comply with Azure API disallowing non-alphanumeric characters in storage requests
+- Linting rules adjusted to omit undesirable linters (see `.golanci.yml`)
 
 ### Removed
 
-- Nothing.
+- Pushing `DOCS.md` Drone Plugin documenation; Drone/Harness now pull READMEs from Plugin repos
 
 ### Deprecated
 

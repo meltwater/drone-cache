@@ -13,9 +13,8 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
-	"github.com/go-kit/kit/log"
-	"github.com/go-kit/kit/log/level"
-
+	"github.com/go-kit/log"
+	"github.com/go-kit/log/level"
 	"github.com/meltwater/drone-cache/internal"
 )
 
@@ -98,6 +97,7 @@ func (b *Backend) Get(ctx context.Context, p string, w io.Writer) error {
 		out, err := b.client.GetObjectWithContext(ctx, in)
 		if err != nil {
 			errCh <- fmt.Errorf("get the object, %w", err)
+
 			return
 		}
 
@@ -113,6 +113,7 @@ func (b *Backend) Get(ctx context.Context, p string, w io.Writer) error {
 	case err := <-errCh:
 		return err
 	case <-ctx.Done():
+		// nolint: wrapcheck
 		return ctx.Err()
 	}
 }
@@ -149,6 +150,7 @@ func (b *Backend) Exists(ctx context.Context, p string) (bool, error) {
 
 	out, err := b.client.HeadObjectWithContext(ctx, in)
 	if err != nil {
+		// nolint: errorlint
 		if awsErr, ok := err.(awserr.Error); ok && awsErr.Code() == s3.ErrCodeNoSuchKey || awsErr.Code() == "NotFound" {
 			return false, nil
 		}
@@ -169,7 +171,6 @@ func assumeRole(l log.Logger, c *aws.Config, roleArn string) credentials.Value {
 		DisableSSL:                    c.DisableSSL,
 		CredentialsChainVerboseErrors: aws.Bool(true),
 	})
-
 	if err != nil {
 		level.Error(l).Log("msg", "s3 backend", "assume-role", err.Error())
 	}
@@ -177,7 +178,6 @@ func assumeRole(l log.Logger, c *aws.Config, roleArn string) credentials.Value {
 	creds, err := stscreds.NewCredentials(sess, roleArn, func(p *stscreds.AssumeRoleProvider) {
 		p.RoleSessionName = "drone-cache"
 	}).Get()
-
 	if err != nil {
 		level.Error(l).Log("msg", "s3 backend", "assume-role", err.Error())
 	}

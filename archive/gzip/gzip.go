@@ -5,10 +5,9 @@ import (
 	"fmt"
 	"io"
 
+	"github.com/go-kit/log"
 	"github.com/meltwater/drone-cache/archive/tar"
 	"github.com/meltwater/drone-cache/internal"
-
-	"github.com/go-kit/kit/log"
 )
 
 // Archive implements archive for gzip.
@@ -34,17 +33,27 @@ func (a *Archive) Create(srcs []string, w io.Writer) (int64, error) {
 
 	defer internal.CloseWithErrLogf(a.logger, gw, "gzip writer")
 
-	return tar.New(a.logger, a.root, a.skipSymlinks).Create(srcs, gw)
+	wBytes, err := tar.New(a.logger, a.root, a.skipSymlinks).Create(srcs, gw)
+	if err != nil {
+		return 0, fmt.Errorf("writing create archive bytes: %w", err)
+	}
+
+	return wBytes, nil
 }
 
 // Extract reads content from the given archive reader and restores it to the destination, returns written bytes.
 func (a *Archive) Extract(dst string, r io.Reader) (int64, error) {
 	gr, err := gzip.NewReader(r)
 	if err != nil {
-		return 0, err
+		return 0, fmt.Errorf("create archive extractor: %w", err)
 	}
 
 	defer internal.CloseWithErrLogf(a.logger, gr, "gzip reader")
 
-	return tar.New(a.logger, a.root, a.skipSymlinks).Extract(dst, gr)
+	eBytes, err := tar.New(a.logger, a.root, a.skipSymlinks).Extract(dst, gr)
+	if err != nil {
+		return 0, fmt.Errorf("extracting archive bytes: %w", err)
+	}
+
+	return eBytes, nil
 }

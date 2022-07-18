@@ -9,12 +9,11 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/go-kit/kit/log"
-	"github.com/go-kit/kit/log/level"
+	"github.com/go-kit/log"
+	"github.com/go-kit/log/level"
+	"github.com/meltwater/drone-cache/internal"
 	"github.com/pkg/sftp"
 	"golang.org/x/crypto/ssh"
-
-	"github.com/meltwater/drone-cache/internal"
 )
 
 // Backend implements storage.Backend for sFTP.
@@ -46,6 +45,7 @@ func New(l log.Logger, c Config) (*Backend, error) {
 	client, err := sftp.NewClient(sshClient)
 	if err != nil {
 		sshClient.Close()
+
 		return nil, fmt.Errorf("unable to connect to ssh with sftp protocol, %w", err)
 	}
 
@@ -73,6 +73,7 @@ func (b *Backend) Get(ctx context.Context, p string, w io.Writer) error {
 		rc, err := b.client.Open(path)
 		if err != nil {
 			errCh <- fmt.Errorf("get the object, %w", err)
+
 			return
 		}
 
@@ -88,6 +89,7 @@ func (b *Backend) Get(ctx context.Context, p string, w io.Writer) error {
 	case err := <-errCh:
 		return err
 	case <-ctx.Done():
+		// nolint: wrapcheck
 		return ctx.Err()
 	}
 }
@@ -104,12 +106,14 @@ func (b *Backend) Put(ctx context.Context, p string, r io.Reader) error {
 		dir := filepath.Dir(path)
 		if err := b.client.MkdirAll(dir); err != nil {
 			errCh <- fmt.Errorf("create directory, %w", err)
+
 			return
 		}
 
 		w, err := b.client.Create(path)
 		if err != nil {
 			errCh <- fmt.Errorf("create cache file, %w", err)
+
 			return
 		}
 
@@ -128,6 +132,7 @@ func (b *Backend) Put(ctx context.Context, p string, r io.Reader) error {
 	case err := <-errCh:
 		return err
 	case <-ctx.Done():
+		// nolint: wrapcheck
 		return ctx.Err()
 	}
 }
@@ -152,6 +157,7 @@ func (b *Backend) Exists(ctx context.Context, p string) (bool, error) {
 		_, err := b.client.Stat(path)
 		if err != nil && !os.IsNotExist(err) {
 			resCh <- &result{err: fmt.Errorf("check the object exists, %w", err)}
+
 			return
 		}
 		resCh <- &result{val: err == nil}
@@ -161,6 +167,7 @@ func (b *Backend) Exists(ctx context.Context, p string) (bool, error) {
 	case res := <-resCh:
 		return res.val, res.err
 	case <-ctx.Done():
+		// nolint: wrapcheck
 		return false, ctx.Err()
 	}
 }
@@ -173,6 +180,7 @@ func authMethod(c Config) ([]ssh.AuthMethod, error) {
 		return []ssh.AuthMethod{ssh.Password(c.Auth.Password)}, nil
 	case SSHAuthMethodPublicKeyFile:
 		pkAuthMethod, err := readPublicKeyFile(c.Auth.PublicKeyFile)
+
 		return []ssh.AuthMethod{pkAuthMethod}, err
 	default:
 		return nil, errors.New("unknown ssh method (PASSWORD, PUBLIC_KEY_FILE)")

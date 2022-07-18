@@ -27,10 +27,9 @@ steps:
         - 'vendor'
 
   - name: build
-    image: golang:1.14.4-alpine3.12
+    image: golang:1.18.4
     pull: true
     commands:
-      - apk add --update make git
       - make drone-cache
 
   - name: rebuild-cache
@@ -74,10 +73,9 @@ steps:
       path: /tmp/cache
 
   - name: build
-    image: golang:1.14.4-alpine3.12
+    image: golang:1.18.4
     pull: true
     commands:
-      - apk add --update make git
       - make drone-cache
 
   - name: rebuild-cache-with-filesystem
@@ -127,10 +125,9 @@ steps:
         - 'vendor'
 
   - name: build
-    image: golang:1.14.4-alpine3.12
+    image: golang:1.18.4
     pull: true
     commands:
-      - apk add --update make git
       - make drone-cache
 
   - name: rebuild-cache-with-key
@@ -175,10 +172,9 @@ steps:
         - 'vendor'
 
   - name: build
-    image: golang:1.14.4-alpine3.12
+    image: golang:1.18.4
     pull: true
     commands:
-      - apk add --update make git
       - make drone-cache
 
   - name: rebuild-cache-with-gzip
@@ -214,10 +210,9 @@ steps:
       debug: true
 
   - name: build
-    image: golang:1.14.4-alpine3.12
+    image: golang:1.18.4
     pull: true
     commands:
-      - apk add --update make git
       - make drone-cache
 
   - name: restore-cache-debug

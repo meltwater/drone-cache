@@ -15,6 +15,7 @@ GOBUILD               := go build -mod=vendor
 GOINSTALL             := go install -mod=vendor
 GOMOD                 := go mod
 GOFMT                 := gofmt
+GOLANGCI_LINT         := golangci-lint
 LDFLAGS               := '-s -w -X main.version=$(VERSION) -X main.commit=$(VCS_REF) -X main.date=$(BUILD_DATE)'
 TAGS                  := netgo
 
@@ -40,7 +41,7 @@ all: drone-cache
 .PHONY: setup
 setup: ## Setups dev environment
 setup: vendor ; $(info $(M) running setup for development )
-	$(Q) make $(GOTEST) $(EMBEDMD) $(LICHE) $(GOLANGCI_LINT) $(BINGO)
+	$(Q) make $(GOTEST) $(EMBEDMD) $(LICHE) $(GOLANGCI_LINT)
 
 drone-cache: ## Runs drone-cache target
 drone-cache: vendor main.go $(wildcard *.go) $(wildcard */*.go) ; $(info $(M) running drone-cache )
@@ -129,9 +130,9 @@ test-e2e: $(GOTEST) ; $(info $(M) running test-e2e )
 
 .PHONY: lint
 lint: ## Runs golangci-lint analysis
-lint: $(GOLANGCI_LINT) ; $(info $(M) running lint )
+lint:
 	# Check .golangci.yml for configuration
-	$(Q) $(GOLANGCI_LINT) run -v --enable-all --skip-dirs tmp -c .golangci.yml
+	$(Q) $(GOLANGCI_LINT) run -v --skip-dirs tmp -c .golangci.yml
 
 .PHONY: fix
 fix: ## Runs golangci-lint fix

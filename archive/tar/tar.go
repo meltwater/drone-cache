@@ -9,12 +9,11 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/go-kit/kit/log"
-
+	"github.com/go-kit/log"
 	"github.com/meltwater/drone-cache/internal"
 )
 
-const defaultDirPermission = 0755
+const defaultDirPermission = 0o755
 
 var (
 	// ErrSourceNotReachable means that given source is not reachable.
@@ -57,7 +56,7 @@ func (a *Archive) Create(srcs []string, w io.Writer) (int64, error) {
 	return written, nil
 }
 
-// nolint: lll
+// nolint: lll, cyclop
 func writeToArchive(tw *tar.Writer, root string, skipSymlinks bool, written *int64) func(string, os.FileInfo, error) error {
 	return func(path string, fi os.FileInfo, err error) error {
 		if err != nil {
@@ -146,7 +145,7 @@ func createSymlinkHeader(fi os.FileInfo, path string) (*tar.Header, error) {
 	return h, nil
 }
 
-func writeFileToArchive(tw io.Writer, path string) (n int64, err error) {
+func writeFileToArchive(tw io.Writer, path string) (int64, error) {
 	f, err := os.Open(path)
 	if err != nil {
 		return 0, fmt.Errorf("open file <%s>, %w", path, err)
@@ -163,6 +162,7 @@ func writeFileToArchive(tw io.Writer, path string) (n int64, err error) {
 }
 
 // Extract reads content from the given archive reader and restores it to the destination, returns written bytes.
+// nolint: cyclop
 func (a *Archive) Extract(dst string, r io.Reader) (int64, error) {
 	var (
 		written int64
@@ -173,7 +173,7 @@ func (a *Archive) Extract(dst string, r io.Reader) (int64, error) {
 		h, err := tr.Next()
 
 		switch {
-		case err == io.EOF: // if no more files are found return
+		case errors.Is(err, io.EOF): // if no more files are found return
 			return written, nil
 		case err != nil: // return any other error
 			return written, fmt.Errorf("tar reader <%v>, %w", err, ErrArchiveNotReadable)
@@ -241,7 +241,7 @@ func extractDir(h *tar.Header, target string) error {
 	return nil
 }
 
-func extractRegular(h *tar.Header, tr io.Reader, target string) (n int64, err error) {
+func extractRegular(h *tar.Header, tr io.Reader, target string) (int64, error) {
 	f, err := os.OpenFile(target, os.O_CREATE|os.O_RDWR, os.FileMode(h.Mode))
 	if err != nil {
 		return 0, fmt.Errorf("open extracted file for writing <%s>, %w", target, err)
@@ -282,9 +282,8 @@ func extractLink(h *tar.Header, target string) error {
 }
 
 func unlink(path string) error {
-	_, err := os.Lstat(path)
-	if err == nil {
-		return os.Remove(path)
+	if _, err := os.Lstat(path); err == nil {
+		return fmt.Errorf("error with unlinking: %w", os.Remove(path))
 	}
 
 	return nil

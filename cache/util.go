@@ -5,7 +5,7 @@ type statWriter struct {
 	written int64
 }
 
-func (s *statWriter) Write(p []byte) (n int, err error) {
+func (s *statWriter) Write(p []byte) (int, error) {
 	size := len(p)
 	s.written += int64(size)
 

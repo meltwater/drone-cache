@@ -11,11 +11,14 @@ import (
 	"text/template"
 	"time"
 
-	"github.com/go-kit/kit/log"
-	"github.com/go-kit/kit/log/level"
-
+	"github.com/go-kit/log"
+	"github.com/go-kit/log/level"
 	"github.com/meltwater/drone-cache/internal"
 	"github.com/meltwater/drone-cache/internal/metadata"
+)
+
+const (
+	EpochNumBase = 10
 )
 
 // Metadata implements a key generator that uses a template engine to generate keys from give metadata.
@@ -35,7 +38,7 @@ func NewMetadata(logger log.Logger, tmpl string, data metadata.Metadata) *Metada
 		data:   data,
 		funcMap: template.FuncMap{
 			"checksum": checksumFunc(logger),
-			"epoch":    func() string { return strconv.FormatInt(time.Now().Unix(), 10) },
+			"epoch":    func() string { return strconv.FormatInt(time.Now().Unix(), EpochNumBase) },
 			"arch":     func() string { return runtime.GOARCH },
 			"os":       func() string { return runtime.GOOS },
 		},
@@ -69,13 +72,19 @@ func (g *Metadata) Generate(_ ...string) (string, error) {
 // Check checks if template is parsable.
 func (g *Metadata) Check() error {
 	_, err := g.parseTemplate()
+
 	return err
 }
 
 // Helpers
 
 func (g *Metadata) parseTemplate() (*template.Template, error) {
-	return template.New("cacheKey").Funcs(g.funcMap).Parse(g.tmpl)
+	tmpl, err := template.New("cacheKey").Funcs(g.funcMap).Parse(g.tmpl)
+	if err != nil {
+		return &template.Template{}, fmt.Errorf("parse template failed, %w", err)
+	}
+
+	return tmpl, nil
 }
 
 func checksumFunc(logger log.Logger) func(string) string {
@@ -83,12 +92,14 @@ func checksumFunc(logger log.Logger) func(string) string {
 		path, err := filepath.Abs(filepath.Clean(p))
 		if err != nil {
 			level.Error(logger).Log("cache key template/checksum could not find file")
+
 			return ""
 		}
 
 		f, err := os.Open(path)
 		if err != nil {
 			level.Error(logger).Log("cache key template/checksum could not open file")
+
 			return ""
 		}
 
@@ -97,6 +108,7 @@ func checksumFunc(logger log.Logger) func(string) string {
 		str, err := readerHasher(f)
 		if err != nil {
 			level.Error(logger).Log("cache key template/checksum could not generate hash")
+
 			return ""
 		}
 
