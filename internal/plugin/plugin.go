@@ -6,9 +6,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"strings"
 
-	"github.com/bmatcuk/doublestar"
 	"github.com/go-kit/log"
 	"github.com/go-kit/log/level"
 	"github.com/meltwater/drone-cache/archive"
@@ -123,21 +121,8 @@ func (p *Plugin) Exec() error { // nolint: funlen,cyclop
 	)
 
 	// 4. Glob match mounts if doublestar paths exist
-	for i, mount := range p.Config.Mount {
-		if strings.Contains(mount, "**") {
-			mountLen := len(p.Config.Mount)
-
-			// Remove the glob from the original mount list
-			p.Config.Mount[i] = p.Config.Mount[mountLen-1]
-			p.Config.Mount = p.Config.Mount[:mountLen-1]
-
-			globMounts, err := doublestar.Glob(mount)
-			if err != nil {
-				return fmt.Errorf("glob mount error <%s>, %w", mount, err)
-			}
-
-			p.Config.Mount = append(p.Config.Mount, globMounts...)
-		}
+	if err = p.Config.HandleMount(); err != nil {
+		return fmt.Errorf("exec handle mount call, %w", err)
 	}
 
 	// 5. Select mode

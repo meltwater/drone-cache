@@ -149,7 +149,9 @@ func TestPlugin(t *testing.T) {
 					c := defaultConfig()
 					setup(t, c, name)
 					paths := tc.mount(tc.name)
-					mount(c, paths...)
+					c = mount(c, paths...)
+					test.Ok(t, c.HandleMount())
+
 					cacheKey(c, tc.cacheKey)
 					format(c, f)
 
@@ -168,7 +170,7 @@ func TestPlugin(t *testing.T) {
 					restoreRoot, cleanup := test.CreateTempDir(t, sanitize(name), testRootMoved)
 					t.Cleanup(cleanup)
 
-					for _, p := range paths {
+					for _, p := range c.Mount {
 						rel, err := filepath.Rel(testRootMounted, p)
 						test.Ok(t, err)
 						dst := filepath.Join(restoreRoot, rel)
@@ -189,7 +191,7 @@ func TestPlugin(t *testing.T) {
 					}
 
 					// Compare
-					test.EqualDirs(t, restoreRoot, testRootMounted, paths)
+					test.EqualDirs(t, restoreRoot, testRootMounted, c.Mount)
 				})
 			}
 		}
@@ -220,6 +222,7 @@ func restore(c *Config) *Config {
 
 func mount(c *Config, mount ...string) *Config {
 	c.Mount = mount
+
 	return c
 }
 
@@ -321,25 +324,21 @@ func exampleFileTreeWithSymlinks(t *testing.T, name string, content []byte) []st
 
 func exampleNestedFileTreeWithGlob(t *testing.T, name string, content []byte) []string {
 	name = sanitize(name)
-	name1 := fmt.Sprintf("%s1", name)
 
-	dir, cleanup := test.CreateTempDir(t, name, testRootMounted)
-	t.Cleanup(cleanup)
+	dir, dirClean := test.CreateTempFilesInDir(t, name, content, testRootMounted)
+	t.Cleanup(dirClean)
 
-	nestedDir, nestedDirClean := test.CreateTempDir(t, name, dir)
+	_, nestedDirClean := test.CreateTempFilesInDir(t, name, content, dir)
 	t.Cleanup(nestedDirClean)
 
-	nestedFile, nestedFileClean := test.CreateTempFile(t, name, content, nestedDir)
-	t.Cleanup(nestedFileClean)
-
-	nestedDir1, nestedDirClean1 := test.CreateTempDir(t, name1, dir)
+	_, nestedDirClean1 := test.CreateTempFilesInDir(t, name, content, dir)
 	t.Cleanup(nestedDirClean1)
 
-	_, nestedFileClean1 := test.CreateTempFile(t, name1, content, nestedDir1)
-	t.Cleanup(nestedFileClean1)
+	file, fileClean := test.CreateTempFile(t, name, content, dir)
+	t.Cleanup(fileClean)
 
-	globPath := fmt.Sprintf("%s/**/%s", testRootMounted, nestedDir1)
-	return []string{nestedDir, nestedFile, globPath}
+	globPath := fmt.Sprintf("%s/**/", testRootMounted)
+	return []string{file, globPath}
 }
 
 // Setup

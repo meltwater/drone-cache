@@ -1,8 +1,11 @@
 package plugin
 
 import (
+	"fmt"
+	"strings"
 	"time"
 
+	"github.com/bmatcuk/doublestar"
 	"github.com/meltwater/drone-cache/storage/backend/azure"
 	"github.com/meltwater/drone-cache/storage/backend/filesystem"
 	"github.com/meltwater/drone-cache/storage/backend/gcs"
@@ -37,4 +40,26 @@ type Config struct {
 	SFTP       sftp.Config
 	Azure      azure.Config
 	GCS        gcs.Config
+}
+
+func (c *Config) HandleMount() error {
+	mountLen := len(c.Mount)
+	if mountLen > 0 {
+		for i, mount := range c.Mount {
+			if strings.Contains(mount, "**") {
+				// Remove the glob from the original mount list
+				c.Mount[i] = c.Mount[mountLen-1]
+				c.Mount = c.Mount[:mountLen-1]
+
+				globMounts, err := doublestar.Glob(mount)
+				if err != nil {
+					return fmt.Errorf("glob handle mount error <%s>, %w", mount, err)
+				}
+
+				c.Mount = append(c.Mount, globMounts...)
+			}
+		}
+	}
+
+	return nil
 }
