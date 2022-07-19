@@ -70,7 +70,7 @@ steps:
     pull: true
     settings:
       restore: true
-      cache_key: {{ .Commit.Branch }}-{{ checksum "go.mod" }} # default if ommitted is {{ .Commit.Branch }}
+      cache_key: '{{ .Commit.Branch }}-{{ checksum "go.mod" }}' # default if ommitted is {{ .Commit.Branch }}
       bucket: drone-cache-bucket
       region: eu-west-1
       mount:
@@ -92,7 +92,7 @@ steps:
         from_secret: aws_secret_access_key
     settings:
       rebuild: true
-      cache_key: {{ .Commit.Branch }}-{{ checksum "go.mod" }} # default if ommitted is {{ .Commit.Branch }}
+      cache_key: '{{ .Commit.Branch }}-{{ checksum "go.mod" }}' # default if ommitted is {{ .Commit.Branch }}
       bucket: drone-cache-bucket
       region: eu-west-1
       mount:
