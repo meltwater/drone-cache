@@ -2,6 +2,7 @@
 package plugin
 
 import (
+	"crypto/md5" // #nosec
 	"errors"
 	"fmt"
 	"os"
@@ -89,9 +90,9 @@ func (p *Plugin) Exec() error { // nolint: funlen,cyclop
 			return fmt.Errorf("parse failed, falling back to default, %w", err)
 		}
 
-		options = append(options, cache.WithFallbackGenerator(keygen.NewHash(p.Metadata.Commit.Branch)))
+		options = append(options, cache.WithFallbackGenerator(keygen.NewHash(md5.New, p.Metadata.Commit.Branch)))
 	} else {
-		generator = keygen.NewHash(p.Metadata.Commit.Branch)
+		generator = keygen.NewHash(md5.New, p.Metadata.Commit.Branch)
 		options = append(options, cache.WithFallbackGenerator(keygen.NewStatic(p.Metadata.Commit.Branch)))
 	}
 

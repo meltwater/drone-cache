@@ -2,8 +2,11 @@ package generator
 
 import (
 	"bytes"
+	"crypto/md5" // #nosec
+	"crypto/sha256"
 	"errors"
 	"fmt"
+	hash2 "hash"
 	"io"
 	"os"
 	"path/filepath"
@@ -92,7 +95,7 @@ func (g *Metadata) parseTemplate() (*template.Template, error) {
 
 func checksumFunc(logger log.Logger) func(string) string {
 	return func(p string) string {
-		return fmt.Sprintf("%x", fileHash(p, logger))
+		return fmt.Sprintf("%x", fileHash(p, logger, md5.New))
 	}
 }
 
@@ -104,24 +107,27 @@ func hashFilesFunc(logger log.Logger) func(...string) string {
 			paths, err := filepath.Glob(pattern)
 			if err != nil {
 				level.Error(logger).Log("could not parse file path as a glob pattern")
+
 				continue
 			}
 
 			for _, p := range paths {
-				readers = append(readers, bytes.NewReader(fileHash(p, logger)))
+				readers = append(readers, bytes.NewReader(fileHash(p, logger, sha256.New)))
 			}
 		}
 
 		if len(readers) == 0 {
 			level.Debug(logger).Log("no matches found for glob")
+
 			return ""
 		}
 
 		level.Debug(logger).Log("found %d files to hash", len(readers))
 
-		h, err := readerHasher(readers...)
+		h, err := readerHasher(sha256.New, readers...)
 		if err != nil {
 			level.Error(logger).Log("could not generate the hash of the input files: %s", err.Error())
+
 			return ""
 		}
 
@@ -129,24 +135,27 @@ func hashFilesFunc(logger log.Logger) func(...string) string {
 	}
 }
 
-func fileHash(path string, logger log.Logger) []byte {
+func fileHash(path string, logger log.Logger, hasher func() hash2.Hash) []byte {
 	path, err := filepath.Abs(filepath.Clean(path))
 	if err != nil {
 		level.Error(logger).Log("could not compute the absolute file path: %s", err.Error())
+
 		return []byte{}
 	}
 
 	f, err := os.Open(path)
 	if err != nil {
 		level.Error(logger).Log("could not open the file: %s", err.Error())
+
 		return []byte{}
 	}
 
 	defer internal.CloseWithErrLogf(logger, f, "checksum close defer")
 
-	h, err := readerHasher(f)
+	h, err := readerHasher(hasher, f)
 	if err != nil {
 		level.Error(logger).Log("could not generate the hash of the input file: %s", err.Error())
+
 		return []byte{}
 	}
 
