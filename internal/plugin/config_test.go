@@ -4,17 +4,9 @@ import (
 	"fmt"
 	"os"
 	"reflect"
-	"strings"
 	"testing"
-	"time"
 
-	"github.com/meltwater/drone-cache/archive"
 	"github.com/meltwater/drone-cache/test"
-)
-
-const (
-	testRoot                       = "testdata"
-	defaultStorageOperationTimeout = 5 * time.Second
 )
 
 func TestHandleMount(t *testing.T) {
@@ -62,7 +54,7 @@ func TestHandleMount(t *testing.T) {
 	}
 
 	for _, tc := range cases {
-		c := defaultConfig()
+		c := Config{}
 		c.Mount = tc.mounts
 
 		tc.makeFiles()
@@ -71,24 +63,4 @@ func TestHandleMount(t *testing.T) {
 		test.Assert(t, reflect.DeepEqual(c.Mount, tc.expectedMounts),
 			"expected mount differs from handled mount result:\nexpected: %v\ngot:%v", tc.expectedMounts, c.Mount)
 	}
-}
-
-// Config plugin configuration
-
-func defaultConfig() *Config {
-	return &Config{
-		CompressionLevel:        archive.DefaultCompressionLevel,
-		StorageOperationTimeout: defaultStorageOperationTimeout,
-		Override:                true,
-	}
-}
-
-func containsGlob(a []string) bool {
-	for _, v := range a {
-		if strings.Contains(v, "**") {
-			return true
-		}
-	}
-
-	return false
 }
