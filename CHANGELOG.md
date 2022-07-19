@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Nothing.
+- Added double star directory searching in mounts (e.g. `path/**/subdir`)
 
 ### Changed
 

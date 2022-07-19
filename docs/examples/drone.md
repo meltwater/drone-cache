@@ -222,3 +222,40 @@ steps:
       rebuild: true
       debug: true
 ```
+
+### Glob Double Star Mounting
+
+```yaml
+kind: pipeline
+name: default
+
+steps:
+  - name: restore-cache-debug
+    image: meltwater/drone-cache
+    settings:
+      pull: true
+      restore: true
+      debug: true
+      mount:
+        - "node_modules"
+        - "packages/**/dist"
+        - "packages/**/node_modules"
+
+  - name: build
+    image: npm
+    pull: true
+    commands:
+      - npm build
+
+
+  - name: restore-cache-debug
+    image: meltwater/drone-cache
+    settings:
+      pull: true
+      rebuild: true
+      debug: true
+      mount:
+        - "node_modules"
+        - "packages/**/dist"
+        - "packages/**/node_modules"
+```
