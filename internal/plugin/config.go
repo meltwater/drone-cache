@@ -43,7 +43,7 @@ type Config struct {
 }
 
 // HandleMount runs prior to Rebuild and Restoring of caches to handle unique
-// paths such as double-star globs
+// paths such as double-star globs.
 func (c *Config) HandleMount() error {
 	mountLen := len(c.Mount)
 	if mountLen > 0 {
