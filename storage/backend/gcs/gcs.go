@@ -240,8 +240,9 @@ func credentials(l log.Logger, c Config) (*google.Credentials, error) {
 		}
 
 		level.Error(l).Log("msg", "gc storage credentials from api-key", "err", err)
-		level.Warn(l).Log("msg", "falling back to anonymous credentials")
 	}
+
+	level.Info(l).Log("msg", "json key not present, falling back to anonymous credentials")
 
 	creds, err := google.FindDefaultCredentials(ctx, gcstorage.ScopeFullControl)
 	if err != nil {
