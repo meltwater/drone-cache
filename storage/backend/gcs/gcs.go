@@ -233,14 +233,17 @@ func credentials(l log.Logger, c Config) (*google.Credentials, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), c.Timeout)
 	defer cancel()
 
-	creds, err := google.CredentialsFromJSON(ctx, []byte(c.JSONKey), gcstorage.ScopeFullControl)
-	if err == nil {
-		return creds, nil
+	if c.JSONKey != "" {
+		creds, err := google.CredentialsFromJSON(ctx, []byte(c.JSONKey), gcstorage.ScopeFullControl)
+		if err == nil {
+			return creds, nil
+		}
+
+		level.Error(l).Log("msg", "gc storage credentials from api-key", "err", err)
+		level.Warn(l).Log("msg", "falling back to anonymous credentials")
 	}
 
-	level.Error(l).Log("msg", "gc storage credentials from api-key", "err", err)
-
-	creds, err = google.FindDefaultCredentials(ctx, gcstorage.ScopeFullControl)
+	creds, err := google.FindDefaultCredentials(ctx, gcstorage.ScopeFullControl)
 	if err != nil {
 		return nil, err
 	}
