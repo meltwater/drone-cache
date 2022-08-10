@@ -2,10 +2,12 @@
 package plugin
 
 import (
+	"crypto/md5" // #nosec
 	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
+	"time"
 
 	"github.com/go-kit/log"
 	"github.com/go-kit/log/level"
@@ -83,14 +85,14 @@ func (p *Plugin) Exec() error { // nolint: funlen,cyclop
 
 	var generator key.Generator
 	if cfg.CacheKeyTemplate != "" {
-		generator = keygen.NewMetadata(p.logger, cfg.CacheKeyTemplate, p.Metadata)
+		generator = keygen.NewMetadata(p.logger, cfg.CacheKeyTemplate, p.Metadata, time.Now)
 		if err := generator.Check(); err != nil {
 			return fmt.Errorf("parse failed, falling back to default, %w", err)
 		}
 
-		options = append(options, cache.WithFallbackGenerator(keygen.NewHash(p.Metadata.Commit.Branch)))
+		options = append(options, cache.WithFallbackGenerator(keygen.NewHash(md5.New, p.Metadata.Commit.Branch)))
 	} else {
-		generator = keygen.NewHash(p.Metadata.Commit.Branch)
+		generator = keygen.NewHash(md5.New, p.Metadata.Commit.Branch)
 		options = append(options, cache.WithFallbackGenerator(keygen.NewStatic(p.Metadata.Commit.Branch)))
 	}
 
