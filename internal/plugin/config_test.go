@@ -44,15 +44,15 @@ func TestHandleMount(t *testing.T) {
 		},
 		{
 			name:   "handle-mount-glob-notempty",
-			mounts: []string{fmt.Sprintf("%s/%s", testRootGlob, "test/**")},
+			mounts: []string{fmt.Sprintf("%s/%s", testRootGlob, "test/**/test")},
 			expectedMounts: []string{
-				fmt.Sprintf("%s/%s", testRootGlob, "test/nestedA"),
-				fmt.Sprintf("%s/%s", testRootGlob, "test/nestedB"),
+				fmt.Sprintf("%s/%s", testRootGlob, "test/nestedA/test"),
+				fmt.Sprintf("%s/%s", testRootGlob, "test/nestedB/test"),
 			},
 			makeFiles: func() {
 				// Make test directories for glob to work properly
-				os.MkdirAll(fmt.Sprintf("%s/%s", testRootGlob, "test/nestedA"), 0755)
-				os.MkdirAll(fmt.Sprintf("%s/%s", testRootGlob, "test/nestedB"), 0755)
+				os.MkdirAll(fmt.Sprintf("%s/%s", testRootGlob, "test/nestedA/test"), 0755)
+				os.MkdirAll(fmt.Sprintf("%s/%s", testRootGlob, "test/nestedB/test"), 0755)
 			},
 		},
 	}

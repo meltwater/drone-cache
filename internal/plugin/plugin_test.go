@@ -328,20 +328,28 @@ func exampleFileTreeWithSymlinks(t *testing.T, name string, content []byte) []st
 func exampleNestedFileTreeWithGlob(t *testing.T, name string, content []byte) []string {
 	name = sanitize(name)
 
-	dir, dirClean := test.CreateTempFilesInDir(t, name, content, testRootMounted)
-	t.Cleanup(dirClean)
+	dirA, dirAClean := test.CreateTempDir(t, name, testRootMounted)
+	t.Cleanup(dirAClean)
 
-	_, nestedDirClean := test.CreateTempFilesInDir(t, name, content, dir)
-	t.Cleanup(nestedDirClean)
+	nestedDirA := fmt.Sprintf("%s/test", dirA)
+	os.Mkdir(nestedDirA, 0o755)
+	t.Cleanup(func() { os.RemoveAll(nestedDirA) })
 
-	_, nestedDirClean1 := test.CreateTempFilesInDir(t, name, content, dir)
-	t.Cleanup(nestedDirClean1)
+	_, nestedFilesAClean := test.CreateTempFilesInDir(t, name, content, nestedDirA)
+	t.Cleanup(nestedFilesAClean)
 
-	file, fileClean := test.CreateTempFile(t, name, content, dir)
-	t.Cleanup(fileClean)
+	dirB, dirBClean := test.CreateTempDir(t, name, testRootMounted)
+	t.Cleanup(dirBClean)
 
-	globPath := fmt.Sprintf("%s/**/", testRootMounted)
-	return []string{file, globPath}
+	nestedDirB := fmt.Sprintf("%s/test", dirB)
+	os.Mkdir(nestedDirB, 0o755)
+	t.Cleanup(func() { os.RemoveAll(nestedDirB) })
+
+	_, nestedFilesBClean := test.CreateTempFilesInDir(t, name, content, nestedDirB)
+	t.Cleanup(nestedFilesBClean)
+
+	globPath := fmt.Sprintf("%s/**/test", testRootMounted)
+	return []string{globPath}
 }
 
 // Setup
