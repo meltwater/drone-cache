@@ -125,7 +125,9 @@ func (p *Plugin) Exec() error { // nolint: funlen,cyclop
 	if err != nil {
 		return fmt.Errorf("get working directory, %w", err)
 	}
+
 	fsys := os.DirFS(cwd)
+
 	if err = p.Config.HandleMount(fsys); err != nil {
 		return fmt.Errorf("exec handle mount call, %w", err)
 	}
