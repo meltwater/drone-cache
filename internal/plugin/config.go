@@ -54,8 +54,6 @@ func (c *Config) HandleMount(fsys fs.FS) error {
 				c.Mount[i] = c.Mount[mountLen-1]
 				c.Mount = c.Mount[:mountLen-1]
 
-				//cwd, _ := os.Getwd()
-				//fsys := os.DirFS(cwd)
 				globMounts, err := doublestar.Glob(fsys, mount)
 				if err != nil {
 					return fmt.Errorf("glob handle mount error <%s>, %w", mount, err)
