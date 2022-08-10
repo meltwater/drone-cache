@@ -150,7 +150,10 @@ func TestPlugin(t *testing.T) {
 					setup(t, c, name)
 					paths := tc.mount(tc.name)
 					c = mount(c, paths...)
-					test.Ok(t, c.HandleMount())
+					cwd, err := os.Getwd()
+					test.Ok(t, err)
+					fsys := os.DirFS(cwd)
+					test.Ok(t, c.HandleMount(fsys))
 
 					cacheKey(c, tc.cacheKey)
 					format(c, f)

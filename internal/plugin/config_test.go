@@ -9,10 +9,14 @@ import (
 	"github.com/meltwater/drone-cache/test"
 )
 
+const (
+	testRootGlob = "testglobdata"
+)
+
 func TestHandleMount(t *testing.T) {
-	test.Ok(t, os.Mkdir(testRoot, 0755))
+	test.Ok(t, os.Mkdir(testRootGlob, 0755))
 	t.Cleanup(func() {
-		os.RemoveAll(testRoot)
+		os.RemoveAll(testRootGlob)
 	})
 	cases := []struct {
 		name           string
@@ -40,15 +44,15 @@ func TestHandleMount(t *testing.T) {
 		},
 		{
 			name:   "handle-mount-glob-notempty",
-			mounts: []string{fmt.Sprintf("%s/%s", testRoot, "test/**")},
+			mounts: []string{fmt.Sprintf("%s/%s", testRootGlob, "test/**")},
 			expectedMounts: []string{
-				fmt.Sprintf("%s/%s", testRoot, "test/nestedA"),
-				fmt.Sprintf("%s/%s", testRoot, "test/nestedB"),
+				fmt.Sprintf("%s/%s", testRootGlob, "test/nestedA"),
+				fmt.Sprintf("%s/%s", testRootGlob, "test/nestedB"),
 			},
 			makeFiles: func() {
 				// Make test directories for glob to work properly
-				os.MkdirAll(fmt.Sprintf("%s/%s", testRoot, "test/nestedA"), 0755)
-				os.MkdirAll(fmt.Sprintf("%s/%s", testRoot, "test/nestedB"), 0755)
+				os.MkdirAll(fmt.Sprintf("%s/%s", testRootGlob, "test/nestedA"), 0755)
+				os.MkdirAll(fmt.Sprintf("%s/%s", testRootGlob, "test/nestedB"), 0755)
 			},
 		},
 	}
@@ -58,7 +62,10 @@ func TestHandleMount(t *testing.T) {
 		c.Mount = tc.mounts
 
 		tc.makeFiles()
-		test.Ok(t, c.HandleMount())
+		cwd, err := os.Getwd()
+		test.Ok(t, err)
+		fsys := os.DirFS(cwd)
+		test.Ok(t, c.HandleMount(fsys))
 
 		test.Assert(t, reflect.DeepEqual(c.Mount, tc.expectedMounts),
 			"expected mount differs from handled mount result:\nexpected: %v\ngot:%v", tc.expectedMounts, c.Mount)

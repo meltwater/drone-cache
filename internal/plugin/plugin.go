@@ -121,7 +121,12 @@ func (p *Plugin) Exec() error { // nolint: funlen,cyclop
 	)
 
 	// 4. Glob match mounts if doublestar paths exist
-	if err = p.Config.HandleMount(); err != nil {
+	cwd, err := os.Getwd()
+	if err != nil {
+		return fmt.Errorf("get working directory, %w", err)
+	}
+	fsys := os.DirFS(cwd)
+	if err = p.Config.HandleMount(fsys); err != nil {
 		return fmt.Errorf("exec handle mount call, %w", err)
 	}
 
