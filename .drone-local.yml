@@ -12,12 +12,6 @@ clone:
   depth: 50
 
 steps:
-  #   This is needed for the tags. And the tags are needed to determine version.
-  - name: fetch
-    image: docker:git
-    commands:
-      - git fetch --tags -f
-
   - name: configure-buckets
     image: minio/mc:RELEASE.2020-10-03T02-54-56Z
     commands:
@@ -37,7 +31,7 @@ steps:
       CGO_ENABLED: 0
 
   - name: lint
-    image: golang:1.18.4
+    image: docker.io/golangci/golangci-lint:v1.46.2
     commands:
       - make lint
     environment:
@@ -237,7 +231,7 @@ steps:
 
 services:
   - name: minio
-    image: minio/minio:RELEASE.2020-11-06T23-17-07Z
+    image: minio/minio:RELEASE.2022-07-15T03-44-22Z
     commands:
       - minio server /data
     environment:
@@ -247,7 +241,7 @@ services:
     ports:
       - 9000
   - name: fakegcs
-    image: fsouza/fake-gcs-server:1.18.3
+    image: fsouza/fake-gcs-server:1.38.3
     ports:
       - 4443
     commands:
@@ -259,7 +253,7 @@ services:
     commands:
       - /entrypoint foo:pass:::sftp_test bar:pass:::plugin_test
   - name: azurite
-    image: mcr.microsoft.com/azure-storage/azurite:3.10.0
+    image: mcr.microsoft.com/azure-storage/azurite:3.18.0
     commands:
       - azurite-blob --blobHost 0.0.0.0
     ports:

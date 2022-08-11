@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- [#209](https://github.com/meltwater/drone-cache/pull/209) Added double star directory searching in mounts (e.g. `path/**/subdir`)
 - [#198](https://github.com/meltwater/drone-cache/pull/198) Add `hashFiles` template function to generate the SHA256 hash of multiple files
 
 ### Changed
