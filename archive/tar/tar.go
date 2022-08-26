@@ -72,7 +72,6 @@ func writeToArchive(tw *tar.Writer, root string, skipSymlinks bool, written *int
 		if err != nil {
 			return fmt.Errorf("create header for <%s>, %w", path, err)
 		}
-		h.Format = tar.FormatPAX
 
 		if fi.Mode()&os.ModeSymlink != 0 { // isSymbolic
 			if skipSymlinks {
@@ -91,6 +90,7 @@ func writeToArchive(tw *tar.Writer, root string, skipSymlinks bool, written *int
 		}
 
 		h.Name = name
+		h.Format = tar.FormatPAX
 
 		if err := tw.WriteHeader(h); err != nil {
 			return fmt.Errorf("write header for <%s>, %w", path, err)
