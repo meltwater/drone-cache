@@ -108,8 +108,99 @@ steps:
 
 ### Using executable (with CLI args)
 
-[embedmd]:# (tmp/help.txt)
 ```txt
+NAME:
+   Drone cache plugin - Drone cache plugin
+
+USAGE:
+   drone-cache [global options] command [command options] [arguments...]
+
+VERSION:
+   v1.4.0
+
+COMMANDS:
+   help, h  Shows a list of commands or help for one command
+
+GLOBAL OPTIONS:
+   --access-key value                    AWS access key [$PLUGIN_ACCESS_KEY, $AWS_ACCESS_KEY_ID, $CACHE_AWS_ACCESS_KEY_ID]
+   --acl value                           upload files with acl (private, public-read, ...) (default: "private") [$PLUGIN_ACL, $AWS_ACL]
+   --archive-format value                archive format to use to store the cache directories (tar, gzip, zstd) (default: "tar") [$PLUGIN_ARCHIVE_FORMAT]
+   --azure.account-key value             Azure Blob Storage Account Key [$PLUGIN_ACCOUNT_KEY, $AZURE_ACCOUNT_KEY]
+   --azure.account-name value            Azure Blob Storage Account Name [$PLUGIN_ACCOUNT_NAME, $AZURE_ACCOUNT_NAME]
+   --azure.blob-container-name value     Azure Blob Storage container name [$PLUGIN_CONTAINER, $AZURE_CONTAINER_NAME]
+   --azure.blob-max-retry-requets value  Azure Blob Storage Max Retry Requests (default: 4) [$AZURE_BLOB_MAX_RETRY_REQUESTS]
+   --azure.blob-storage-url value        Azure Blob Storage URL (default: "blob.core.windows.net") [$AZURE_BLOB_STORAGE_URL]
+   --backend value                       cache backend to use in plugin (s3, filesystem, sftp, azure, gcs) (default: "s3") [$PLUGIN_BACKEND]
+   --backend.operation-timeout value     timeout value to use for each storage operations (default: 3m0s) [$PLUGIN_BACKEND_OPERATION_TIMEOUT, $BACKEND_OPERATION_TIMEOUT]
+   --bucket value                        AWS bucket name [$PLUGIN_BUCKET, $S3_BUCKET, $GCS_BUCKET]
+   --build.created value                 build created (default: 0) [$DRONE_BUILD_CREATED]
+   --build.deploy value                  build deployment target [$DRONE_DEPLOY_TO]
+   --build.event value                   build event (default: "push") [$DRONE_BUILD_EVENT]
+   --build.finished value                build finished (default: 0) [$DRONE_BUILD_FINISHED]
+   --build.link value                    build link [$DRONE_BUILD_LINK]
+   --build.number value                  build number (default: 0) [$DRONE_BUILD_NUMBER]
+   --build.started value                 build started (default: 0) [$DRONE_BUILD_STARTED]
+   --build.status value                  build status (default: "success") [$DRONE_BUILD_STATUS]
+   --cache-key value                     cache key to use for the cache directories [$PLUGIN_CACHE_KEY]
+   --commit.author.avatar value          git author avatar [$DRONE_COMMIT_AUTHOR_AVATAR]
+   --commit.author.email value           git author email [$DRONE_COMMIT_AUTHOR_EMAIL]
+   --commit.author.name value            git author name [$DRONE_COMMIT_AUTHOR]
+   --commit.branch value                 git commit branch (default: "master") [$DRONE_COMMIT_BRANCH]
+   --commit.link value                   git commit link [$DRONE_COMMIT_LINK]
+   --commit.message value                git commit message [$DRONE_COMMIT_MESSAGE]
+   --commit.ref value                    git commit ref (default: "refs/heads/master") [$DRONE_COMMIT_REF]
+   --commit.sha value                    git commit sha [$DRONE_COMMIT_SHA]
+   --compression-level value             compression level to use for gzip/zstd compression when archive-format specified as gzip/zstd
+                                             (check https://godoc.org/compress/flate#pkg-constants for available options for gzip
+                                             and https://pkg.go.dev/github.com/klauspost/compress/zstd#EncoderLevelFromZstd for zstd) (default: -1) [$PLUGIN_COMPRESSION_LEVEL]
+   --debug                               debug (default: false) [$PLUGIN_DEBUG, $DEBUG]
+   --encryption value                    server-side encryption algorithm, defaults to none. (AES256, aws:kms) [$PLUGIN_ENCRYPTION, $AWS_ENCRYPTION]
+   --endpoint value                      endpoint for the s3/cloud storage connection [$PLUGIN_ENDPOINT, $S3_ENDPOINT, $GCS_ENDPOINT]
+   --filesystem.cache-root value         local filesystem root directory for the filesystem cache (default: "/tmp/cache") [$PLUGIN_FILESYSTEM_CACHE_ROOT, $FILESYSTEM_CACHE_ROOT]
+   --gcs.acl value                       upload files with acl (private, public-read, ...) (default: "private") [$PLUGIN_GCS_ACL, $GCS_ACL]
+   --gcs.api-key value                   Google service account API key [$PLUGIN_API_KEY, $GCP_API_KEY]
+   --gcs.encryption-key value            server-side encryption key, must be a 32-byte AES-256 key, defaults to none
+                                             (See https://cloud.google.com/storage/docs/encryption for details.) [$PLUGIN_GCS_ENCRYPTION_KEY, $GCS_ENCRYPTION_KEY]
+   --gcs.json-key value                  Google service account JSON key [$PLUGIN_JSON_KEY, $GCS_CACHE_JSON_KEY]
+   --help, -h                            show help (default: false)
+   --local-root value                    local root directory to base given mount paths (default pwd [present working directory]) [$PLUGIN_LOCAL_ROOT]
+   --log.format value                    log format to use. ('logfmt', 'json') (default: "logfmt") [$PLUGIN_LOG_FORMAT, $LOG_FORMAT]
+   --log.level value                     log filtering level. ('error', 'warn', 'info', 'debug') (default: "info") [$PLUGIN_LOG_LEVEL, $LOG_LEVEL]
+   --mount value                         cache directories, an array of folders to cache  (accepts multiple inputs) [$PLUGIN_MOUNT]
+   --override                            override even if cache key already exists in backend (default: true) [$PLUGIN_OVERRIDE]
+   --path-style                          AWS path style to use for bucket paths. (true for minio, false for aws) (default: false) [$PLUGIN_PATH_STYLE, $AWS_PLUGIN_PATH_STYLE]
+   --prev.build.number value             previous build number (default: 0) [$DRONE_PREV_BUILD_NUMBER]
+   --prev.build.status value             previous build status [$DRONE_PREV_BUILD_STATUS]
+   --prev.commit.sha value               previous build sha [$DRONE_PREV_COMMIT_SHA]
+   --rebuild                             rebuild the cache directories (default: false) [$PLUGIN_REBUILD]
+   --region value                        AWS bucket region. (us-east-1, eu-west-1, ...) [$PLUGIN_REGION, $S3_REGION]
+   --remote-root value                   remote root directory to contain all the cache files created (default repo.name) [$PLUGIN_REMOTE_ROOT]
+   --remote.url value                    git remote url [$DRONE_REMOTE_URL]
+   --repo.avatar value                   repository avatar [$DRONE_REPO_AVATAR]
+   --repo.branch value                   repository default branch [$DRONE_REPO_BRANCH]
+   --repo.fullname value                 repository full name [$DRONE_REPO]
+   --repo.link value                     repository link [$DRONE_REPO_LINK]
+   --repo.name value                     repository name [$DRONE_REPO_NAME]
+   --repo.namespace value                repository namespace [$DRONE_REPO_NAMESPACE]
+   --repo.owner value                    repository owner (for Drone version < 1.0) [$DRONE_REPO_OWNER]
+   --repo.private                        repository is private (default: false) [$DRONE_REPO_PRIVATE]
+   --repo.trusted                        repository is trusted (default: false) [$DRONE_REPO_TRUSTED]
+   --restore                             restore the cache directories (default: false) [$PLUGIN_RESTORE]
+   --role-arn value                      AWS IAM role ARN to assume [$PLUGIN_ASSUME_ROLE_ARN, $AWS_ASSUME_ROLE_ARN]
+   --s3-bucket-public value              Set to use anonymous credentials with public S3 bucket [$PLUGIN_S3_BUCKET_PUBLIC, $S3_BUCKET_PUBLIC]
+   --secret-key value                    AWS secret key [$PLUGIN_SECRET_KEY, $AWS_SECRET_ACCESS_KEY, $CACHE_AWS_SECRET_ACCESS_KEY]
+   --sftp.auth-method value              sftp auth method, defaults to none. (PASSWORD, PUBLIC_KEY_FILE) [$SFTP_AUTH_METHOD]
+   --sftp.cache-root value               sftp root directory [$SFTP_CACHE_ROOT]
+   --sftp.host value                     sftp host [$SFTP_HOST]
+   --sftp.password value                 sftp password [$PLUGIN_PASSWORD, $SFTP_PASSWORD]
+   --sftp.port value                     sftp port [$SFTP_PORT]
+   --sftp.public-key-file value          sftp public key file path [$PLUGIN_PUBLIC_KEY_FILE, $SFTP_PUBLIC_KEY_FILE]
+   --sftp.username value                 sftp username [$PLUGIN_USERNAME, $SFTP_USERNAME]
+   --skip-symlinks                       skip symbolic links in archive (default: false) [$PLUGIN_SKIP_SYMLINKS, $SKIP_SYMLINKS]
+   --sts-endpoint value                  Custom STS endpoint for IAM role assumption [$PLUGIN_STS_ENDPOINT, $AWS_STS_ENDPOINT]
+   --version, -v                         print the version (default: false)
+   --yaml.signed                         build yaml is signed (default: false) [$DRONE_YAML_SIGNED]
+   --yaml.verified                       build yaml is verified (default: false) [$DRONE_YAML_VERIFIED]
 ```
 
 ### Using Docker (with Environment variables)
@@ -131,8 +222,27 @@ $ docker run --rm \
 
 ## Development
 
-[embedmd]:# (tmp/make_help.txt)
 ```txt
+Usage:
+  make <target>
+
+Targets:
+  setup          	  Setups dev environment
+  drone-cache    	  Runs drone-cache target
+  clean          	  Cleans build resourcess
+  docs           	  Generates docs
+  generate       	  Generate documentation, website and yaml files,
+  vendor         	  Updates vendored copy of dependencies
+  compress       	  Creates compressed binary
+  container      	  Builds drone-cache docker image with latest tag
+  container-push 	  Pushes latest $(CONTAINER_REPO) image to repository
+  test           	  Runs tests
+  test-integration	  Runs integration tests
+  test-unit      	  Runs unit tests
+  lint           	  Runs golangci-lint analysis
+  fix            	  Runs golangci-lint fix
+  format         	  Runs gofmt
+  help           	  Shows this help message
 ```
 
 ## Releases
