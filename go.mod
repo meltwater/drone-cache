@@ -5,12 +5,14 @@ go 1.18
 require (
 	cloud.google.com/go/storage v1.24.0
 	github.com/Azure/azure-storage-blob-go v0.15.0
+	github.com/aliyun/aliyun-oss-go-sdk v2.2.5+incompatible
 	github.com/aws/aws-sdk-go v1.44.60
 	github.com/bmatcuk/doublestar/v4 v4.2.0
 	github.com/dustin/go-humanize v1.0.0
 	github.com/go-kit/log v0.2.1
 	github.com/google/go-cmp v0.5.8
 	github.com/klauspost/compress v1.15.9
+	github.com/pkg/errors v0.9.1
 	github.com/pkg/sftp v1.13.5
 	github.com/urfave/cli/v2 v2.11.1
 	golang.org/x/crypto v0.0.0-20220722155217-630584e8d5aa
@@ -41,6 +43,7 @@ require (
 	golang.org/x/net v0.0.0-20220722155237-a158d28d115b // indirect
 	golang.org/x/sys v0.0.0-20220721230656-c6bc011c0c49 // indirect
 	golang.org/x/text v0.3.7 // indirect
+	golang.org/x/time v0.0.0-20210723032227-1f47c861a9ac // indirect
 	golang.org/x/xerrors v0.0.0-20220609144429-65e65417b02f // indirect
 	google.golang.org/appengine v1.6.7 // indirect
 	google.golang.org/genproto v0.0.0-20220720214146-176da50484ac // indirect
