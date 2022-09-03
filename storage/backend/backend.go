@@ -86,12 +86,10 @@ func FromConfig(l log.Logger, backedType string, cfg Config) (Backend, error) {
 		level.Warn(l).Log("msg", "using Alibaba OSS storage as backend")
 		b, err = alioss.New(log.With(l, "backend", AliOSS), cfg.Alioss, cfg.Debug)
 	default:
-
 		return nil, errors.New("unknown backend")
 	}
 
 	if err != nil {
-
 		return nil, fmt.Errorf("initialize backend, %w", err)
 	}
 
