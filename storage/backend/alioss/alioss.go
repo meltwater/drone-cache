@@ -26,6 +26,7 @@ func newAlibabaOss(bucket string, conf *oss.Config, opts ...oss.ClientOption) (*
 	if err != nil {
 		return nil, errors.Wrap(err, "could not create alibabaOSS client")
 	}
+
 	return &Backend{
 		bucket: bucket,
 		client: client,
@@ -57,23 +58,24 @@ func New(l log.Logger, c Config, debug bool) (*Backend, error) {
 func (c Backend) Get(ctx context.Context, p string, w io.Writer) error {
 	bucket, err := c.client.Bucket(c.bucket)
 	if err != nil {
+
 		return errors.Wrap(err, "couldn't get the object")
 	}
 	reader, err := bucket.GetObject(p)
 	if err != nil {
+
 		return errors.Wrap(err, "couldn't get the object")
 	} else {
-		if reader != nil {
-			fmt.Printf("Successfully read the fileObject from bucket, closing reader object")
-			reader.Close()
-		}
+		fmt.Printf("reader: %v\n", reader)
 	}
+
 	return nil
 }
 
 func (c Backend) Put(ctx context.Context, p string, src io.Reader) error {
 	bucket, err := c.client.Bucket(c.bucket)
 	if err != nil {
+
 		return errors.Wrap(err, "couldn't put the object")
 	}
 
@@ -90,20 +92,25 @@ func (c Backend) Put(ctx context.Context, p string, src io.Reader) error {
 
 	}
 	if err := bucket.PutObject(p, src, options...); err != nil {
+
 		return errors.Wrap(err, "couldn't put the object")
 	}
+
 	return nil
 }
 
 func (c Backend) Exists(ctx context.Context, p string) (bool, error) {
 	bucket, err := c.client.Bucket(c.bucket)
 	if err != nil {
+
 		return false, errors.Wrap(err, "couldn't get the bucket object")
 	}
 	options := []oss.Option{}
 	result, err := bucket.IsObjectExist(p, options...)
 	if err != nil {
+
 		return false, errors.Wrap(err, "couldn't get the object")
 	}
+
 	return result, nil
 }
