@@ -61,8 +61,12 @@ func (c Backend) Get(ctx context.Context, p string, w io.Writer) error {
 	}
 
 	reader, err := bucket.GetObject(p)
+
 	if err != nil {
 		return errors.Wrap(err, "couldn't get the object")
+	}
+	if reader != nil {
+		fmt.Print("FileObject read succeeded!")
 	}
 
 	return nil
