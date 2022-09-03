@@ -13,7 +13,7 @@ import (
 
 // Backend implements storage.Backend for AWs S3.
 type Backend struct {
-	// logger log.Logger
+	logger log.Logger
 
 	bucket     string
 	acl        string
@@ -66,7 +66,7 @@ func (c Backend) Get(ctx context.Context, p string, w io.Writer) error {
 	}
 
 	if reader != nil {
-		fmt.Printf("FileObject %v read succeeded", reader)
+		level.Info(c.logger).Log("Successfully read fileobject")
 	}
 
 	return nil
