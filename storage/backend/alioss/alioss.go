@@ -66,7 +66,7 @@ func (c Backend) Get(ctx context.Context, p string, w io.Writer) error {
 	}
 
 	if reader != nil {
-		fmt.Println("FileObject read succeeded")
+		fmt.Printf("FileObject %v read succeeded", reader)
 	}
 
 	return nil
