@@ -13,7 +13,7 @@ import (
 
 // Backend implements storage.Backend for AWs S3.
 type Backend struct {
-	logger log.Logger
+	// logger log.Logger
 
 	bucket     string
 	acl        string
@@ -64,8 +64,9 @@ func (c Backend) Get(ctx context.Context, p string, w io.Writer) error {
 	if err != nil {
 		return errors.Wrap(err, "couldn't get the object")
 	}
+
 	if reader != nil {
-		fmt.Print("FileObject read succeeded!")
+		fmt.Println("FileObject read succeeded")
 	}
 
 	return nil
@@ -78,6 +79,7 @@ func (c Backend) Put(ctx context.Context, p string, src io.Reader) error {
 	}
 
 	options := []oss.Option{}
+
 	if c.encryption != "" {
 		option := oss.ServerSideEncryption(c.encryption)
 		options = append(options, option)
@@ -91,6 +93,7 @@ func (c Backend) Put(ctx context.Context, p string, src io.Reader) error {
 	if err := bucket.PutObject(p, src, options...); err != nil {
 		return errors.Wrap(err, "couldn't put the object")
 	}
+
 	return nil
 }
 
