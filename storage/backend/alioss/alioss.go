@@ -35,16 +35,18 @@ func newAlibabaOss(bucket string, conf *oss.Config, opts ...oss.ClientOption) (*
 
 func New(l log.Logger, c Config, debug bool) (*Backend, error) {
 	ossConf := &oss.Config{}
-
 	if c.Endpoint != "" {
 		ossConf.Endpoint = c.Endpoint
 	}
+
 	if c.AccesKeyID != "" {
 		ossConf.AccessKeyID = c.AccesKeyID
 	}
+
 	if c.AccesKeySecret != "" {
 		ossConf.AccessKeySecret = c.AccesKeySecret
 	}
+
 	if debug {
 		level.Debug(l).Log("msg", "oss storage backend", "config", fmt.Sprintf("%+v", c))
 	}
@@ -55,15 +57,12 @@ func New(l log.Logger, c Config, debug bool) (*Backend, error) {
 func (c Backend) Get(ctx context.Context, p string, w io.Writer) error {
 	bucket, err := c.client.Bucket(c.bucket)
 	if err != nil {
-
 		return errors.Wrap(err, "couldn't get the object")
 	}
+
 	reader, err := bucket.GetObject(p)
 	if err != nil {
-
 		return errors.Wrap(err, "couldn't get the object")
-	} else {
-		fmt.Printf("reader: %v\n", reader)
 	}
 
 	return nil
@@ -84,10 +83,8 @@ func (c Backend) Put(ctx context.Context, p string, src io.Reader) error {
 	if c.acl != "" {
 		option := oss.ObjectACL(oss.ACLType(c.acl))
 		options = append(options, option)
-
 	}
 	if err := bucket.PutObject(p, src, options...); err != nil {
-
 		return errors.Wrap(err, "couldn't put the object")
 	}
 
