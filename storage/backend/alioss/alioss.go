@@ -61,7 +61,6 @@ func (c Backend) Get(ctx context.Context, p string, w io.Writer) error {
 	}
 
 	reader, err := bucket.GetObject(p)
-
 	if err != nil {
 		return errors.Wrap(err, "couldn't get the object")
 	}
@@ -79,19 +78,19 @@ func (c Backend) Put(ctx context.Context, p string, src io.Reader) error {
 	}
 
 	options := []oss.Option{}
-
 	if c.encryption != "" {
 		option := oss.ServerSideEncryption(c.encryption)
 		options = append(options, option)
 	}
+
 	if c.acl != "" {
 		option := oss.ObjectACL(oss.ACLType(c.acl))
 		options = append(options, option)
 	}
+
 	if err := bucket.PutObject(p, src, options...); err != nil {
 		return errors.Wrap(err, "couldn't put the object")
 	}
-
 	return nil
 }
 
