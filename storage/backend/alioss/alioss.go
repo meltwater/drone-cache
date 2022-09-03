@@ -6,7 +6,7 @@ import (
 	"io"
 
 	"github.com/aliyun/aliyun-oss-go-sdk/oss"
-	"github.com/go-kit/kit/log"
+	"github.com/go-kit/log"
 	"github.com/go-kit/log/level"
 	"github.com/pkg/errors"
 )
@@ -39,15 +39,12 @@ func New(l log.Logger, c Config, debug bool) (*Backend, error) {
 	if c.Endpoint != "" {
 		ossConf.Endpoint = c.Endpoint
 	}
-
 	if c.AccesKeyID != "" {
 		ossConf.AccessKeyID = c.AccesKeyID
 	}
-
 	if c.AccesKeySecret != "" {
 		ossConf.AccessKeySecret = c.AccesKeySecret
 	}
-
 	if debug {
 		level.Debug(l).Log("msg", "oss storage backend", "config", fmt.Sprintf("%+v", c))
 	}
@@ -75,7 +72,6 @@ func (c Backend) Get(ctx context.Context, p string, w io.Writer) error {
 func (c Backend) Put(ctx context.Context, p string, src io.Reader) error {
 	bucket, err := c.client.Bucket(c.bucket)
 	if err != nil {
-
 		return errors.Wrap(err, "couldn't put the object")
 	}
 
@@ -85,7 +81,6 @@ func (c Backend) Put(ctx context.Context, p string, src io.Reader) error {
 		option := oss.ServerSideEncryption(c.encryption)
 		options = append(options, option)
 	}
-
 	if c.acl != "" {
 		option := oss.ObjectACL(oss.ACLType(c.acl))
 		options = append(options, option)
@@ -102,13 +97,13 @@ func (c Backend) Put(ctx context.Context, p string, src io.Reader) error {
 func (c Backend) Exists(ctx context.Context, p string) (bool, error) {
 	bucket, err := c.client.Bucket(c.bucket)
 	if err != nil {
-
 		return false, errors.Wrap(err, "couldn't get the bucket object")
 	}
+
 	options := []oss.Option{}
+
 	result, err := bucket.IsObjectExist(p, options...)
 	if err != nil {
-
 		return false, errors.Wrap(err, "couldn't get the object")
 	}
 
