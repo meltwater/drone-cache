@@ -479,14 +479,14 @@ func main() {
 		// Alibaba OSS specific Config flags
 
 		&cli.StringFlag{
-			Name:    "access-key",
+			Name:    "alibaba.access-key",
 			Usage:   "AlibabaOSS access key",
-			EnvVars: []string{"PLUGIN_ACCESS_KEY", "ALIBABA_ACCESS_KEY_ID", "CACHE_ALIBABA_ACCESS_KEY_ID"},
+			EnvVars: []string{"PLUGIN_ALIBABA_ACCESS_KEY", "ALIBABA_ACCESS_KEY_ID", "CACHE_ALIBABA_ACCESS_KEY_ID"},
 		},
 		&cli.StringFlag{
-			Name:    "secret-key",
+			Name:    "alibaba.secret-key",
 			Usage:   "AlibabaOSS access secret",
-			EnvVars: []string{"PLUGIN_ACCESS_SECRET", "ALIBABA_ACCESS_SECRET", "CACHE_ALIBABA_ACCESS_SECRET"},
+			EnvVars: []string{"PLUGIN_ALIBABA_ACCESS_SECRET", "ALIBABA_ACCESS_SECRET", "CACHE_ALIBABA_ACCESS_SECRET"},
 		},
 	}
 
@@ -603,8 +603,8 @@ func run(c *cli.Context) error {
 		Alioss: alioss.Config{
 			Bucket:         c.String("bucket"),
 			Endpoint:       c.String("endpoint"),
-			AccesKeyID:     c.String("access-key"),
-			AccesKeySecret: c.String("secret-key"),
+			AccesKeyID:     c.String("alibaba.access-key"),
+			AccesKeySecret: c.String("alibaba.secret-key"),
 		},
 
 		SkipSymlinks: c.Bool("skip-symlinks"),
