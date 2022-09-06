@@ -14,6 +14,7 @@ import (
 	"github.com/meltwater/drone-cache/internal/plugin"
 	"github.com/meltwater/drone-cache/storage"
 	"github.com/meltwater/drone-cache/storage/backend"
+	"github.com/meltwater/drone-cache/storage/backend/alioss"
 	"github.com/meltwater/drone-cache/storage/backend/azure"
 	"github.com/meltwater/drone-cache/storage/backend/filesystem"
 	"github.com/meltwater/drone-cache/storage/backend/gcs"
@@ -474,6 +475,19 @@ func main() {
 			Usage:   "sftp port",
 			EnvVars: []string{"SFTP_PORT"},
 		},
+
+		// Alibaba OSS specific Config flags
+
+		&cli.StringFlag{
+			Name:    "access-key",
+			Usage:   "AlibabaOSS access key",
+			EnvVars: []string{"PLUGIN_ACCESS_KEY", "ALIBABA_ACCESS_KEY_ID", "CACHE_ALIBABA_ACCESS_KEY_ID"},
+		},
+		&cli.StringFlag{
+			Name:    "secret-key",
+			Usage:   "AlibabaOSS access secret",
+			EnvVars: []string{"PLUGIN_ACCESS_SECRET", "ALIBABA_ACCESS_SECRET", "CACHE_ALIBABA_ACCESS_SECRET"},
+		},
 	}
 
 	if err := app.Run(os.Args); err != nil {
@@ -585,6 +599,12 @@ func run(c *cli.Context) error {
 			JSONKey:    c.String("gcs.json-key"),
 			Encryption: c.String("gcs.encryption-key"),
 			Timeout:    c.Duration("backend.operation-timeout"),
+		},
+		Alioss: alioss.Config{
+			Bucket:         c.String("bucket"),
+			Endpoint:       c.String("endpoint"),
+			AccesKeyID:     c.String("access-key"),
+			AccesKeySecret: c.String("secret-key"),
 		},
 
 		SkipSymlinks: c.Bool("skip-symlinks"),
