@@ -106,6 +106,7 @@ func (p *Plugin) Exec() error { // nolint: funlen,cyclop
 		GCS:        cfg.GCS,
 		S3:         cfg.S3,
 		SFTP:       cfg.SFTP,
+		Alioss:     cfg.Alioss,
 	})
 	if err != nil {
 		return fmt.Errorf("initialize backend <%s>, %w", cfg.Backend, err)
