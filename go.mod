@@ -14,7 +14,7 @@ require (
 	github.com/klauspost/compress v1.15.9
 	github.com/pkg/errors v0.9.1
 	github.com/pkg/sftp v1.13.5
-	github.com/urfave/cli/v2 v2.11.1
+	github.com/urfave/cli/v2 v2.14.1
 	golang.org/x/crypto v0.0.0-20220722155217-630584e8d5aa
 	golang.org/x/oauth2 v0.0.0-20220822191816-0ebed06d0094
 	google.golang.org/api v0.94.0
