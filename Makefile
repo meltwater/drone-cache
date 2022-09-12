@@ -41,7 +41,7 @@ all: drone-cache
 .PHONY: setup
 setup: ## Setups dev environment
 setup: vendor ; $(info $(M) running setup for development )
-	$(Q) make $(GOTEST) $(EMBEDMD) $(LICHE) $(GOLANGCI_LINT)
+	$(Q) make $(GOTEST) $(GOLANGCI_LINT)
 
 drone-cache: ## Runs drone-cache target
 drone-cache: vendor main.go $(wildcard *.go) $(wildcard */*.go) ; $(info $(M) running drone-cache )
@@ -54,31 +54,9 @@ clean: ; $(info $(M) running clean )
 	$(Q) rm -rf target
 	$(Q) rm -rf tmp
 
-tmp/help.txt: drone-cache
-	-mkdir -p tmp
-	$(ROOT_DIR)/drone-cache --help &> tmp/help.txt
-
 tmp/make_help.txt: Makefile
 	-mkdir -p tmp
 	$(Q) awk 'BEGIN {FS = ":.*##"; printf "Usage:\n  make <target>\n\nTargets:\n"} /^[a-zA-Z_-]+:.*?##/ { printf "  %-15s\t %s\n", $$1, $$2 }' $(MAKEFILE_LIST) &> tmp/make_help.txt
-
-README.md: tmp/help.txt tmp/make_help.txt $(EMBEDMD)
-	$(EMBEDMD) -w README.md
-
-tmp/docs.txt: drone-cache
-	$(Q) echo "IMPLEMENT ME"
-
-DOCS.md: tmp/docs.txt $(EMBEDMD)
-	$(EMBEDMD) -w DOCS.md
-
-docs: ## Generates docs
-docs: clean README.md DOCS.md $(LICHE)
-	$(Q) $(LICHE) --recursive docs --document-root .
-	$(Q) $(LICHE) --exclude "(goreportcard.com)" --document-root . *.md
-
-generate: ## Generate documentation, website and yaml files,
-generate: docs # site
-	$(Q) echo "Generated!"
 
 .PHONY: vendor
 vendor: ## Updates vendored copy of dependencies

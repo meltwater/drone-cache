@@ -56,14 +56,6 @@ steps:
       - name: testdata
         path: /drone/src/tmp/testdata/cache
 
-  - name: generate
-    image: golang:1.18.4
-    commands:
-      # Following environment tricks are because of unintended variable capture by flag library.
-      # This mitigates contamination happens when generating CLI flag documentation.
-      - env -i make PATH=$(which go):$PATH HOME=$HOME PWD=$PWD GO=$(which go) GOPATH=$(go env GOPATH) generate
-      - git diff --exit-code
-
   - name: rebuild-cache
     image: meltwater/drone-cache:v1.2.2
     pull: always
