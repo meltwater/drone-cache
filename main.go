@@ -476,7 +476,7 @@ func main() {
 			EnvVars: []string{"SFTP_PORT"},
 		},
 
-		// Alibaba OSS specific Config flags
+		// Alibaba OSS (storage) specific Config flags
 
 		&cli.StringFlag{
 			Name:    "alibaba.access-key",

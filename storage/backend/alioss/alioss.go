@@ -11,7 +11,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-// Backend implements storage.Backend for AWs S3.
+// Backend implements storage.Backend for Alibaba OSS storage.
 type Backend struct {
 	logger log.Logger
 
