@@ -9,7 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- [#223](https://github.com/meltwater/drone-cache/pull/223) Added implementation for AlibabaOSS for backend storage
+
 ### Changed
+
+- Updated dependency `cloud.google.com/go/storage v1.24.0` -> `v1.26.0`
+- Updated dependency `github.com/urfave/cli/v2 v2.11.1` -> `v2.14.1`
+- Updated dependency `google.golang.org/api v0.88.0` -> `v0.94.0`
+- Updated dependency `google.golang.org/protobuf v1.28.0 ` -> `v1.28.1`
 
 ### Removed
 
