@@ -124,6 +124,8 @@ COMMANDS:
 GLOBAL OPTIONS:
    --access-key value                    AWS access key [$PLUGIN_ACCESS_KEY, $AWS_ACCESS_KEY_ID, $CACHE_AWS_ACCESS_KEY_ID]
    --acl value                           upload files with acl (private, public-read, ...) (default: "private") [$PLUGIN_ACL, $AWS_ACL]
+   --alibaba.access-key value            AlibabaOSS access key [$PLUGIN_ALIBABA_ACCESS_KEY, $ALIBABA_ACCESS_KEY_ID, $CACHE_ALIBABA_ACCESS_KEY_ID]
+   --alibaba.secret-key value            AlibabaOSS access secret [$PLUGIN_ALIBABA_ACCESS_SECRET, $ALIBABA_ACCESS_SECRET, $CACHE_ALIBABA_ACCESS_SECRET]
    --archive-format value                archive format to use to store the cache directories (tar, gzip, zstd) (default: "tar") [$PLUGIN_ARCHIVE_FORMAT]
    --azure.account-key value             Azure Blob Storage Account Key [$PLUGIN_ACCOUNT_KEY, $AZURE_ACCOUNT_KEY]
    --azure.account-name value            Azure Blob Storage Account Name [$PLUGIN_ACCOUNT_NAME, $AZURE_ACCOUNT_NAME]
