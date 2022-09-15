@@ -4,11 +4,10 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/go-kit/log"
+	"github.com/go-kit/log/level"
 	"github.com/meltwater/drone-cache/storage"
 	"github.com/meltwater/drone-cache/storage/backend"
-
-	"github.com/go-kit/kit/log"
-	"github.com/go-kit/kit/log/level"
 )
 
 type flusher struct {

@@ -1,0 +1,53 @@
+project_name: drone-cache
+before:
+  hooks:
+    - make clean
+    - make vendor
+dist: target/dist
+builds:
+-
+  goos:
+    - linux
+  goarch:
+    - amd64
+
+  env:
+    - CGO_ENABLED=0
+  flags:
+    -tags netgo
+  ldflags: >
+    -s
+    -w
+    -X main.Version={{.Version}}
+    -X main.Commit={{.ShortCommit}}
+    -X main.Date={{.Date}}
+  hooks:
+    # Ignores failures, this is just best effort. Alternative: find target/dist -name drone-cache -type f -exec upx {} +
+    post: find target/dist -name drone-cache -type f -print0 | xargs -n 1 -0 upx
+checksum:
+  name_template: "{{ .ProjectName }}_{{ .Version }}_checksums.txt" # default
+snapshot:
+  name_template: "{{ .Tag }}-SNAPSHOT-{{.ShortCommit}}" # default
+dockers:
+  -
+    goos: linux
+    goarch: amd64
+    goarm: ''
+
+    # Modify the image template name here as desired
+    image_templates:
+    - "drone-cache:MyTestTag"
+
+    dockerfile: Dockerfile
+    build_flag_templates:
+    - "--label=org.label-schema.schema-version=1.0"
+    - "--label=version={{.Version}}"
+    - "--label=org.label-schema.name={{.ProjectName}}"
+    - "--label=org.label-schema.version={{.Version}}"
+    - "--label=org.label-schema.build-date={{.Date}}"
+    - "--label=org.label-schema.vcs-ref={{.FullCommit}}"
+    - "--label=org.label-schema.docker.dockerfile=Dockerfile"
+    - "--label=org.opencontainers.image.name={{.ProjectName}}"
+    - "--label=org.opencontainers.image.version={{.Version}}"
+    - "--label=org.opencontainers.image.created={{.Date}}"
+    - "--label=org.opencontainers.image.revision={{.FullCommit}}"

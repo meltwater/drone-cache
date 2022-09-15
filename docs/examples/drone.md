@@ -12,7 +12,7 @@ name: default
 
 steps:
   - name: restore-cache
-    image: meltwater/drone-cache:dev
+    image: meltwater/drone-cache
     environment:
       AWS_ACCESS_KEY_ID:
         from_secret: aws_access_key_id
@@ -27,14 +27,13 @@ steps:
         - 'vendor'
 
   - name: build
-    image: golang:1.14.4-alpine3.12
+    image: golang:1.18.4
     pull: true
     commands:
-      - apk add --update make git
       - make drone-cache
 
   - name: rebuild-cache
-    image: meltwater/drone-cache:dev
+    image: meltwater/drone-cache
     pull: true
     environment:
       AWS_ACCESS_KEY_ID:
@@ -59,7 +58,7 @@ name: default
 
 steps:
   - name: restore-cache-with-filesystem
-    image: meltwater/drone-cache:dev
+    image: meltwater/drone-cache
     pull: true
     settings:
       backend: "filesystem"
@@ -74,14 +73,13 @@ steps:
       path: /tmp/cache
 
   - name: build
-    image: golang:1.14.4-alpine3.12
+    image: golang:1.18.4
     pull: true
     commands:
-      - apk add --update make git
       - make drone-cache
 
   - name: rebuild-cache-with-filesystem
-    image: meltwater/drone-cache:dev
+    image: meltwater/drone-cache
     pull: true
     settings:
       backend: "filesystem"
@@ -111,7 +109,7 @@ name: default
 
 steps:
   - name: restore-cache-with-key
-    image: meltwater/drone-cache:dev
+    image: meltwater/drone-cache
     environment:
       AWS_ACCESS_KEY_ID:
         from_secret: aws_access_key_id
@@ -127,14 +125,13 @@ steps:
         - 'vendor'
 
   - name: build
-    image: golang:1.14.4-alpine3.12
+    image: golang:1.18.4
     pull: true
     commands:
-      - apk add --update make git
       - make drone-cache
 
   - name: rebuild-cache-with-key
-    image: meltwater/drone-cache:dev
+    image: meltwater/drone-cache
     pull: true
     environment:
       AWS_ACCESS_KEY_ID:
@@ -158,7 +155,7 @@ name: default
 
 steps:
   - name: restore-cache-with-gzip
-    image: meltwater/drone-cache:dev
+    image: meltwater/drone-cache
     pull: true
     environment:
       AWS_ACCESS_KEY_ID:
@@ -175,14 +172,13 @@ steps:
         - 'vendor'
 
   - name: build
-    image: golang:1.14.4-alpine3.12
+    image: golang:1.18.4
     pull: true
     commands:
-      - apk add --update make git
       - make drone-cache
 
   - name: rebuild-cache-with-gzip
-    image: meltwater/drone-cache:dev
+    image: meltwater/drone-cache
     pull: true
     environment:
       AWS_ACCESS_KEY_ID:
@@ -207,23 +203,59 @@ name: default
 
 steps:
   - name: restore-cache-debug
-    image: meltwater/drone-cache:dev
+    image: meltwater/drone-cache
     settings:
       pull: true
       restore: true
       debug: true
 
   - name: build
-    image: golang:1.14.4-alpine3.12
+    image: golang:1.18.4
     pull: true
     commands:
-      - apk add --update make git
       - make drone-cache
 
   - name: restore-cache-debug
-    image: meltwater/drone-cache:dev
+    image: meltwater/drone-cache
     settings:
       pull: true
       rebuild: true
       debug: true
+```
+
+### Glob Double Star Mounting
+
+```yaml
+kind: pipeline
+name: default
+
+steps:
+  - name: restore-cache-debug
+    image: meltwater/drone-cache
+    settings:
+      pull: true
+      restore: true
+      debug: true
+      mount:
+        - "node_modules"
+        - "packages/**/dist"
+        - "packages/**/node_modules"
+
+  - name: build
+    image: npm
+    pull: true
+    commands:
+      - npm build
+
+
+  - name: restore-cache-debug
+    image: meltwater/drone-cache
+    settings:
+      pull: true
+      rebuild: true
+      debug: true
+      mount:
+        - "node_modules"
+        - "packages/**/dist"
+        - "packages/**/node_modules"
 ```

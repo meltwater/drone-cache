@@ -2,12 +2,12 @@ package storage
 
 import (
 	"context"
+	"fmt"
 	"io"
 	"time"
 
+	"github.com/go-kit/log"
 	"github.com/meltwater/drone-cache/storage/backend"
-
-	"github.com/go-kit/kit/log"
 )
 
 const DefaultOperationTimeout = 3 * time.Minute
@@ -48,7 +48,11 @@ func (s *storage) Get(p string, w io.Writer) error {
 	ctx, cancel := context.WithTimeout(context.Background(), s.timeout)
 	defer cancel()
 
-	return s.b.Get(ctx, p, w)
+	if err := s.b.Get(ctx, p, w); err != nil {
+		return fmt.Errorf("storage backend get failure, %w", err)
+	}
+
+	return nil
 }
 
 // Put writes contents of io.Reader to remote storage at given key location.
@@ -56,7 +60,11 @@ func (s *storage) Put(p string, r io.Reader) error {
 	ctx, cancel := context.WithTimeout(context.Background(), s.timeout)
 	defer cancel()
 
-	return s.b.Put(ctx, p, r)
+	if err := s.b.Put(ctx, p, r); err != nil {
+		return fmt.Errorf("storage backend put failure, %w", err)
+	}
+
+	return nil
 }
 
 // Exists checks if object with given key exists in remote storage.
@@ -64,7 +72,12 @@ func (s *storage) Exists(p string) (bool, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), s.timeout)
 	defer cancel()
 
-	return s.b.Exists(ctx, p)
+	ret, err := s.b.Exists(ctx, p)
+	if err != nil {
+		return ret, fmt.Errorf("storage backend exists failure, %w", err)
+	}
+
+	return ret, nil
 }
 
 // List lists contents of the given directory by given key from remote storage.

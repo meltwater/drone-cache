@@ -3,10 +3,7 @@ name: release
 on:
   push:
     tags:
-      - v[0-9].[0-9]+.[0-9]+
-    branches:
-      - -master
-      - release-*
+      - "v[0-9]+.[0-9]+.[0-9]+"
 
 jobs:
   goreleaser:
@@ -16,13 +13,19 @@ jobs:
         name: Checkout
         uses: actions/checkout@v2
       -
+        name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+      -
+        name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+      -
         name: Unshallow
         run: git fetch --prune --unshallow
       -
         name: Set up Go
         uses: actions/setup-go@v1
         with:
-          go-version: 1.14.x
+          go-version: 1.18.x
       -
         name: Set up UPX
         run: sudo apt-get update && sudo apt-get install upx-ucl
@@ -36,7 +39,7 @@ jobs:
         name: Run GoReleaser for Release
         uses: goreleaser/goreleaser-action@v1
         with:
-          version: v0.137.0
+          version: v0.180.3
           args: release --rm-dist
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

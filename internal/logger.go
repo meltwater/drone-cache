@@ -3,8 +3,8 @@ package internal
 import (
 	"os"
 
-	"github.com/go-kit/kit/log"
-	"github.com/go-kit/kit/log/level"
+	"github.com/go-kit/log"
+	"github.com/go-kit/log/level"
 )
 
 const (
@@ -43,6 +43,7 @@ func NewLogger(logLevel, logFormat, name string) log.Logger {
 
 	logger = level.NewFilter(logger, lvl)
 	logger = log.With(logger, "name", name)
+	logger = log.With(logger, "ts", log.DefaultTimestampUTC, "caller", log.DefaultCaller)
 
-	return log.With(logger, "ts", log.DefaultTimestampUTC, "caller", log.DefaultCaller)
+	return logger
 }

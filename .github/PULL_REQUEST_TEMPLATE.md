@@ -12,7 +12,7 @@ Contributors guide: ./CONTRIBUTING.md
 Code of conduct: ./CODE_OF_CONDUCT.md
 -->
 
-Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our [code of conduct](CODE_OF_CONDUCT.md), and the process for submitting pull requests to us.
+Please read [CONTRIBUTING.md](/CONTRIBUTING.md) for details on our [code of conduct](/CODE_OF_CONDUCT.md), and the process for submitting pull requests to us.
 
 Fixes #
 
@@ -33,14 +33,14 @@ Fixes #
 
 <!-- Remove items that do not apply. For completed items, change [ ] to [x]. -->
 
-- [ ] Read the [**CONTRIBUTING**](CONTRIBUTING.md) document.
-- [ ] Read the [**CODE OF CONDUCT**](CODE_OF_CONDUCT.md) document.
+- [ ] Read the [**CONTRIBUTING**](/CONTRIBUTING.md) document.
+- [ ] Read the [**CODE OF CONDUCT**](/CODE_OF_CONDUCT.md) document.
 - [ ] Add tests to cover changes.
 - [ ] Ensure your code follows the code style of this project.
 - [ ] Ensure CI and all other PR checks are green OR
     - [ ] Code compiles correctly.
     - [ ] Created tests which fail without the change (if possible).
     - [ ] All new and existing tests passed.
-- [ ] Add your changes to `Unreleased` section of [CHANGELOG](CHANGELOG.md).
-- [ ] Improve and update the [README](README.md) (if necessary).
-- [ ] Ensure [documentation](./DOCS.md) is up-to-date. The same file will be updated in [plugin index](https://github.com/drone/drone-plugin-index/blob/master/content/meltwater/drone-cache/index.md) when your PR is accepted, so it will be available for end-users at http://plugins.drone.io.
+- [ ] Add your changes to `Unreleased` section of [CHANGELOG](/CHANGELOG.md).
+- [ ] Improve and update the [README](/README.md) (if necessary).
+- [ ] Ensure [documentation](/DOCS.md) is up-to-date.

@@ -14,7 +14,7 @@ import (
 	"time"
 
 	gcstorage "cloud.google.com/go/storage"
-	"github.com/go-kit/kit/log"
+	"github.com/go-kit/log"
 	"github.com/meltwater/drone-cache/test"
 	"google.golang.org/api/option"
 )

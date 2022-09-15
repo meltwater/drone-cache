@@ -8,14 +8,13 @@ import (
 	"sync"
 	"time"
 
+	"github.com/dustin/go-humanize"
+	"github.com/go-kit/log"
+	"github.com/go-kit/log/level"
 	"github.com/meltwater/drone-cache/archive"
 	"github.com/meltwater/drone-cache/internal"
 	"github.com/meltwater/drone-cache/key"
 	"github.com/meltwater/drone-cache/storage"
-
-	"github.com/dustin/go-humanize"
-	"github.com/go-kit/kit/log"
-	"github.com/go-kit/kit/log/level"
 )
 
 type rebuilder struct {
@@ -96,8 +95,8 @@ func (r rebuilder) Rebuild(srcs []string) error {
 }
 
 // rebuild pushes the archived file to the cache.
-func (r rebuilder) rebuild(src, dst string) (err error) {
-	src, err = filepath.Abs(filepath.Clean(src))
+func (r rebuilder) rebuild(src, dst string) error {
+	src, err := filepath.Abs(filepath.Clean(src))
 	if err != nil {
 		return fmt.Errorf("clean source path, %w", err)
 	}
@@ -133,7 +132,7 @@ func (r rebuilder) rebuild(src, dst string) (err error) {
 			level.Error(r.logger).Log("msg", "pr close", "err", err)
 		}
 
-		return err
+		return fmt.Errorf("rebuilder rebuild put file, %w", err)
 	}
 
 	level.Debug(r.logger).Log(
@@ -165,5 +164,5 @@ func (r rebuilder) generateKey(parts ...string) (string, error) {
 		}
 	}
 
-	return "", err
+	return "", fmt.Errorf("rebuilder generate key, %w", err)
 }

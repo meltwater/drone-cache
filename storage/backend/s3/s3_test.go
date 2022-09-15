@@ -14,7 +14,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
-	"github.com/go-kit/kit/log"
+	"github.com/go-kit/log"
 
 	"github.com/meltwater/drone-cache/test"
 )
@@ -61,6 +61,7 @@ func TestRoundTripWithAssumeRole(t *testing.T) {
 		ACL:       acl,
 		Bucket:    "s3-round-trip-with-role",
 		Endpoint:  endpoint,
+		StsEndpoint: endpoint,
 		Key:       userAccessKey,
 		PathStyle: true, // Should be true for minio and false for AWS.
 		Region:    defaultRegion,

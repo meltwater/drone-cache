@@ -1,13 +1,11 @@
-package gzip
+package zstd
 
 import (
 	"compress/flate"
-	"compress/gzip"
 	"io"
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"strings"
 	"testing"
 
 	"github.com/go-kit/log"
@@ -20,39 +18,30 @@ var (
 	testRoot          = "testdata"
 	testRootMounted   = "testdata/mounted"
 	testRootExtracted = "testdata/extracted"
-	testAbsPattern    = "testdata_absolute"
 )
 
 func TestCreate(t *testing.T) {
 	test.Ok(t, os.MkdirAll(testRootMounted, 0755))
 	test.Ok(t, os.MkdirAll(testRootExtracted, 0755))
-
-	testAbs, err := ioutil.TempDir("", testAbsPattern)
-	test.Ok(t, err)
-	test.Equals(t, filepath.IsAbs(testAbs), true)
-
-	t.Cleanup(func() {
-		os.RemoveAll(testRoot)
-		os.RemoveAll(testAbs)
-	})
+	t.Cleanup(func() { os.RemoveAll(testRoot) })
 
 	for _, tc := range []struct {
 		name    string
-		tgz     *Archive
+		tzst    *Archive
 		srcs    []string
 		written int64
 		err     error
 	}{
 		{
 			name:    "empty mount paths",
-			tgz:     New(log.NewNopLogger(), testRootMounted, true, flate.DefaultCompression),
+			tzst:    New(log.NewNopLogger(), testRootMounted, true, flate.DefaultCompression),
 			srcs:    []string{},
 			written: 0,
 			err:     nil,
 		},
 		{
 			name: "non-existing mount paths",
-			tgz:  New(log.NewNopLogger(), testRootMounted, true, flate.DefaultCompression),
+			tzst: New(log.NewNopLogger(), testRootMounted, true, flate.DefaultCompression),
 			srcs: []string{
 				"iamnotexists",
 				"metoo",
@@ -62,77 +51,51 @@ func TestCreate(t *testing.T) {
 		},
 		{
 			name:    "existing mount paths",
-			tgz:     New(log.NewNopLogger(), testRootMounted, true, flate.DefaultCompression),
-			srcs:    exampleFileTree(t, "gzip_create", testRootMounted),
+			tzst:    New(log.NewNopLogger(), testRootMounted, true, flate.DefaultCompression),
+			srcs:    exampleFileTree(t, "zstd_create"),
 			written: 43, // 3 x tmpfile in dir, 1 tmpfile
 			err:     nil,
 		},
 		{
 			name:    "existing mount nested paths",
-			tgz:     New(log.NewNopLogger(), testRootMounted, true, flate.DefaultCompression),
+			tzst:    New(log.NewNopLogger(), testRootMounted, true, flate.DefaultCompression),
 			srcs:    exampleNestedFileTree(t, "tar_create"),
 			written: 56, // 4 x tmpfile in dir, 1 tmpfile
 			err:     nil,
 		},
 		{
 			name:    "existing mount paths with symbolic links",
-			tgz:     New(log.NewNopLogger(), testRootMounted, false, flate.DefaultCompression),
-			srcs:    exampleFileTreeWithSymlinks(t, "gzip_create_symlink"),
-			written: 43,
-			err:     nil,
-		},
-		{
-			name:    "absolute mount paths",
-			tgz:     New(log.NewNopLogger(), testRootMounted, true, flate.DefaultCompression),
-			srcs:    exampleFileTree(t, "tar_create", testAbs),
+			tzst:    New(log.NewNopLogger(), testRootMounted, false, flate.DefaultCompression),
+			srcs:    exampleFileTreeWithSymlinks(t, "zstd_create_symlink"),
 			written: 43,
 			err:     nil,
 		},
 	} {
-		tc := tc // NOTICE: https://github.com/golang/go/wiki/CommonMistakes#using-goroutines-on-loop-iterator-variables
+		tc := tc // NOTE: https://github.com/golang/go/wiki/CommonMistakes#using-goroutines-on-loop-iterator-variables
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
 
 			// Setup
-			var absSrcs []string
-			var relativeSrcs []string
-
-			for _, src := range tc.srcs {
-				if strings.HasPrefix(src, "/") {
-					absSrcs = append(absSrcs, src)
-				} else {
-					relativeSrcs = append(relativeSrcs, src)
-				}
-			}
-
-			dstDir, dstDirClean := test.CreateTempDir(t, "gzip_create_archives", testRootMounted)
+			dstDir, dstDirClean := test.CreateTempDir(t, "zstd_create_archives", testRootMounted)
 			t.Cleanup(dstDirClean)
 
-			extDir, extDirClean := test.CreateTempDir(t, "gzip_create_extracted", testRootExtracted)
+			extDir, extDirClean := test.CreateTempDir(t, "zstd_create_extracted", testRootExtracted)
 			t.Cleanup(extDirClean)
 
 			// Run
-			archivePath := filepath.Join(dstDir, filepath.Clean(tc.name+".tar.gz"))
-			written, err := create(tc.tgz, tc.srcs, archivePath)
+			archivePath := filepath.Join(dstDir, filepath.Clean(tc.name+".tar.zst"))
+			written, err := create(tc.tzst, tc.srcs, archivePath)
 			if err != nil {
 				test.Expected(t, err, tc.err)
 				return
 			}
 
-			for _, src := range absSrcs {
-				test.Ok(t, os.RemoveAll(src))
-			}
-
 			test.Exists(t, archivePath)
 			test.Assert(t, written == tc.written, "case %q: written bytes got %d want %v", tc.name, written, tc.written)
 
-			_, err = extract(tc.tgz, archivePath, extDir)
+			_, err = extract(tc.tzst, archivePath, extDir)
 			test.Ok(t, err)
-			test.EqualDirs(t, extDir, testRootMounted, relativeSrcs)
-
-			for _, src := range absSrcs {
-				test.Exists(t, src)
-			}
+			test.EqualDirs(t, extDir, testRootMounted, tc.srcs)
 		})
 	}
 }
@@ -140,52 +103,39 @@ func TestCreate(t *testing.T) {
 func TestExtract(t *testing.T) {
 	test.Ok(t, os.MkdirAll(testRootMounted, 0755))
 	test.Ok(t, os.MkdirAll(testRootExtracted, 0755))
-
-	testAbs, err := ioutil.TempDir("", testAbsPattern)
-	test.Ok(t, err)
-	test.Equals(t, filepath.IsAbs(testAbs), true)
-
-	t.Cleanup(func() {
-		os.RemoveAll(testRoot)
-		os.RemoveAll(testAbs)
-	})
+	t.Cleanup(func() { os.RemoveAll(testRoot) })
 
 	// Setup
-	tgz := New(log.NewNopLogger(), testRootMounted, false, flate.DefaultCompression)
+	tzst := New(log.NewNopLogger(), testRootMounted, false, flate.DefaultCompression)
 
-	arcDir, arcDirClean := test.CreateTempDir(t, "gzip_extract_archive")
+	arcDir, arcDirClean := test.CreateTempDir(t, "zstd_extract_archive")
 	t.Cleanup(arcDirClean)
 
-	files := exampleFileTree(t, "gzip_extract", testRootMounted)
-	archivePath := filepath.Join(arcDir, "test.tar.gz")
-	_, err = create(tgz, files, archivePath)
+	files := exampleFileTree(t, "zstd_extract")
+	archivePath := filepath.Join(arcDir, "test.tar.zst")
+	_, err := create(tzst, files, archivePath)
 	test.Ok(t, err)
 
-	nestedFiles := exampleNestedFileTree(t, "gzip_extract_nested")
-	nestedArchivePath := filepath.Join(arcDir, "nested_test.tar.gz")
-	_, err = create(tgz, nestedFiles, nestedArchivePath)
+	nestedFiles := exampleNestedFileTree(t, "zstd_extract_nested")
+	nestedArchivePath := filepath.Join(arcDir, "nested_test.tar.zst")
+	_, err = create(tzst, nestedFiles, nestedArchivePath)
 	test.Ok(t, err)
 
-	filesWithSymlink := exampleFileTreeWithSymlinks(t, "gzip_extract_symlink")
-	archiveWithSymlinkPath := filepath.Join(arcDir, "test_with_symlink.tar.gz")
-	_, err = create(tgz, filesWithSymlink, archiveWithSymlinkPath)
+	filesWithSymlink := exampleFileTreeWithSymlinks(t, "zstd_extract_symlink")
+	archiveWithSymlinkPath := filepath.Join(arcDir, "test_with_symlink.tar.zst")
+	_, err = create(tzst, filesWithSymlink, archiveWithSymlinkPath)
 	test.Ok(t, err)
 
-	emptyArchivePath := filepath.Join(arcDir, "empty_test.tar.gz")
-	_, err = create(tgz, []string{}, emptyArchivePath)
+	emptyArchivePath := filepath.Join(arcDir, "empty_test.tar.zst")
+	_, err = create(tzst, []string{}, emptyArchivePath)
 	test.Ok(t, err)
 
-	badArchivePath := filepath.Join(arcDir, "bad_test.tar.gz")
+	badArchivePath := filepath.Join(arcDir, "bad_test.tar.zst")
 	test.Ok(t, ioutil.WriteFile(badArchivePath, []byte("hello\ndrone\n"), 0644))
-
-	filesAbs := exampleFileTree(t, ".gzip_extract_absolute", testAbs)
-	archiveAbsPath := filepath.Join(arcDir, "test_absolute.tar.gz")
-	_, err = create(tgz, filesAbs, archiveAbsPath)
-	test.Ok(t, err)
 
 	for _, tc := range []struct {
 		name        string
-		tgz         *Archive
+		tzst        *Archive
 		archivePath string
 		srcs        []string
 		written     int64
@@ -193,7 +143,7 @@ func TestExtract(t *testing.T) {
 	}{
 		{
 			name:        "non-existing archive",
-			tgz:         New(log.NewNopLogger(), testRootMounted, true, flate.DefaultCompression),
+			tzst:        New(log.NewNopLogger(), testRootMounted, true, flate.DefaultCompression),
 			archivePath: "iamnotexists",
 			srcs:        []string{},
 			written:     0,
@@ -201,7 +151,7 @@ func TestExtract(t *testing.T) {
 		},
 		{
 			name:        "non-existing root destination",
-			tgz:         New(log.NewNopLogger(), testRootMounted, true, flate.DefaultCompression),
+			tzst:        New(log.NewNopLogger(), testRootMounted, true, flate.DefaultCompression),
 			archivePath: emptyArchivePath,
 			srcs:        []string{},
 			written:     0,
@@ -209,7 +159,7 @@ func TestExtract(t *testing.T) {
 		},
 		{
 			name:        "empty archive",
-			tgz:         New(log.NewNopLogger(), testRootMounted, true, flate.DefaultCompression),
+			tzst:        New(log.NewNopLogger(), testRootMounted, true, flate.DefaultCompression),
 			archivePath: emptyArchivePath,
 			srcs:        []string{},
 			written:     0,
@@ -217,15 +167,15 @@ func TestExtract(t *testing.T) {
 		},
 		{
 			name:        "bad archives",
-			tgz:         New(log.NewNopLogger(), testRootMounted, true, flate.DefaultCompression),
+			tzst:        New(log.NewNopLogger(), testRootMounted, true, flate.DefaultCompression),
 			archivePath: badArchivePath,
 			srcs:        []string{},
 			written:     0,
-			err:         gzip.ErrHeader,
+			err:         tar.ErrArchiveNotReadable,
 		},
 		{
 			name:        "existing archive",
-			tgz:         New(log.NewNopLogger(), testRootMounted, true, flate.DefaultCompression),
+			tzst:        New(log.NewNopLogger(), testRootMounted, true, flate.DefaultCompression),
 			archivePath: archivePath,
 			srcs:        files,
 			written:     43,
@@ -233,7 +183,7 @@ func TestExtract(t *testing.T) {
 		},
 		{
 			name:        "existing archive with nested files",
-			tgz:         New(log.NewNopLogger(), testRootMounted, true, flate.DefaultCompression),
+			tzst:        New(log.NewNopLogger(), testRootMounted, true, flate.DefaultCompression),
 			archivePath: nestedArchivePath,
 			srcs:        nestedFiles,
 			written:     56,
@@ -241,17 +191,9 @@ func TestExtract(t *testing.T) {
 		},
 		{
 			name:        "existing archive with symbolic links",
-			tgz:         New(log.NewNopLogger(), testRootMounted, false, flate.DefaultCompression),
+			tzst:        New(log.NewNopLogger(), testRootMounted, false, flate.DefaultCompression),
 			archivePath: archiveWithSymlinkPath,
 			srcs:        filesWithSymlink,
-			written:     43,
-			err:         nil,
-		},
-		{
-			name:        "absolute mount paths",
-			tgz:         New(log.NewNopLogger(), testRootMounted, true, flate.DefaultCompression),
-			archivePath: archiveAbsPath,
-			srcs:        filesAbs,
 			written:     43,
 			err:         nil,
 		},
@@ -260,36 +202,17 @@ func TestExtract(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
 
-			// Setup
-			var absSrcs []string
-			var relativeSrcs []string
-
-			for _, src := range tc.srcs {
-				if strings.HasPrefix(src, "/") {
-					absSrcs = append(absSrcs, src)
-				} else {
-					relativeSrcs = append(relativeSrcs, src)
-				}
-			}
-
-			dstDir, dstDirClean := test.CreateTempDir(t, "gzip_extract_"+tc.name, testRootExtracted)
+			dstDir, dstDirClean := test.CreateTempDir(t, "zstd_extract_"+tc.name, testRootExtracted)
 			t.Cleanup(dstDirClean)
-			// Run
-			for _, src := range absSrcs {
-				test.Ok(t, os.RemoveAll(src))
-			}
-			written, err := extract(tc.tgz, tc.archivePath, dstDir)
+
+			written, err := extract(tc.tzst, tc.archivePath, dstDir)
 			if err != nil {
 				test.Expected(t, err, tc.err)
 				return
 			}
 
-			// Test
 			test.Assert(t, written == tc.written, "case %q: written bytes got %d want %v", tc.name, written, tc.written)
-			for _, src := range absSrcs {
-				test.Exists(t, src)
-			}
-			test.EqualDirs(t, dstDir, testRootMounted, relativeSrcs)
+			test.EqualDirs(t, dstDir, testRootMounted, tc.srcs)
 		})
 	}
 }
@@ -348,11 +271,11 @@ func extract(a *Archive, src string, dst string) (int64, error) {
 
 // Fixtures
 
-func exampleFileTree(t *testing.T, name string, in string) []string {
-	file, fileClean := test.CreateTempFile(t, name, []byte("hello\ndrone!\n"), in) // 13 bytes
+func exampleFileTree(t *testing.T, name string) []string {
+	file, fileClean := test.CreateTempFile(t, name, []byte("hello\ndrone!\n"), testRootMounted) // 13 bytes
 	t.Cleanup(fileClean)
 
-	dir, dirClean := test.CreateTempFilesInDir(t, name, []byte("hello\ngo!\n"), in) // 10 bytes
+	dir, dirClean := test.CreateTempFilesInDir(t, name, []byte("hello\ngo!\n"), testRootMounted) // 10 bytes
 	t.Cleanup(dirClean)
 
 	return []string{file, dir}

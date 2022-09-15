@@ -7,9 +7,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/go-kit/kit/log"
-	"github.com/go-kit/kit/log/level"
-
+	"github.com/go-kit/log"
+	"github.com/go-kit/log/level"
 	"github.com/meltwater/drone-cache/archive"
 	"github.com/meltwater/drone-cache/internal"
 	"github.com/meltwater/drone-cache/key"
@@ -77,7 +76,9 @@ func (r restorer) Restore(dsts []string) error {
 }
 
 // restore fetches the archived file from the cache and restores to the host machine's file system.
-func (r restorer) restore(src, dst string) (err error) {
+func (r restorer) restore(src, dst string) error {
+	var err error
+
 	pr, pw := io.Pipe()
 	defer internal.CloseWithErrCapturef(&err, pr, "rebuild, pr close <%s>", dst)
 
@@ -132,5 +133,5 @@ func (r restorer) generateKey(parts ...string) (string, error) {
 		}
 	}
 
-	return "", err
+	return "", fmt.Errorf("restorer generate key, %w", err)
 }

@@ -2,23 +2,24 @@ package main
 
 import (
 	"errors"
+	"fmt"
 	stdlog "log"
 	"os"
 
+	"github.com/go-kit/log"
+	"github.com/go-kit/log/level"
 	"github.com/meltwater/drone-cache/archive"
 	"github.com/meltwater/drone-cache/internal"
 	"github.com/meltwater/drone-cache/internal/metadata"
 	"github.com/meltwater/drone-cache/internal/plugin"
 	"github.com/meltwater/drone-cache/storage"
 	"github.com/meltwater/drone-cache/storage/backend"
+	"github.com/meltwater/drone-cache/storage/backend/alioss"
 	"github.com/meltwater/drone-cache/storage/backend/azure"
 	"github.com/meltwater/drone-cache/storage/backend/filesystem"
 	"github.com/meltwater/drone-cache/storage/backend/gcs"
 	"github.com/meltwater/drone-cache/storage/backend/s3"
 	"github.com/meltwater/drone-cache/storage/backend/sftp"
-
-	"github.com/go-kit/kit/log"
-	"github.com/go-kit/kit/log/level"
 	"github.com/urfave/cli/v2"
 )
 
@@ -272,14 +273,15 @@ func main() {
 		// RESTORE-KEYS
 		&cli.StringFlag{
 			Name:    "archive-format, arcfmt",
-			Usage:   "archive format to use to store the cache directories (tar, gzip)",
+			Usage:   "archive format to use to store the cache directories (tar, gzip, zstd)",
 			Value:   archive.DefaultArchiveFormat,
 			EnvVars: []string{"PLUGIN_ARCHIVE_FORMAT"},
 		},
 		&cli.IntFlag{
 			Name: "compression-level, cpl",
-			Usage: `compression level to use for gzip compression when archive-format specified as gzip
-			(check https://godoc.org/compress/flate#pkg-constants for available options)`,
+			Usage: `compression level to use for gzip/zstd compression when archive-format specified as gzip/zstd
+			(check https://godoc.org/compress/flate#pkg-constants for available options for gzip
+			and https://pkg.go.dev/github.com/klauspost/compress/zstd#EncoderLevelFromZstd for zstd)`,
 			Value:   archive.DefaultCompressionLevel,
 			EnvVars: []string{"PLUGIN_COMPRESSION_LEVEL"},
 		},
@@ -362,6 +364,17 @@ func main() {
 			Name:    "encryption, enc",
 			Usage:   "server-side encryption algorithm, defaults to none. (AES256, aws:kms)",
 			EnvVars: []string{"PLUGIN_ENCRYPTION", "AWS_ENCRYPTION"},
+		},
+		&cli.StringFlag{
+			Name:    "s3-bucket-public",
+			Usage:   "Set to use anonymous credentials with public S3 bucket",
+			EnvVars: []string{"PLUGIN_S3_BUCKET_PUBLIC", "S3_BUCKET_PUBLIC"},
+		},
+		&cli.StringFlag{
+			Name:    "sts-endpoint",
+			Usage:   "Custom STS endpoint for IAM role assumption",
+			Value:   "",
+			EnvVars: []string{"PLUGIN_STS_ENDPOINT", "AWS_STS_ENDPOINT"},
 		},
 		&cli.StringFlag{
 			Name:    "role-arn",
@@ -462,6 +475,19 @@ func main() {
 			Usage:   "sftp port",
 			EnvVars: []string{"SFTP_PORT"},
 		},
+
+		// Alibaba OSS (storage) specific Config flags
+
+		&cli.StringFlag{
+			Name:    "alibaba.access-key",
+			Usage:   "AlibabaOSS access key",
+			EnvVars: []string{"PLUGIN_ALIBABA_ACCESS_KEY", "ALIBABA_ACCESS_KEY_ID", "CACHE_ALIBABA_ACCESS_KEY_ID"},
+		},
+		&cli.StringFlag{
+			Name:    "alibaba.secret-key",
+			Usage:   "AlibabaOSS access secret",
+			EnvVars: []string{"PLUGIN_ALIBABA_ACCESS_SECRET", "ALIBABA_ACCESS_SECRET", "CACHE_ALIBABA_ACCESS_SECRET"},
+		},
 	}
 
 	if err := app.Run(os.Args); err != nil {
@@ -471,7 +497,7 @@ func main() {
 
 // nolint:funlen
 func run(c *cli.Context) error {
-	var logLevel = c.String("log.level")
+	logLevel := c.String("log.level")
 	if c.Bool("debug") {
 		logLevel = internal.LogLevelDebug
 	}
@@ -534,14 +560,17 @@ func run(c *cli.Context) error {
 			CacheRoot: c.String("filesystem.cache-root"),
 		},
 		S3: s3.Config{
-			ACL:        c.String("acl"),
-			Bucket:     c.String("bucket"),
-			Encryption: c.String("encryption"),
-			Endpoint:   c.String("endpoint"),
-			Key:        c.String("access-key"),
-			PathStyle:  c.Bool("path-style"),
-			Region:     c.String("region"),
-			Secret:     c.String("secret-key"),
+			ACL:         c.String("acl"),
+			Bucket:      c.String("bucket"),
+			Encryption:  c.String("encryption"),
+			Endpoint:    c.String("endpoint"),
+			Key:         c.String("access-key"),
+			PathStyle:   c.Bool("path-style"),
+			Public:      c.Bool("s3-bucket-public"),
+			Region:      c.String("region"),
+			Secret:      c.String("secret-key"),
+			StsEndpoint: c.String("sts-endpoint"),
+			RoleArn:     c.String("role-arn"),
 		},
 		Azure: azure.Config{
 			AccountName:    c.String("azure.account-name"),
@@ -571,6 +600,12 @@ func run(c *cli.Context) error {
 			Encryption: c.String("gcs.encryption-key"),
 			Timeout:    c.Duration("backend.operation-timeout"),
 		},
+		Alioss: alioss.Config{
+			Bucket:         c.String("bucket"),
+			Endpoint:       c.String("endpoint"),
+			AccesKeyID:     c.String("alibaba.access-key"),
+			AccesKeySecret: c.String("alibaba.secret-key"),
+		},
 
 		SkipSymlinks: c.Bool("skip-symlinks"),
 	}
@@ -584,7 +619,7 @@ func run(c *cli.Context) error {
 		// If it is exit-code enabled, always exit with error.
 		level.Warn(logger).Log("msg", "silent fails disabled, exiting with status code on error")
 
-		return err
+		return fmt.Errorf("status code exit, %w", err)
 	}
 
 	var e plugin.Error
@@ -595,5 +630,5 @@ func run(c *cli.Context) error {
 		return nil
 	}
 
-	return err
+	return fmt.Errorf("uncaught error, %w", err)
 }

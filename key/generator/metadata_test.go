@@ -1,10 +1,11 @@
 package generator
 
 import (
+	"runtime"
 	"testing"
-	"text/template"
+	"time"
 
-	"github.com/go-kit/kit/log"
+	"github.com/go-kit/log"
 	"github.com/meltwater/drone-cache/internal/metadata"
 	"github.com/meltwater/drone-cache/test"
 )
@@ -12,7 +13,7 @@ import (
 func TestGenerate(t *testing.T) {
 	t.Parallel()
 
-	l := log.NewNopLogger()
+	logger := log.NewNopLogger()
 
 	for _, tt := range []struct {
 		given    string
@@ -21,61 +22,28 @@ func TestGenerate(t *testing.T) {
 		{`{{ .Repo.Name }}`, "RepoName"},
 		{`{{ checksum "checksum_file_test.txt"}}`, "04a29c732ecbce101c1be44c948a50c6"},
 		{`{{ checksum "../../docs/drone_env_vars.md"}}`, "f8b5b7f96f3ffaa828e4890aab290e59"},
+		{`{{ hashFiles "" }}`, ""},
+		{`{{ hashFiles "checksum_file_test.txt" }}`, "b9fff559e00dd879bdffee979ee73e08c67dee2117da071083d3b833cbff7bc8"},
+		{`{{ hashFiles "checksum_file_test.txt" "checksum_file_test.txt" }}`, "fed16eb2e98f501968c74e261feb26a8776b2ae03b205ad7302f949e75ca455f"},
+		{`{{ hashFiles "checksum_file_tes*.txt" }}`, "b9fff559e00dd879bdffee979ee73e08c67dee2117da071083d3b833cbff7bc8"},
 		{`{{ epoch }}`, "1550563151"},
-		{`{{ arch }}`, "amd64"},
-		{`{{ os }}`, "darwin"},
+		{`{{ arch }}`, runtime.GOARCH},
+		{`{{ os }}`, runtime.GOOS},
 	} {
 		tt := tt
 		t.Run(tt.given, func(t *testing.T) {
-			g := Metadata{
-				logger: l,
-				tmpl:   tt.given,
-				data:   metadata.Metadata{Repo: metadata.Repo{Name: "RepoName"}},
-				funcMap: template.FuncMap{
-					"checksum": checksumFunc(l),
-					"epoch":    func() string { return "1550563151" },
-					"arch":     func() string { return "amd64" },
-					"os":       func() string { return "darwin" },
+			g := NewMetadata(
+				logger,
+				tt.given,
+				metadata.Metadata{Repo: metadata.Repo{Name: "RepoName"}},
+				func() time.Time {
+					return time.Unix(1550563151, 0)
 				},
-			}
+			)
 
 			actual, err := g.Generate(tt.given)
 			test.Ok(t, err)
-			test.Equals(t, actual, tt.expected)
-		})
-	}
-}
-
-func TestParseTemplate(t *testing.T) {
-	t.Parallel()
-
-	l := log.NewNopLogger()
-
-	for _, tt := range []struct {
-		given string
-	}{
-		{`{{ .Repo.Name }}`},
-		{`{{ checksum "checksum_file_test.txt"}}`},
-		{`{{ epoch }}`},
-		{`{{ arch }}`},
-		{`{{ os }}`},
-	} {
-		tt := tt
-		t.Run(tt.given, func(t *testing.T) {
-			g := Metadata{
-				logger: l,
-				tmpl:   tt.given,
-				data:   metadata.Metadata{Repo: metadata.Repo{Name: "RepoName"}},
-				funcMap: template.FuncMap{
-					"checksum": checksumFunc(l),
-					"epoch":    func() string { return "1550563151" },
-					"arch":     func() string { return "amd64" },
-					"os":       func() string { return "darwin" },
-				},
-			}
-
-			_, err := g.parseTemplate()
-			test.Ok(t, err)
+			test.Equals(t, tt.expected, actual)
 		})
 	}
 }

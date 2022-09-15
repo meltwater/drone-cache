@@ -2,11 +2,15 @@
 package plugin
 
 import (
+	"crypto/md5" // #nosec
 	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
+	"time"
 
+	"github.com/go-kit/log"
+	"github.com/go-kit/log/level"
 	"github.com/meltwater/drone-cache/archive"
 	"github.com/meltwater/drone-cache/cache"
 	"github.com/meltwater/drone-cache/internal/metadata"
@@ -14,9 +18,6 @@ import (
 	keygen "github.com/meltwater/drone-cache/key/generator"
 	"github.com/meltwater/drone-cache/storage"
 	"github.com/meltwater/drone-cache/storage/backend"
-
-	"github.com/go-kit/kit/log"
-	"github.com/go-kit/kit/log/level"
 )
 
 // Error recognized error from plugin.
@@ -42,7 +43,7 @@ func New(logger log.Logger) *Plugin {
 }
 
 // Exec entry point of Plugin, where the magic happens.
-func (p *Plugin) Exec() error { // nolint:funlen
+func (p *Plugin) Exec() error { // nolint: funlen,cyclop
 	cfg := p.Config
 
 	// 1. Check parameters
@@ -84,14 +85,14 @@ func (p *Plugin) Exec() error { // nolint:funlen
 
 	var generator key.Generator
 	if cfg.CacheKeyTemplate != "" {
-		generator = keygen.NewMetadata(p.logger, cfg.CacheKeyTemplate, p.Metadata)
+		generator = keygen.NewMetadata(p.logger, cfg.CacheKeyTemplate, p.Metadata, time.Now)
 		if err := generator.Check(); err != nil {
 			return fmt.Errorf("parse failed, falling back to default, %w", err)
 		}
 
-		options = append(options, cache.WithFallbackGenerator(keygen.NewHash(p.Metadata.Commit.Branch)))
+		options = append(options, cache.WithFallbackGenerator(keygen.NewHash(md5.New, p.Metadata.Commit.Branch)))
 	} else {
-		generator = keygen.NewHash(p.Metadata.Commit.Branch)
+		generator = keygen.NewHash(md5.New, p.Metadata.Commit.Branch)
 		options = append(options, cache.WithFallbackGenerator(keygen.NewStatic(p.Metadata.Commit.Branch)))
 	}
 
@@ -105,6 +106,7 @@ func (p *Plugin) Exec() error { // nolint:funlen
 		GCS:        cfg.GCS,
 		S3:         cfg.S3,
 		SFTP:       cfg.SFTP,
+		Alioss:     cfg.Alioss,
 	})
 	if err != nil {
 		return fmt.Errorf("initialize backend <%s>, %w", cfg.Backend, err)
@@ -121,10 +123,23 @@ func (p *Plugin) Exec() error { // nolint:funlen
 		options...,
 	)
 
-	// 4. Select mode
+	// 4. Glob match mounts if doublestar paths exist
+	cwd, err := os.Getwd()
+	if err != nil {
+		return fmt.Errorf("get working directory, %w", err)
+	}
+
+	fsys := os.DirFS(cwd)
+
+	if err = p.Config.HandleMount(fsys); err != nil {
+		return fmt.Errorf("exec handle mount call, %w", err)
+	}
+
+	// 5. Select mode
 	if cfg.Rebuild {
 		if err := c.Rebuild(p.Config.Mount); err != nil {
 			level.Debug(p.logger).Log("err", fmt.Sprintf("%+v\n", err))
+
 			return Error(fmt.Sprintf("[IMPORTANT] build cache, %+v\n", err))
 		}
 	}
@@ -132,6 +147,7 @@ func (p *Plugin) Exec() error { // nolint:funlen
 	if cfg.Restore {
 		if err := c.Restore(p.Config.Mount); err != nil {
 			level.Debug(p.logger).Log("err", fmt.Sprintf("%+v\n", err))
+
 			return Error(fmt.Sprintf("[IMPORTANT] restore cache, %+v\n", err))
 		}
 	}

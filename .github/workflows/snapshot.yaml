@@ -4,12 +4,7 @@ name: snapshot
 on:
   push:
     tags:
-      - v[0-9].[0-9]+.[0-9]+-rc[0-9]+
-      - v[0-9].[0-9]+.[0-9]+-rc.[0-9]+
-    branches:
-      - -master
-      - release-*
-
+      - "v[0-9]+.[0-9]+.[0-9]+-rc[0-9]+"
 jobs:
   goreleaser:
     runs-on: ubuntu-latest
@@ -17,6 +12,12 @@ jobs:
       -
         name: Checkout
         uses: actions/checkout@v2
+      -
+        name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+      -
+        name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
       -
         name: Unshallow
         run: git fetch --prune --unshallow
@@ -38,7 +39,7 @@ jobs:
         name: Run GoReleaser for Snapshot
         uses: goreleaser/goreleaser-action@v1
         with:
-          version: v0.137.0
+          version: v0.180.3
           # not using --snapshot because we want to push images for snapshots
           args: release --rm-dist --config=.goreleaser-snapshot.yml
         env:

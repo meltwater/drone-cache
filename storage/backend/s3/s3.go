@@ -13,10 +13,8 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
-	"github.com/aws/aws-sdk-go/service/sts"
-	"github.com/go-kit/kit/log"
-	"github.com/go-kit/kit/log/level"
-
+	"github.com/go-kit/log"
+	"github.com/go-kit/log/level"
 	"github.com/meltwater/drone-cache/internal"
 )
 
@@ -37,7 +35,11 @@ func New(l log.Logger, c Config, debug bool) (*Backend, error) {
 		Endpoint:         &c.Endpoint,
 		DisableSSL:       aws.Bool(!strings.HasPrefix(c.Endpoint, "https://")),
 		S3ForcePathStyle: aws.Bool(c.PathStyle),
-		Credentials:      credentials.AnonymousCredentials,
+	}
+
+	// Use anonymous credentials if the S3 bucket is public
+	if c.Public {
+		conf.Credentials = credentials.AnonymousCredentials
 	}
 
 	if c.Key != "" && c.Secret != "" {
@@ -47,8 +49,19 @@ func New(l log.Logger, c Config, debug bool) (*Backend, error) {
 	}
 
 	if c.RoleArn != "" {
+		stsConf := conf
+		if c.StsEndpoint != "" {
+			stsConf = conf.Copy(&aws.Config{
+				Endpoint:   &c.StsEndpoint,
+				DisableSSL: aws.Bool(!strings.HasPrefix(c.StsEndpoint, "https://")),
+			})
+		} else {
+			stsConf.Endpoint = nil
+			stsConf.DisableSSL = nil
+		}
+
 		conf.Credentials = credentials.NewStaticCredentials(c.Key, c.Secret, "")
-		crds := assumeRole(l, conf, c.RoleArn)
+		crds := assumeRole(l, stsConf, c.RoleArn)
 		conf.Credentials = credentials.NewStaticCredentials(crds.AccessKeyID, crds.SecretAccessKey, crds.SessionToken)
 	}
 
@@ -84,6 +97,7 @@ func (b *Backend) Get(ctx context.Context, p string, w io.Writer) error {
 		out, err := b.client.GetObjectWithContext(ctx, in)
 		if err != nil {
 			errCh <- fmt.Errorf("get the object, %w", err)
+
 			return
 		}
 
@@ -99,6 +113,7 @@ func (b *Backend) Get(ctx context.Context, p string, w io.Writer) error {
 	case err := <-errCh:
 		return err
 	case <-ctx.Done():
+		// nolint: wrapcheck
 		return ctx.Err()
 	}
 }
@@ -135,6 +150,7 @@ func (b *Backend) Exists(ctx context.Context, p string) (bool, error) {
 
 	out, err := b.client.HeadObjectWithContext(ctx, in)
 	if err != nil {
+		// nolint: errorlint
 		if awsErr, ok := err.(awserr.Error); ok && awsErr.Code() == s3.ErrCodeNoSuchKey || awsErr.Code() == "NotFound" {
 			return false, nil
 		}
@@ -148,18 +164,23 @@ func (b *Backend) Exists(ctx context.Context, p string) (bool, error) {
 }
 
 func assumeRole(l log.Logger, c *aws.Config, roleArn string) credentials.Value {
-	client := sts.New(session.Must(session.NewSessionWithOptions(session.Options{})), c)
-
-	stsProvider := stscreds.AssumeRoleProvider{
-		Client:          client,
-		RoleARN:         roleArn,
-		RoleSessionName: "drone-cache",
-	}
-
-	role, err := stsProvider.Retrieve()
+	sess, err := session.NewSession(&aws.Config{
+		Credentials:                   c.Credentials,
+		Region:                        c.Region,
+		Endpoint:                      c.Endpoint,
+		DisableSSL:                    c.DisableSSL,
+		CredentialsChainVerboseErrors: aws.Bool(true),
+	})
 	if err != nil {
 		level.Error(l).Log("msg", "s3 backend", "assume-role", err.Error())
 	}
 
-	return role
+	creds, err := stscreds.NewCredentials(sess, roleArn, func(p *stscreds.AssumeRoleProvider) {
+		p.RoleSessionName = "drone-cache"
+	}).Get()
+	if err != nil {
+		level.Error(l).Log("msg", "s3 backend", "assume-role", err.Error())
+	}
+
+	return creds
 }

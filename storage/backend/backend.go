@@ -7,9 +7,9 @@ import (
 	"io"
 	"time"
 
-	"github.com/go-kit/kit/log"
-	"github.com/go-kit/kit/log/level"
-
+	"github.com/go-kit/log"
+	"github.com/go-kit/log/level"
+	"github.com/meltwater/drone-cache/storage/backend/alioss"
 	"github.com/meltwater/drone-cache/storage/backend/azure"
 	"github.com/meltwater/drone-cache/storage/backend/filesystem"
 	"github.com/meltwater/drone-cache/storage/backend/gcs"
@@ -28,6 +28,8 @@ const (
 	S3 = "s3"
 	// SFTP type of the corresponding backend represented as string constant.
 	SFTP = "sftp"
+	// OSS type of the corresponding backend represented as string constant.
+	AliOSS = "alioss"
 )
 
 // MOTICE: FileEntry needs a better place.
@@ -80,6 +82,9 @@ func FromConfig(l log.Logger, backedType string, cfg Config) (Backend, error) {
 	case SFTP:
 		level.Warn(l).Log("msg", "using sftp as backend")
 		b, err = sftp.New(log.With(l, "backend", SFTP), cfg.SFTP)
+	case AliOSS:
+		level.Warn(l).Log("msg", "using Alibaba OSS storage as backend")
+		b, err = alioss.New(log.With(l, "backend", AliOSS), cfg.Alioss, cfg.Debug)
 	default:
 		return nil, errors.New("unknown backend")
 	}

@@ -33,6 +33,7 @@ Cache key template syntax is very basic. You just need to provide a string. In t
 Also following helper functions provided for your use:
 
 * `checksum`: Provides md5 hash of a file for given path
+* `hashFiles`: Provides SHA256 hash after SHA256 hashing each single file
 * `epoch`: Provides Unix epoch
 * `arch`: Provides Architecture of running system
 * `os`: Provides Operation system of running system
@@ -44,6 +45,10 @@ For further information about this syntax please see [official docs](https://gol
 `"{{ .Repo.Name }}-{{ .Commit.Branch }}-{{ checksum "go.mod" }}-yadayadayada"`
 
 `"{{ .Repo.Name }}_{{ checksum "go.mod" }}_{{ checksum "go.sum" }}_{{ arch }}_{{ os }}"`
+
+`"{{ .Repo.Name }}_{{ hashFiles "go.mod" "go.sum" }}_{{ arch }}_{{ os }}"`
+
+`"{{ .Repo.Name }}_{{ hashFiles "go.*" }}_{{ arch }}_{{ os }}"`
 *Metadata*
 
 Following metadata object is available and pre-populated with current build information for you to use in cache key templates.
@@ -100,7 +105,7 @@ name: default
 
 steps:
   - name: restore-cache
-    image: meltwater/drone-cache:dev
+    image: meltwater/drone-cache
     environment:
       AWS_ACCESS_KEY_ID:
         from_secret: aws_access_key_id
@@ -115,14 +120,13 @@ steps:
         - 'vendor'
 
   - name: build
-    image: golang:1.14.4-alpine3.12
+    image: golang:1.18.4
     pull: true
     commands:
-      - apk add --update make git
       - make drone-cache
 
   - name: rebuild-cache
-    image: meltwater/drone-cache:dev
+    image: meltwater/drone-cache
     pull: true
     environment:
       AWS_ACCESS_KEY_ID:
@@ -145,7 +149,7 @@ name: default
 
 steps:
   - name: restore-cache-with-filesystem
-    image: meltwater/drone-cache:dev
+    image: meltwater/drone-cache
     pull: true
     settings:
       backend: "filesystem"
@@ -160,14 +164,13 @@ steps:
       path: /tmp/cache
 
   - name: build
-    image: golang:1.14.4-alpine3.12
+    image: golang:1.18.4
     pull: true
     commands:
-      - apk add --update make git
       - make drone-cache
 
   - name: rebuild-cache-with-filesystem
-    image: meltwater/drone-cache:dev
+    image: meltwater/drone-cache
     pull: true
     settings:
       backend: "filesystem"
@@ -196,7 +199,7 @@ name: default
 
 steps:
   - name: restore-cache-with-key
-    image: meltwater/drone-cache:dev
+    image: meltwater/drone-cache
     environment:
       AWS_ACCESS_KEY_ID:
         from_secret: aws_access_key_id
@@ -212,14 +215,13 @@ steps:
         - 'vendor'
 
   - name: build
-    image: golang:1.14.4-alpine3.12
+    image: golang:1.18.4
     pull: true
     commands:
-      - apk add --update make git
       - make drone-cache
 
   - name: rebuild-cache-with-key
-    image: meltwater/drone-cache:dev
+    image: meltwater/drone-cache
     pull: true
     environment:
       AWS_ACCESS_KEY_ID:
@@ -244,7 +246,7 @@ name: default
 
 steps:
   - name: restore-cache-with-gzip
-    image: meltwater/drone-cache:dev
+    image: meltwater/drone-cache
     pull: true
     environment:
       AWS_ACCESS_KEY_ID:
@@ -261,14 +263,13 @@ steps:
         - 'vendor'
 
   - name: build
-    image: golang:1.14.4-alpine3.12
+    image: golang:1.18.4
     pull: true
     commands:
-      - apk add --update make git
       - make drone-cache
 
   - name: rebuild-cache-with-gzip
-    image: meltwater/drone-cache:dev
+    image: meltwater/drone-cache
     pull: true
     environment:
       AWS_ACCESS_KEY_ID:
@@ -293,21 +294,20 @@ name: default
 
 steps:
   - name: restore-cache-debug
-    image: meltwater/drone-cache:dev
+    image: meltwater/drone-cache
     settings:
       pull: true
       restore: true
       debug: true
 
   - name: build
-    image: golang:1.14.4-alpine3.12
+    image: golang:1.18.4
     pull: true
     commands:
-      - apk add --update make git
       - make drone-cache
 
   - name: restore-cache-debug
-    image: meltwater/drone-cache:dev
+    image: meltwater/drone-cache
     settings:
       pull: true
       rebuild: true
@@ -332,7 +332,7 @@ cache_key
 : cache key to use for the cache directories
 
 archive_format
-: archive format to use to store the cache directories (`tar`, `gzip`) (default: `tar`)
+: archive format to use to store the cache directories (`tar`, `gzip`, `zstd`) (default: `tar`)
 
 override
 : override already existing cache files (default: `true`)

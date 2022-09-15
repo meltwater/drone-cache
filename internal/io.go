@@ -6,13 +6,13 @@ import (
 	"io"
 	"os"
 
-	"github.com/go-kit/kit/log"
-	"github.com/go-kit/kit/log/level"
+	"github.com/go-kit/log"
+	"github.com/go-kit/log/level"
 )
 
 // CloseWithErrLogf is making sure we log every error, even those from best effort tiny closers.
 func CloseWithErrLogf(logger log.Logger, closer io.Closer, format string, a ...interface{}) {
-	err := close(closer)
+	err := closeIo(closer)
 	if err == nil {
 		return
 	}
@@ -27,7 +27,7 @@ func CloseWithErrLogf(logger log.Logger, closer io.Closer, format string, a ...i
 // CloseWithErrCapturef runs function and on error return error by argument including the given error..
 func CloseWithErrCapturef(err *error, closer io.Closer, format string, a ...interface{}) {
 	if err != nil {
-		cErr := close(closer)
+		cErr := closeIo(closer)
 		if cErr == nil {
 			return
 		}
@@ -40,7 +40,7 @@ func CloseWithErrCapturef(err *error, closer io.Closer, format string, a ...inte
 		return
 	}
 
-	cErr := close(closer)
+	cErr := closeIo(closer)
 	if cErr == nil {
 		return
 	}
@@ -48,7 +48,7 @@ func CloseWithErrCapturef(err *error, closer io.Closer, format string, a ...inte
 	*err = cErr
 }
 
-func close(closer io.Closer) error {
+func closeIo(closer io.Closer) error {
 	err := closer.Close()
 	if err == nil {
 		return nil
@@ -58,5 +58,5 @@ func close(closer io.Closer) error {
 		return nil
 	}
 
-	return err
+	return fmt.Errorf("error closing io.Closer: %w", err)
 }

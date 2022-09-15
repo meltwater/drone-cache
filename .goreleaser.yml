@@ -84,16 +84,10 @@ changelog:
     - Merge branch
 dockers:
   -
-    goos: linux
-    goarch: amd64
-    goarm: ''
-    binaries:
-    - drone-cache
     image_templates:
-    - "meltwater/drone-cache:latest"
-    - "meltwater/drone-cache:{{ .Tag }}"
-    - "meltwater/drone-cache:v{{ .Major }}.{{ .Minor }}"
-    - "meltwater/drone-cache:v{{ .Major }}"
+    - "meltwater/drone-cache:{{ .Tag }}-linux-amd64"
+    - "meltwater/drone-cache:v{{ .Major }}.{{ .Minor }}-linux-amd64"
+    - "meltwater/drone-cache:v{{ .Major }}-linux-amd64"
 
     # TODO: Add missing GOOS and ARCH
     # .Os	GOOS (usually allow replacements)
@@ -101,10 +95,9 @@ dockers:
     # .Arm	GOARM (usually allow replacements)
     # .Mips	GOMIPS (usually allow replacements)
     # TODO: Add github docker repo
-    # - "docker.pkg.github.com/meltwater/drone-cache/drone-cache:latest"
-    # - "docker.pkg.github.com/meltwater/drone-cache/drone-cache:{{ .Tag }}"
-    # - "docker.pkg.github.com/meltwater/drone-cache/drone-cache:v{{ .Major }}.{{ .Minor }}"
-    # - "docker.pkg.github.com/meltwater/drone-cache/drone-cache:v{{ .Major }}"
+    # - "docker.pkg.github.com/meltwater/drone-cache/drone-cache:{{ .Tag }}-linux-amd64"
+    # - "docker.pkg.github.com/meltwater/drone-cache/drone-cache:v{{ .Major }}.{{ .Minor }}-linux-amd64"
+    # - "docker.pkg.github.com/meltwater/drone-cache/drone-cache:v{{ .Major }}-linux-amd64"
 
     # Skips the docker push. Could be useful if you also do draft releases.
     # If set to auto, the release will not be pushed to the docker repository
@@ -112,7 +105,9 @@ dockers:
     # Defaults to false. It's auto as an additional safety measure.
     skip_push: auto
     dockerfile: Dockerfile
+    use: buildx
     build_flag_templates:
+    - "--platform=linux/amd64"
     - "--label=org.label-schema.schema-version=1.0"
     - "--label=version={{.Version}}"
     - "--label=org.label-schema.name={{.ProjectName}}"
@@ -124,3 +119,58 @@ dockers:
     - "--label=org.opencontainers.image.version={{.Version}}"
     - "--label=org.opencontainers.image.created={{.Date}}"
     - "--label=org.opencontainers.image.revision={{.FullCommit}}"
+  -
+    image_templates:
+    - "meltwater/drone-cache:{{ .Tag }}-linux-arm64"
+    - "meltwater/drone-cache:v{{ .Major }}.{{ .Minor }}-linux-arm64"
+    - "meltwater/drone-cache:v{{ .Major }}-linux-arm64"
+
+    # TODO: Add missing GOOS and ARCH
+    # .Os	GOOS (usually allow replacements)
+    # .Arch	GOARCH (usually allow replacements)
+    # .Arm	GOARM (usually allow replacements)
+    # .Mips	GOMIPS (usually allow replacements)
+    # TODO: Add github docker repo
+    # - "docker.pkg.github.com/meltwater/drone-cache/drone-cache:{{ .Tag }}-linux-arm64"
+    # - "docker.pkg.github.com/meltwater/drone-cache/drone-cache:v{{ .Major }}.{{ .Minor }}-linux-arm64"
+    # - "docker.pkg.github.com/meltwater/drone-cache/drone-cache:v{{ .Major }}-linux-arm64"
+
+    # Skips the docker push. Could be useful if you also do draft releases.
+    # If set to auto, the release will not be pushed to the docker repository
+    # in case there is an indicator for prerelease in the tag e.g. v1.0.0-rc1
+    # Defaults to false. It's auto as an additional safety measure.
+    skip_push: auto
+    dockerfile: Dockerfile
+    use: buildx
+    goarch: arm64
+    build_flag_templates:
+    - "--platform=linux/arm64"
+    - "--label=org.label-schema.schema-version=1.0"
+    - "--label=version={{.Version}}"
+    - "--label=org.label-schema.name={{.ProjectName}}"
+    - "--label=org.label-schema.version={{.Version}}"
+    - "--label=org.label-schema.build-date={{.Date}}"
+    - "--label=org.label-schema.vcs-ref={{.FullCommit}}"
+    - "--label=org.label-schema.docker.dockerfile=Dockerfile"
+    - "--label=org.opencontainers.image.name={{.ProjectName}}"
+    - "--label=org.opencontainers.image.version={{.Version}}"
+    - "--label=org.opencontainers.image.created={{.Date}}"
+    - "--label=org.opencontainers.image.revision={{.FullCommit}}"
+
+docker_manifests:
+- name_template: 'meltwater/drone-cache:{{ .Tag }}'
+  image_templates:
+  - 'meltwater/drone-cache:{{ .Tag }}-linux-amd64'
+  - 'meltwater/drone-cache:{{ .Tag }}-linux-arm64'
+- name_template: 'meltwater/drone-cache:latest'
+  image_templates:
+  - 'meltwater/drone-cache:{{ .Tag }}-linux-amd64'
+  - 'meltwater/drone-cache:{{ .Tag }}-linux-arm64'
+- name_template: 'meltwater/drone-cache:v{{ .Major }}.{{ .Minor }}'
+  image_templates:
+  - 'meltwater/drone-cache:v{{ .Major }}.{{ .Minor }}-linux-amd64'
+  - 'meltwater/drone-cache:v{{ .Major }}.{{ .Minor }}-linux-arm64'
+- name_template: 'meltwater/drone-cache:v{{ .Major }}'
+  image_templates:
+  - 'meltwater/drone-cache:v{{ .Major }}-linux-amd64'
+  - 'meltwater/drone-cache:v{{ .Major }}-linux-arm64'

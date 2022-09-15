@@ -1,16 +1,16 @@
-package gzip
+package zstd
 
 import (
-	"compress/gzip"
 	"fmt"
 	"io"
 
 	"github.com/go-kit/log"
+	"github.com/klauspost/compress/zstd"
 	"github.com/meltwater/drone-cache/archive/tar"
 	"github.com/meltwater/drone-cache/internal"
 )
 
-// Archive implements archive for gzip.
+// Archive implements archive for zstd.
 type Archive struct {
 	logger log.Logger
 
@@ -19,23 +19,23 @@ type Archive struct {
 	skipSymlinks     bool
 }
 
-// New creates an archive that uses the .tar.gz file format.
+// New creates an archive that uses the .tar.zst file format.
 func New(logger log.Logger, root string, skipSymlinks bool, compressionLevel int) *Archive {
 	return &Archive{logger, root, compressionLevel, skipSymlinks}
 }
 
 // Create writes content of the given source to an archive, returns written bytes.
 func (a *Archive) Create(srcs []string, w io.Writer) (int64, error) {
-	gw, err := gzip.NewWriterLevel(w, a.compressionLevel)
+	zw, err := zstd.NewWriter(w, zstd.WithEncoderLevel(zstd.EncoderLevelFromZstd(a.compressionLevel)))
 	if err != nil {
-		return 0, fmt.Errorf("create archive writer, %w", err)
+		return 0, fmt.Errorf("zstd create archive writer, %w", err)
 	}
 
-	defer internal.CloseWithErrLogf(a.logger, gw, "gzip writer")
+	defer internal.CloseWithErrLogf(a.logger, zw, "zstd writer")
 
-	wBytes, err := tar.New(a.logger, a.root, a.skipSymlinks).Create(srcs, gw)
+	wBytes, err := tar.New(a.logger, a.root, a.skipSymlinks).Create(srcs, zw)
 	if err != nil {
-		return 0, fmt.Errorf("writing create archive bytes: %w", err)
+		return 0, fmt.Errorf("zstd create archive, %w", err)
 	}
 
 	return wBytes, nil
@@ -43,16 +43,16 @@ func (a *Archive) Create(srcs []string, w io.Writer) (int64, error) {
 
 // Extract reads content from the given archive reader and restores it to the destination, returns written bytes.
 func (a *Archive) Extract(dst string, r io.Reader) (int64, error) {
-	gr, err := gzip.NewReader(r)
+	zr, err := zstd.NewReader(r)
 	if err != nil {
-		return 0, fmt.Errorf("create archive extractor: %w", err)
+		return 0, fmt.Errorf("zstd create extract archive reader, %w", err)
 	}
 
-	defer internal.CloseWithErrLogf(a.logger, gr, "gzip reader")
+	defer internal.CloseWithErrLogf(a.logger, zr.IOReadCloser(), "zstd reader")
 
-	eBytes, err := tar.New(a.logger, a.root, a.skipSymlinks).Extract(dst, gr)
+	eBytes, err := tar.New(a.logger, a.root, a.skipSymlinks).Extract(dst, zr)
 	if err != nil {
-		return 0, fmt.Errorf("extracting archive bytes: %w", err)
+		return 0, fmt.Errorf("zstd extract archive, %w", err)
 	}
 
 	return eBytes, nil

@@ -1,6 +1,7 @@
 package generator
 
 import (
+	"crypto/md5"
 	"testing"
 
 	"github.com/meltwater/drone-cache/test"
@@ -9,7 +10,7 @@ import (
 func TestGenerateHash(t *testing.T) {
 	t.Parallel()
 
-	actual, err := NewHash().Generate("hash")
+	actual, err := NewHash(md5.New).Generate("hash")
 	test.Ok(t, err)
 
 	expected := "0800fc577294c34e0b28ad2839435945"
