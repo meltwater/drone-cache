@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+- [#141](https://github.com/meltwater/drone-cache/pull/141) archive/tar, archive/gzip:
+  add absolute path mode: fix an issue #130 with drone where it fails to make extraction if the passed path is an absoulte path.
 ### Added
 
 - [#223](https://github.com/meltwater/drone-cache/pull/223) Added implementation for AlibabaOSS for backend storage
