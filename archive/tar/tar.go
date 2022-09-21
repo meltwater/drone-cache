@@ -97,6 +97,7 @@ func writeToArchive(tw *tar.Writer, root string, skipSymlinks bool, written *int
 		}
 
 		h.Name = name
+		h.Format = tar.FormatPAX
 
 		if err := tw.WriteHeader(h); err != nil {
 			return fmt.Errorf("write header for <%s>, %w", path, err)
@@ -259,6 +260,12 @@ func extractRegular(h *tar.Header, tr io.Reader, target string) (int64, error) {
 	written, err := io.Copy(f, tr)
 	if err != nil {
 		return written, fmt.Errorf("copy extracted file for writing <%s>, %w", target, err)
+	}
+
+	if !h.ModTime.IsZero() {
+		if err = os.Chtimes(target, h.AccessTime, h.ModTime); err != nil {
+			return written, fmt.Errorf("set atime/mtime <%s>, %w", target, err)
+		}
 	}
 
 	return written, nil
