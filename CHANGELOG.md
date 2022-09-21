@@ -7,28 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
-- [#141](https://github.com/meltwater/drone-cache/pull/141) archive/tar, archive/gzip:
-  add absolute path mode: fix an issue #130 with drone where it fails to make extraction if the passed path is an absoulte path.
 ### Added
-
-- [#223](https://github.com/meltwater/drone-cache/pull/223) Added implementation for AlibabaOSS for backend storage
 
 ### Changed
 
-- Updated dependency `cloud.google.com/go/storage v1.24.0` -> `v1.26.0`
-- Updated dependency `github.com/urfave/cli/v2 v2.11.1` -> `v2.14.1`
-- Updated dependency `google.golang.org/api v0.88.0` -> `v0.94.0`
-- Updated dependency `google.golang.org/protobuf v1.28.0 ` -> `v1.28.1`
-
 ### Removed
 
-## [1.4.0] - 2022-09-01
+## [1.4.0] - 2022-09-21
 
 ### Added
 
-- [#212](https://github.com/meltwater/drone-cache/pull/212) `filesystem` backend now restores files modification time (with sub-second prevision if possible)
-- [#209](https://github.com/meltwater/drone-cache/pull/209) Added double star directory searching in mounts (e.g. `path/**/subdir`)
+- [#141](https://github.com/meltwater/drone-cache/pull/141) archive/tar, archive/gzip: add absolute path mode: fix an issue #130 with drone where it fails to make extraction if the passed path is an absoulte path.
 - [#198](https://github.com/meltwater/drone-cache/pull/198) Add `hashFiles` template function to generate the SHA256 hash of multiple files
+- [#209](https://github.com/meltwater/drone-cache/pull/209) Added double star directory searching in mounts (e.g. `path/**/subdir`)
+- [#212](https://github.com/meltwater/drone-cache/pull/212) `filesystem` backend now restores files modification time (with sub-second prevision if possible)
+- [#223](https://github.com/meltwater/drone-cache/pull/223) Added implementation for AlibabaOSS for backend storage
 
 ### Changed
 
@@ -36,13 +29,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Switched and updated to moved dependency `go-kit/kit@v0.9.0` -> `go-kit/log@v0.2.1`
 - Updated dependency `Azure/azure-storage-blob-go@v0.8.0` -> `v0.15.0`
 - Updated dependency `aws/aws-sdk-go@v1.37.29` -> `v1.44.55`
-- Updated dependency `cloud.google.com/go/storage@v1.1.0` -> `v1.23.0`
-- Updated dependency `google.golang.org/api@v0.9.0` -> `v0.87.0`
+- Updated dependency `cloud.google.com/go/storage@v1.1.0` -> `v1.26.0`
+- Updated dependency `github.com/urfave/cli/v2@v2.11.1` -> `v2.14.1`
+- Updated dependency `google.golang.org/api@v0.88.0` -> `v0.94.0`
+- Updated dependency `google.golang.org/protobuf v1.28.0 ` -> `v1.28.1`
 - Updated dependency `google/go-cmp@v0.4.0` -> `v0.5.8`
 - Updated dependency `klauspost/compress@v1.13.5` -> `v1.15.8`
 - Updated dependency `pkg/sftp@v1.10.1` -> `v1.13.5`
 - Updated dependency `urface/cli/v2@v2.1.1` -> `v2.11.0`
-- Updated linting from manual install to official `golangci/golangci-lint:v1.46.2` Docker image 
+- Updated linting from manual install to official `golangci/golangci-lint:v1.46.2` Docker image
 - Updated golang base image from `1.14-alpine` to `1.18.4` (debian); issues with alpine `>= 3.13` due to DroneCI Docker Engine version
 - Updated test image `minio/minio:RELEASE.2020-11-06T23-17-07Z` to `RELEASE.2022-07-15T03-44-22Z`
 - Updated test image `fsouza/fake-gcs-server:1.18.3` to `1.38.3`
@@ -106,7 +101,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [#135](https://github.com/meltwater/drone-cache/issues/135) backend/gcs: Fixed parsing of GCS JSON key.
 - [#151](https://github.com/meltwater/drone-cache/issues/151) backend/s3: Fix assume role parameter passing
 - [#164](https://github.com/meltwater/drone-cache/issues/164) tests: lock azurite image to 3.10.0
-- [#133](https://github.com/meltwater/drone-cache/pull/133) backend/s3: Fixed Anonymous Credentials Error on public buckets. 
+- [#133](https://github.com/meltwater/drone-cache/pull/133) backend/s3: Fixed Anonymous Credentials Error on public buckets.
   - Fixes [#132](https://github.com/meltwater/drone-cache/issues/132)
 
 ### Removed
