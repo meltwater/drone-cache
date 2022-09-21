@@ -20,7 +20,7 @@ require (
 	google.golang.org/api v0.94.0
 )
 
-require github.com/mattn/go-ieproxy v0.0.7 // indirect
+require github.com/mattn/go-ieproxy v0.0.9 // indirect
 
 require (
 	cloud.google.com/go v0.103.0 // indirect
