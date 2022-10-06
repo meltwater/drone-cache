@@ -7,9 +7,9 @@ dist: target/dist
 builds:
 -
   goos:
-    - darwin
+    #- darwin
     - linux
-    - windows
+    #- windows
     # github.com/mattn/go-ieproxy vendor/github.com/mattn/go-ieproxy/GetProxyFunc.go:10:9: undefined: proxyMiddleman
     # - openbsd
     # - freebsd
@@ -24,12 +24,6 @@ builds:
     - 6
     - 7
   ignore:
-    - goos: windows
-      goarch: 386
-    - goos: windows
-      goarch: amd64
-    - goos: windows
-      goarch: arm
     - goos: darwin
       goarch: 386
   env:
