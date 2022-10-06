@@ -9,7 +9,8 @@ builds:
   goos:
     - darwin
     - linux
-    - windows
+    # vendor/github.com/mattn/go-ieproxy/ieproxy_windows.go:22:6: getConf redeclared in this block
+    #- windows
     # github.com/mattn/go-ieproxy vendor/github.com/mattn/go-ieproxy/GetProxyFunc.go:10:9: undefined: proxyMiddleman
     # - openbsd
     # - freebsd
