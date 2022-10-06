@@ -16,16 +16,16 @@ builds:
     # - netbsd
     # - dragonfly
   goarch:
-    - 386
+    # - 386
     - amd64
     - arm
     - arm64
   goarm:
     - 6
     - 7
-  ignore:
-    - goos: darwin
-      goarch: 386
+  #ignore:
+  #  - goos: darwin
+  #    goarch: 386
   env:
     - CGO_ENABLED=0
   flags:
