@@ -10,7 +10,7 @@ import (
 	"github.com/meltwater/drone-cache/storage/backend"
 )
 
-const DefaultOperationTimeout = 3 * time.Minute
+const DefaultOperationTimeout = 30 * time.Minute
 
 // Storage is a place that files can be written to and read from.
 type Storage interface {
