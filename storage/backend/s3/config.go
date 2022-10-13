@@ -18,7 +18,6 @@ type Config struct {
 	StsEndpoint string
 	RoleArn     string // if "", do not assume IAM role i.e. use the IAM user.
 	EnableSSL   bool   // Set SSL mode for connection to AWS S3. default is true.
-
 	// us-east-1
 	// us-west-1
 	// us-west-2
@@ -27,9 +26,8 @@ type Config struct {
 	// ap-southeast-2
 	// ap-northeast-1
 	// sa-east-1
-	Region string
-	Secret string
-
+	Region    string
+	Secret    string
 	PathStyle bool // Use path style instead of domain style. Should be true for minio and false for AWS.
 	Public    bool
 }

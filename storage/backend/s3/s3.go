@@ -189,15 +189,17 @@ func assumeRole(l log.Logger, c *aws.Config, roleArn string) credentials.Value {
 }
 
 // Set the mode for SSL for S3 connectivity. Default mode is enabled.
+// if EnableSSL flag was set to false, then return DisableSSL=true.
+// if a custom stsEndpoint was specified without https, set mode to true (disableSSL=true)
+//  enable SSL for all other conditions. set disableSSL=false
+
 func setSSLMode(l log.Logger, c Config) bool {
 	level.Info(l).Log("msg", "Setting SSL mode from config...")
-	// if EnableSSL flag was set to false, then return DisableSSL=true
 	if c.EnableSSL == false {
 		return true
-		// if a custom stsEndpoint was specified without https, set mode to true (disableSSL=true)
 	} else if c.StsEndpoint != "" && !strings.HasPrefix(c.StsEndpoint, "https://") {
 		return true
-	} else { // enable SSL for all other conditions. set disableSSL=false
+	} else {
 		return false
 	}
 }
