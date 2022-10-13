@@ -1,3 +1,4 @@
+//go:build integration
 // +build integration
 
 package s3
@@ -24,16 +25,16 @@ const (
 	defaultAccessKey           = "AKIAIOSFODNN7EXAMPLE"
 	defaultSecretAccessKey     = "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
 	defaultRegion              = "eu-west-1"
-	defaultACL             	   = "private"
-	defaultUserAccessKey   	   = "foo"
+	defaultACL                 = "private"
+	defaultUserAccessKey       = "foo"
 	defaultUserSecretAccessKey = "barbarbar"
 )
 
 var (
-	endpoint        	= getEnv("TEST_S3_ENDPOINT", defaultEndpoint)
-	accessKey       	= getEnv("TEST_S3_ACCESS_KEY", defaultAccessKey)
-	secretAccessKey 	= getEnv("TEST_S3_SECRET_KEY", defaultSecretAccessKey)
-	acl             	= getEnv("TEST_S3_ACL", defaultACL)
+	endpoint            = getEnv("TEST_S3_ENDPOINT", defaultEndpoint)
+	accessKey           = getEnv("TEST_S3_ACCESS_KEY", defaultAccessKey)
+	secretAccessKey     = getEnv("TEST_S3_SECRET_KEY", defaultSecretAccessKey)
+	acl                 = getEnv("TEST_S3_ACL", defaultACL)
 	userAccessKey       = getEnv("TEST_USER_S3_ACCESS_KEY", defaultUserAccessKey)
 	userSecretAccessKey = getEnv("TEST_USER_S3_SECRET_KEY", defaultUserSecretAccessKey)
 )
@@ -42,14 +43,14 @@ func TestRoundTrip(t *testing.T) {
 	t.Parallel()
 
 	backend, cleanUp := setup(t, Config{
-		ACL:       acl,
-		Bucket:    "s3-round-trip",
-		Endpoint:  endpoint,
-		Key:       accessKey,
-		PathStyle: true, // Should be true for minio and false for AWS.
-		Region:    defaultRegion,
-		Secret:    secretAccessKey,
-		DisableSSL:true // minio unable to handle https requests
+		ACL:        acl,
+		Bucket:     "s3-round-trip",
+		Endpoint:   endpoint,
+		Key:        accessKey,
+		PathStyle:  true, // Should be true for minio and false for AWS.
+		Region:     defaultRegion,
+		Secret:     secretAccessKey,
+		DisableSSL: true, // minio unable to handle https requests
 	})
 	t.Cleanup(cleanUp)
 	roundTrip(t, backend)
@@ -59,16 +60,16 @@ func TestRoundTripWithAssumeRole(t *testing.T) {
 	t.Parallel()
 
 	backend, cleanUp := setup(t, Config{
-		ACL:       acl,
-		Bucket:    "s3-round-trip-with-role",
-		Endpoint:  endpoint,
+		ACL:         acl,
+		Bucket:      "s3-round-trip-with-role",
+		Endpoint:    endpoint,
 		StsEndpoint: endpoint,
-		Key:       userAccessKey,
-		PathStyle: true, // Should be true for minio and false for AWS.
-		Region:    defaultRegion,
-		Secret:    userSecretAccessKey,
-		RoleArn:   "arn:aws:iam::account-id:role/TestRole",
-		DisableSSL:true, // setting to true so minio doesn't crash
+		Key:         userAccessKey,
+		PathStyle:   true, // Should be true for minio and false for AWS.
+		Region:      defaultRegion,
+		Secret:      userSecretAccessKey,
+		RoleArn:     "arn:aws:iam::account-id:role/TestRole",
+		DisableSSL:  true, // setting to true so minio doesn't crash
 	})
 	t.Cleanup(cleanUp)
 	roundTrip(t, backend)
@@ -121,10 +122,10 @@ func setup(t *testing.T, config Config) (*Backend, func()) {
 
 func newClient(config Config) *s3.S3 {
 	conf := &aws.Config{
-		Region:           aws.String(defaultRegion),
-		Endpoint:         aws.String(endpoint),
-		//DisableSSL:       aws.Bool(!strings.HasPrefix(endpoint, "https://")),
-		DisableSSL:		  aws.Bool(true),
+		Region:   aws.String(defaultRegion),
+		Endpoint: aws.String(endpoint),
+		// DisableSSL:       aws.Bool(!strings.HasPrefix(endpoint, "https://")),
+		DisableSSL:       aws.Bool(true),
 		S3ForcePathStyle: aws.Bool(true),
 		Credentials:      credentials.NewStaticCredentials(config.Key, config.Secret, ""),
 	}
