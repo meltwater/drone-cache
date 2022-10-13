@@ -123,7 +123,8 @@ func newClient(config Config) *s3.S3 {
 	conf := &aws.Config{
 		Region:           aws.String(defaultRegion),
 		Endpoint:         aws.String(endpoint),
-		DisableSSL:       aws.Bool(!strings.HasPrefix(endpoint, "https://")),
+		//DisableSSL:       aws.Bool(!strings.HasPrefix(endpoint, "https://")),
+		DisableSSL:		  aws.Bool(true),
 		S3ForcePathStyle: aws.Bool(true),
 		Credentials:      credentials.NewStaticCredentials(config.Key, config.Secret, ""),
 	}
