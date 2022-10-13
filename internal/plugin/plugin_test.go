@@ -441,7 +441,8 @@ func setupS3(t *testing.T, c *Config, name string) {
 	client := awss3.New(session.Must(session.NewSessionWithOptions(session.Options{})), &aws.Config{
 		Region:           aws.String(defaultRegion),
 		Endpoint:         aws.String(endpoint),
-		DisableSSL:       aws.Bool(!strings.HasPrefix(endpoint, "https://")),
+		DisableSSL:		  aws.Bool(true)
+		//DisableSSL:       aws.Bool(!strings.HasPrefix(endpoint, "https://")),
 		S3ForcePathStyle: aws.Bool(true),
 		Credentials:      credentials.NewStaticCredentials(accessKey, secretAccessKey, ""),
 	})
@@ -458,6 +459,7 @@ func setupS3(t *testing.T, c *Config, name string) {
 		Endpoint:  endpoint,
 		Key:       accessKey,
 		PathStyle: true, // Should be true for minio and false for AWS.
+		DisableSSL:true
 		Region:    defaultRegion,
 		Secret:    secretAccessKey,
 	}
