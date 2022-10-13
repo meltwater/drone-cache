@@ -382,6 +382,11 @@ func main() {
 			Value:   "",
 			EnvVars: []string{"PLUGIN_ASSUME_ROLE_ARN", "AWS_ASSUME_ROLE_ARN"},
 		},
+		&cli.BoolFlag{
+			Name:    "enable-ssl",
+			Usage:   "Set SSL mode for connections to S3. Default is true",
+			EnvVars: []string{"PLUGIN_ENABLESSL", "AWS_ENABLESSL"},
+		},
 
 		// GCS specific Configs flags
 
@@ -571,6 +576,7 @@ func run(c *cli.Context) error {
 			Secret:      c.String("secret-key"),
 			StsEndpoint: c.String("sts-endpoint"),
 			RoleArn:     c.String("role-arn"),
+			EnableSSL:   c.Bool("enable-ssl"),
 		},
 		Azure: azure.Config{
 			AccountName:    c.String("azure.account-name"),

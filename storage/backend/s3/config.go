@@ -17,6 +17,7 @@ type Config struct {
 	Key         string
 	StsEndpoint string
 	RoleArn     string // if "", do not assume IAM role i.e. use the IAM user.
+	EnableSSL   bool   // Set SSL mode for connection to AWS S3. default is true.
 
 	// us-east-1
 	// us-west-1
