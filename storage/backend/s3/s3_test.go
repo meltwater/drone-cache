@@ -68,7 +68,7 @@ func TestRoundTripWithAssumeRole(t *testing.T) {
 		Region:    defaultRegion,
 		Secret:    userSecretAccessKey,
 		RoleArn:   "arn:aws:iam::account-id:role/TestRole",
-		DisableSSL:true, // minio unable to handle https requests
+		DisableSSL:true // minio unable to handle https requests
 	})
 	t.Cleanup(cleanUp)
 	roundTrip(t, backend)
