@@ -7,6 +7,7 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"time"
 
 	"github.com/Azure/azure-storage-blob-go/azblob"
 	"github.com/go-kit/log"
@@ -55,7 +56,11 @@ func New(l log.Logger, c Config) (*Backend, error) {
 		level.Error(l).Log("msg", "can't create url with : "+err.Error())
 	}
 
-	pipeline := azblob.NewPipeline(credential, azblob.PipelineOptions{})
+	pipeline := azblob.NewPipeline(credential, azblob.PipelineOptions{
+		Retry: azblob.RetryOptions{
+			TryTimeout: 30 * time.Minute,
+		},
+	})
 	containerURL := azblob.NewContainerURL(*blobURL, pipeline)
 
 	// 4. Always creating new container, it will throw error if it already exists.
