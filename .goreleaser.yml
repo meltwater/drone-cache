@@ -66,7 +66,7 @@ snapshot:
   name_template: "{{ .Tag }}-SNAPSHOT-{{.ShortCommit}}" # default
 release:
   github:
-    owner: meltwater
+    owner: LambdaTest
     name: drone-cache
   prerelease: auto # in case there is an indicator for this in the tag e.g. v1.0.0-rc1
 changelog:
