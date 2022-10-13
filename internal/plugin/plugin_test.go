@@ -459,7 +459,7 @@ func setupS3(t *testing.T, c *Config, name string) {
 		Endpoint:  endpoint,
 		Key:       accessKey,
 		PathStyle: true, // Should be true for minio and false for AWS.
-		DisableSSL:true
+		DisableSSL:true,
 		Region:    defaultRegion,
 		Secret:    secretAccessKey,
 	}
