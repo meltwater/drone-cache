@@ -383,8 +383,8 @@ func main() {
 			EnvVars: []string{"PLUGIN_ASSUME_ROLE_ARN", "AWS_ASSUME_ROLE_ARN"},
 		},
 		&cli.BoolFlag{
-			Name:    "enable-ssl",
-			Usage:   "Set SSL mode for connections to S3. Default is true",
+			Name:    "disable-ssl",
+			Usage:   "Set SSL mode for connections to S3. Default is false (DisableSSL=false)",
 			EnvVars: []string{"PLUGIN_ENABLESSL", "AWS_ENABLESSL"},
 		},
 
@@ -576,7 +576,7 @@ func run(c *cli.Context) error {
 			Secret:      c.String("secret-key"),
 			StsEndpoint: c.String("sts-endpoint"),
 			RoleArn:     c.String("role-arn"),
-			EnableSSL:   c.Bool("enable-ssl"),
+			DisableSSL:  c.Bool("disable-ssl"),
 		},
 		Azure: azure.Config{
 			AccountName:    c.String("azure.account-name"),

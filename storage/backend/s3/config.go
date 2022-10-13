@@ -29,7 +29,7 @@ type Config struct {
 	Region string
 	Secret string
 
-	PathStyle bool // Use path style instead of domain style. Should be true for minio and false for AWS.
-	EnableSSL bool // Set SSL mode for connection to AWS S3. default is true.
-	Public    bool
+	PathStyle  bool // Use path style instead of domain style. Should be true for minio and false for AWS.
+	DisableSSL bool // Set SSL mode for connection to AWS S3. default is false.
+	Public     bool
 }
