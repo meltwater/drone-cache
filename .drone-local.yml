@@ -53,7 +53,7 @@ steps:
         path: /drone/src/tmp/testdata/cache
 
   - name: rebuild-cache
-    image: drone-cache:KennyTestTag
+    image: drone-cache:MyTestTag
     pull: if-not-exists
     settings:
       bucket: drone-cache-bucket
@@ -67,9 +67,10 @@ steps:
     environment:
       AWS_ACCESS_KEY_ID: AKIAIOSFODNN7EXAMPLE
       AWS_SECRET_ACCESS_KEY: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+      AWS_DISABLESSL: true
 
   - name: rebuild-cache-with-key
-    image: drone-cache:KennyTestTag
+    image: drone-cache:MyTestTag
     pull: if-not-exists
     settings:
       bucket: drone-cache-bucket
@@ -84,9 +85,10 @@ steps:
     environment:
       AWS_ACCESS_KEY_ID: AKIAIOSFODNN7EXAMPLE
       AWS_SECRET_ACCESS_KEY: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+      AWS_DISABLESSL: true
 
   - name: rebuild-cache-with-gzip
-    image: drone-cache:KennyTestTag
+    image: drone-cache:MyTestTag
     pull: if-not-exists
     settings:
       archive_format: gzip
@@ -102,9 +104,10 @@ steps:
     environment:
       AWS_ACCESS_KEY_ID: AKIAIOSFODNN7EXAMPLE
       AWS_SECRET_ACCESS_KEY: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+      AWS_DISABLESSL: true
 
   - name: rebuild-cache-with-zstd
-    image: drone-cache:KennyTestTag
+    image: drone-cache:MyTestTag
     pull: if-not-exists
     settings:
       archive_format: zstd
@@ -120,9 +123,10 @@ steps:
     environment:
       AWS_ACCESS_KEY_ID: AKIAIOSFODNN7EXAMPLE
       AWS_SECRET_ACCESS_KEY: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+      AWS_DISABLESSL: true
 
   - name: rebuild-cache-with-filesystem
-    image: drone-cache:KennyTestTag
+    image: drone-cache:MyTestTag
     pull: if-not-exists
     settings:
       archive_format: gzip
@@ -137,7 +141,7 @@ steps:
         path: /tmp/cache
 
   - name: restore-cache-with-key
-    image: drone-cache:KennyTestTag
+    image: drone-cache:MyTestTag
     pull: if-not-exists
     settings:
       bucket: drone-cache-bucket
@@ -153,9 +157,10 @@ steps:
     environment:
       AWS_ACCESS_KEY_ID: AKIAIOSFODNN7EXAMPLE
       AWS_SECRET_ACCESS_KEY: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+      AWS_DISABLESSL: true
 
   - name: restore-cache-with-gzip
-    image: drone-cache:KennyTestTag
+    image: drone-cache:MyTestTag
     pull: if-not-exists
     settings:
       archive_format: gzip
@@ -171,9 +176,10 @@ steps:
     environment:
       AWS_ACCESS_KEY_ID: AKIAIOSFODNN7EXAMPLE
       AWS_SECRET_ACCESS_KEY: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+      AWS_DISABLESSL: true
 
   - name: restore-cache-with-zstd
-    image: drone-cache:KennyTestTag
+    image: drone-cache:MyTestTag
     pull: if-not-exists
     settings:
       archive_format: zstd
@@ -189,9 +195,10 @@ steps:
     environment:
       AWS_ACCESS_KEY_ID: AKIAIOSFODNN7EXAMPLE
       AWS_SECRET_ACCESS_KEY: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+      AWS_DISABLESSL: true
 
   - name: restore-cache-with-filesystem
-    image: drone-cache:KennyTestTag
+    image: drone-cache:MyTestTag
     pull: if-not-exists
     settings:
       archive_format: gzip
@@ -206,7 +213,7 @@ steps:
         path: /tmp/cache
 
   - name: restore-cache-debug
-    image: drone-cache:KennyTestTag
+    image: drone-cache:MyTestTag
     pull: if-not-exists
     settings:
       debug: true
@@ -214,7 +221,7 @@ steps:
       pull: always
 
   - name: restore-cache
-    image: drone-cache:KennyTestTag
+    image: drone-cache:MyTestTag
     pull: if-not-exists
     settings:
       bucket: drone-cache-bucket
@@ -228,6 +235,7 @@ steps:
     environment:
       AWS_ACCESS_KEY_ID: AKIAIOSFODNN7EXAMPLE
       AWS_SECRET_ACCESS_KEY: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+      AWS_DISABLESSL: true
 
 services:
   - name: minio

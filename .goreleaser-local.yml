@@ -36,7 +36,7 @@ dockers:
 
     # Modify the image template name here as desired
     image_templates:
-    - "drone-cache:KennyTestTag"
+    - "drone-cache:MyTestTag"
 
     dockerfile: Dockerfile
     build_flag_templates:

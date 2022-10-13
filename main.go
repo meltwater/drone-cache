@@ -228,7 +228,7 @@ func main() {
 
 		&cli.StringFlag{
 			Name:    "backend, b",
-			Usage:   "cache backend to use in plugin (s3, filesystem, sftp, azure, gcs)",
+			Usage:   "cache backend to use in plugin (s3, filesystem, sftp, azure, gcs, alibaba)",
 			Value:   backend.S3,
 			EnvVars: []string{"PLUGIN_BACKEND"},
 		},
@@ -385,7 +385,7 @@ func main() {
 		&cli.BoolFlag{
 			Name:    "disable-ssl",
 			Usage:   "Set SSL mode for connections to S3. Default is false (DisableSSL=false)",
-			EnvVars: []string{"PLUGIN_ENABLESSL", "AWS_ENABLESSL"},
+			EnvVars: []string{"PLUGIN_DISABLESSL", "AWS_DISABLESSL"},
 		},
 
 		// GCS specific Configs flags

@@ -132,7 +132,7 @@ GLOBAL OPTIONS:
    --azure.blob-container-name value     Azure Blob Storage container name [$PLUGIN_CONTAINER, $AZURE_CONTAINER_NAME]
    --azure.blob-max-retry-requets value  Azure Blob Storage Max Retry Requests (default: 4) [$AZURE_BLOB_MAX_RETRY_REQUESTS]
    --azure.blob-storage-url value        Azure Blob Storage URL (default: "blob.core.windows.net") [$AZURE_BLOB_STORAGE_URL]
-   --backend value                       cache backend to use in plugin (s3, filesystem, sftp, azure, gcs) (default: "s3") [$PLUGIN_BACKEND]
+   --backend value                       cache backend to use in plugin (s3, filesystem, sftp, azure, gcs, alibaba) (default: "s3") [$PLUGIN_BACKEND]
    --backend.operation-timeout value     timeout value to use for each storage operations (default: 3m0s) [$PLUGIN_BACKEND_OPERATION_TIMEOUT, $BACKEND_OPERATION_TIMEOUT]
    --bucket value                        AWS bucket name [$PLUGIN_BUCKET, $S3_BUCKET, $GCS_BUCKET]
    --build.created value                 build created (default: 0) [$DRONE_BUILD_CREATED]
@@ -156,6 +156,7 @@ GLOBAL OPTIONS:
                                              (check https://godoc.org/compress/flate#pkg-constants for available options for gzip
                                              and https://pkg.go.dev/github.com/klauspost/compress/zstd#EncoderLevelFromZstd for zstd) (default: -1) [$PLUGIN_COMPRESSION_LEVEL]
    --debug                               debug (default: false) [$PLUGIN_DEBUG, $DEBUG]
+   --disable-ssl                         Set SSL mode for connections to S3. Default is false (DisableSSL=false) (default: false) [$PLUGIN_DISABLESSL, $AWS_DISABLESSL]
    --encryption value                    server-side encryption algorithm, defaults to none. (AES256, aws:kms) [$PLUGIN_ENCRYPTION, $AWS_ENCRYPTION]
    --endpoint value                      endpoint for the s3/cloud storage connection [$PLUGIN_ENDPOINT, $S3_ENDPOINT, $GCS_ENDPOINT]
    --filesystem.cache-root value         local filesystem root directory for the filesystem cache (default: "/tmp/cache") [$PLUGIN_FILESYSTEM_CACHE_ROOT, $FILESYSTEM_CACHE_ROOT]

@@ -194,14 +194,22 @@ func assumeRole(l log.Logger, c *aws.Config, roleArn string) credentials.Value {
 //  enable SSL for all other conditions. set disableSSL=false
 
 func setSSLMode(l log.Logger, c Config) bool {
-	level.Info(l).Log("msg", "Setting SSL mode from config...")
+	level.Info(l).Log("msg", "Setting SSL mode from config")
 
 	switch {
 	case c.DisableSSL:
+		level.Info(l).Log("msg", "DisableSSL flag was set to true. disabling SSL")
+
 		return true
+
 	case c.StsEndpoint != "" && !strings.HasPrefix(c.StsEndpoint, "https://"):
+		level.Info(l).Log("msg", "DisableSSL flag was set to true. disabling SSL")
+
 		return true
+
 	default:
+		level.Info(l).Log("msg", "DisableSSL flag was set to false. enabling SSL")
+
 		return false
 	}
 }
