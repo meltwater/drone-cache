@@ -8,6 +8,7 @@ type Config struct {
 	AccountKey       string
 	ContainerName    string
 	BlobStorageURL   string
+	CDNHost          string
 	Azurite          bool
 	MaxRetryRequests int
 	Timeout          time.Duration

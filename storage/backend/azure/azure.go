@@ -7,6 +7,7 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"path/filepath"
 	"time"
 
 	"github.com/Azure/azure-storage-blob-go/azblob"
@@ -25,10 +26,11 @@ const (
 
 // Backend implements sotrage.Backend for Azure Blob Storage.
 type Backend struct {
-	logger log.Logger
-
-	cfg          Config
-	containerURL azblob.ContainerURL
+	logger              log.Logger
+	httpClient          *http.Client
+	cfg                 Config
+	containerURL        azblob.ContainerURL
+	sharedKeyCredential *azblob.SharedKeyCredential
 }
 
 // New creates an AzureBlob backend.
@@ -80,7 +82,10 @@ func New(l log.Logger, c Config) (*Backend, error) {
 		}
 	}
 
-	return &Backend{logger: l, cfg: c, containerURL: containerURL}, nil
+	return &Backend{logger: l, cfg: c, containerURL: containerURL,
+		httpClient:          http.DefaultClient,
+		sharedKeyCredential: credential,
+	}, nil
 }
 
 // Get writes downloaded content to the given writer.
@@ -89,21 +94,52 @@ func (b *Backend) Get(ctx context.Context, p string, w io.Writer) error {
 
 	go func() {
 		defer close(errCh)
+		var respBody io.ReadCloser
+		var err error
 
-		blobURL := b.containerURL.NewBlockBlobURL(p)
+		if b.cfg.CDNHost != "" {
+			filename := filepath.Base(p)
+			cacheKey := filepath.Base(filepath.Dir(p))
+			remoteRoot := filepath.Dir(filepath.Dir(p))
+			if filename == "" || cacheKey == "" || remoteRoot == "" {
+				errCh <- errors.New("missing values")
+				return
+			}
 
-		// nolint: lll
-		resp, err := blobURL.Download(ctx, 0, azblob.CountToEnd, azblob.BlobAccessConditions{}, false, azblob.ClientProvidedKeyOptions{})
-		if err != nil {
-			errCh <- fmt.Errorf("get the object, %w", err)
+			blobPath := filepath.Join(cacheKey, filename)
+			reqURL, err := b.generateSASTokenWithCDN(remoteRoot, blobPath)
+			if err != nil {
+				errCh <- fmt.Errorf("sas query params, %w", err)
+				return
+			}
+			req, err := http.NewRequest(http.MethodGet, reqURL, http.NoBody)
+			if err != nil {
+				errCh <- fmt.Errorf("cdn request, %w", err)
+				return
+			}
+			resp, err := b.httpClient.Do(req)
+			if err != nil {
+				errCh <- fmt.Errorf("get object from cdn, %w", err)
+				return
+			}
+			respBody = resp.Body
+			defer internal.CloseWithErrLogf(b.logger, respBody, "response body, close defer")
 
-			return
+		} else {
+			blobURL := b.containerURL.NewBlockBlobURL(p)
+			// nolint: lll
+			resp, err := blobURL.Download(ctx, 0, azblob.CountToEnd, azblob.BlobAccessConditions{}, false, azblob.ClientProvidedKeyOptions{})
+			if err != nil {
+				errCh <- fmt.Errorf("get the object, %w", err)
+
+				return
+			}
+
+			respBody = resp.Body(azblob.RetryReaderOptions{MaxRetryRequests: b.cfg.MaxRetryRequests})
+			defer internal.CloseWithErrLogf(b.logger, respBody, "response body, close defer")
 		}
 
-		rc := resp.Body(azblob.RetryReaderOptions{MaxRetryRequests: b.cfg.MaxRetryRequests})
-		defer internal.CloseWithErrLogf(b.logger, rc, "response body, close defer")
-
-		_, err = io.Copy(w, rc)
+		_, err = io.Copy(w, respBody)
 		if err != nil {
 			errCh <- fmt.Errorf("copy the object, %w", err)
 		}
@@ -147,4 +183,29 @@ func (b *Backend) Exists(ctx context.Context, p string) (bool, error) {
 	}
 
 	return get.StatusCode() == http.StatusOK, nil
+}
+
+// Exists checks if path already exists.
+func (b *Backend) generateSASTokenWithCDN(containerName, blobPath string) (string, error) {
+	sasDefaultSignature := azblob.BlobSASSignatureValues{
+		Protocol:      azblob.SASProtocolHTTPS,
+		ExpiryTime:    time.Now().UTC().Add(12 * time.Hour),
+		ContainerName: containerName,
+		BlobName:      blobPath,
+		Permissions:   azblob.BlobSASPermissions{Read: true, List: true}.String(),
+	}
+	sasQueryParams, err := sasDefaultSignature.NewSASQueryParameters(b.sharedKeyCredential)
+	if err != nil {
+		return "", err
+	}
+	parts := azblob.BlobURLParts{
+		Scheme:        "https",
+		Host:          b.cfg.CDNHost,
+		ContainerName: containerName,
+		BlobName:      blobPath,
+		SAS:           sasQueryParams,
+	}
+
+	rawURL := parts.URL()
+	return rawURL.String(), nil
 }

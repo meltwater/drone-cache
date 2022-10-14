@@ -431,6 +431,11 @@ func main() {
 			Value:   "blob.core.windows.net",
 			EnvVars: []string{"AZURE_BLOB_STORAGE_URL"},
 		},
+		// Config flags
+		&cli.StringFlag{
+			Name:  "azure.cdn-host",
+			Usage: "Azure CDN Host",
+		},
 		&cli.IntFlag{
 			Name:    "azure.blob-max-retry-requets",
 			Usage:   "Azure Blob Storage Max Retry Requests",
@@ -577,6 +582,7 @@ func run(c *cli.Context) error {
 			AccountKey:     c.String("azure.account-key"),
 			ContainerName:  c.String("azure.container-name"),
 			BlobStorageURL: c.String("azure.blob-storage-url"),
+			CDNHost:        c.String("azure.cdn-host"),
 			Azurite:        false,
 			Timeout:        c.Duration("backend.operation-timeout"),
 		},
