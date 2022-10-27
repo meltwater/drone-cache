@@ -228,7 +228,7 @@ func main() {
 
 		&cli.StringFlag{
 			Name:    "backend, b",
-			Usage:   "cache backend to use in plugin (s3, filesystem, sftp, azure, gcs)",
+			Usage:   "cache backend to use in plugin (s3, filesystem, sftp, azure, gcs, alibaba)",
 			Value:   backend.S3,
 			EnvVars: []string{"PLUGIN_BACKEND"},
 		},
@@ -381,6 +381,11 @@ func main() {
 			Usage:   "AWS IAM role ARN to assume",
 			Value:   "",
 			EnvVars: []string{"PLUGIN_ASSUME_ROLE_ARN", "AWS_ASSUME_ROLE_ARN"},
+		},
+		&cli.BoolFlag{
+			Name:    "disable-ssl",
+			Usage:   "Set SSL mode for connections to S3. Default is false (DisableSSL=false)",
+			EnvVars: []string{"PLUGIN_DISABLESSL", "AWS_DISABLESSL"},
 		},
 
 		// GCS specific Configs flags
@@ -571,6 +576,7 @@ func run(c *cli.Context) error {
 			Secret:      c.String("secret-key"),
 			StsEndpoint: c.String("sts-endpoint"),
 			RoleArn:     c.String("role-arn"),
+			DisableSSL:  c.Bool("disable-ssl"),
 		},
 		Azure: azure.Config{
 			AccountName:    c.String("azure.account-name"),

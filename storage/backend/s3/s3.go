@@ -30,10 +30,13 @@ type Backend struct {
 
 // New creates an S3 backend.
 func New(l log.Logger, c Config, debug bool) (*Backend, error) {
+	// Set SSL mode (enable/disable) using configuration flags
+	sslMode := setSSLMode(l, c)
+
 	conf := &aws.Config{
 		Region:           aws.String(c.Region),
 		Endpoint:         &c.Endpoint,
-		DisableSSL:       aws.Bool(!strings.HasPrefix(c.Endpoint, "https://")),
+		DisableSSL:       aws.Bool(sslMode),
 		S3ForcePathStyle: aws.Bool(c.PathStyle),
 	}
 
@@ -53,7 +56,7 @@ func New(l log.Logger, c Config, debug bool) (*Backend, error) {
 		if c.StsEndpoint != "" {
 			stsConf = conf.Copy(&aws.Config{
 				Endpoint:   &c.StsEndpoint,
-				DisableSSL: aws.Bool(!strings.HasPrefix(c.StsEndpoint, "https://")),
+				DisableSSL: aws.Bool(sslMode),
 			})
 		} else {
 			stsConf.Endpoint = nil
@@ -183,4 +186,30 @@ func assumeRole(l log.Logger, c *aws.Config, roleArn string) credentials.Value {
 	}
 
 	return creds
+}
+
+// Set the mode for SSL for S3 connectivity. Default mode is enabled.
+// if DisableSSL flag was set to true, then return DisableSSL=true.
+// if a custom stsEndpoint was specified without https, set mode to true (disableSSL=true)
+//  enable SSL for all other conditions. set disableSSL=false
+
+func setSSLMode(l log.Logger, c Config) bool {
+	level.Info(l).Log("msg", "Setting SSL mode from config")
+
+	switch {
+	case c.DisableSSL:
+		level.Info(l).Log("msg", "DisableSSL flag was set to true. disabling SSL")
+
+		return true
+
+	case c.StsEndpoint != "" && !strings.HasPrefix(c.StsEndpoint, "https://"):
+		level.Info(l).Log("msg", "DisableSSL flag was set to true. disabling SSL")
+
+		return true
+
+	default:
+		level.Info(l).Log("msg", "DisableSSL flag was set to false. enabling SSL")
+
+		return false
+	}
 }
