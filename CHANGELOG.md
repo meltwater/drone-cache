@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## Unreleased
 
 ### Added
-[#230](https://github.com/meltwater/drone-cache/pull/230) Added command line flag to enable/disable SSL for AWS S3
+[#230](https://github.com/meltwater/drone-cache/pull/233) Added command line flag to enable/disable SSL for AWS S3
 
 ### Changed
 
