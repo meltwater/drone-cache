@@ -32,6 +32,9 @@ If you want to learn more about the story behind `drone-cache`, you can read our
 * [Google Cloud Storage](https://cloud.google.com/storage/)
   * [Configuration](#)
   * [Example](#)
+* [Alibaba OSS Storage](https://www.alibabacloud.com/help/en/object-storage-service/)
+  * [Configuration](#)
+  * [Example](#)
 * or any mounted local volume
   * [Configuration](#)
   * [Example](#)

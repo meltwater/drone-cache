@@ -67,6 +67,7 @@ steps:
     environment:
       AWS_ACCESS_KEY_ID: AKIAIOSFODNN7EXAMPLE
       AWS_SECRET_ACCESS_KEY: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+      AWS_DISABLESSL: true
 
   - name: rebuild-cache-with-key
     image: drone-cache:MyTestTag
@@ -84,6 +85,7 @@ steps:
     environment:
       AWS_ACCESS_KEY_ID: AKIAIOSFODNN7EXAMPLE
       AWS_SECRET_ACCESS_KEY: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+      AWS_DISABLESSL: true
 
   - name: rebuild-cache-with-gzip
     image: drone-cache:MyTestTag
@@ -102,6 +104,7 @@ steps:
     environment:
       AWS_ACCESS_KEY_ID: AKIAIOSFODNN7EXAMPLE
       AWS_SECRET_ACCESS_KEY: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+      AWS_DISABLESSL: true
 
   - name: rebuild-cache-with-zstd
     image: drone-cache:MyTestTag
@@ -120,6 +123,7 @@ steps:
     environment:
       AWS_ACCESS_KEY_ID: AKIAIOSFODNN7EXAMPLE
       AWS_SECRET_ACCESS_KEY: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+      AWS_DISABLESSL: true
 
   - name: rebuild-cache-with-filesystem
     image: drone-cache:MyTestTag
@@ -153,6 +157,7 @@ steps:
     environment:
       AWS_ACCESS_KEY_ID: AKIAIOSFODNN7EXAMPLE
       AWS_SECRET_ACCESS_KEY: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+      AWS_DISABLESSL: true
 
   - name: restore-cache-with-gzip
     image: drone-cache:MyTestTag
@@ -171,6 +176,7 @@ steps:
     environment:
       AWS_ACCESS_KEY_ID: AKIAIOSFODNN7EXAMPLE
       AWS_SECRET_ACCESS_KEY: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+      AWS_DISABLESSL: true
 
   - name: restore-cache-with-zstd
     image: drone-cache:MyTestTag
@@ -189,6 +195,7 @@ steps:
     environment:
       AWS_ACCESS_KEY_ID: AKIAIOSFODNN7EXAMPLE
       AWS_SECRET_ACCESS_KEY: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+      AWS_DISABLESSL: true
 
   - name: restore-cache-with-filesystem
     image: drone-cache:MyTestTag
@@ -228,6 +235,7 @@ steps:
     environment:
       AWS_ACCESS_KEY_ID: AKIAIOSFODNN7EXAMPLE
       AWS_SECRET_ACCESS_KEY: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+      AWS_DISABLESSL: true
 
 services:
   - name: minio

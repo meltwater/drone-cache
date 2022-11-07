@@ -71,6 +71,7 @@ steps:
     environment:
       AWS_ACCESS_KEY_ID: AKIAIOSFODNN7EXAMPLE
       AWS_SECRET_ACCESS_KEY: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+      AWS_DISABLESSL: true
 
   - name: rebuild-cache-with-key
     image: meltwater/drone-cache:v1.2.2
@@ -88,6 +89,7 @@ steps:
     environment:
       AWS_ACCESS_KEY_ID: AKIAIOSFODNN7EXAMPLE
       AWS_SECRET_ACCESS_KEY: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+      AWS_DISABLESSL: true
 
   - name: rebuild-cache-with-gzip
     image: meltwater/drone-cache:v1.2.2
@@ -106,6 +108,7 @@ steps:
     environment:
       AWS_ACCESS_KEY_ID: AKIAIOSFODNN7EXAMPLE
       AWS_SECRET_ACCESS_KEY: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+      AWS_DISABLESSL: true
 
   - name: rebuild-cache-with-zstd
     image: meltwater/drone-cache:v1.2.2
@@ -124,6 +127,7 @@ steps:
     environment:
       AWS_ACCESS_KEY_ID: AKIAIOSFODNN7EXAMPLE
       AWS_SECRET_ACCESS_KEY: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+      AWS_DISABLESSL: true
 
   - name: rebuild-cache-with-filesystem
     image: meltwater/drone-cache:v1.2.2
@@ -157,6 +161,7 @@ steps:
     environment:
       AWS_ACCESS_KEY_ID: AKIAIOSFODNN7EXAMPLE
       AWS_SECRET_ACCESS_KEY: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+      AWS_DISABLESSL: true
 
   - name: restore-cache-with-gzip
     image: meltwater/drone-cache:v1.2.2
@@ -175,6 +180,7 @@ steps:
     environment:
       AWS_ACCESS_KEY_ID: AKIAIOSFODNN7EXAMPLE
       AWS_SECRET_ACCESS_KEY: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+      AWS_DISABLESSL: true
 
   - name: restore-cache-with-zstd
     image: meltwater/drone-cache:v1.2.2
@@ -193,6 +199,7 @@ steps:
     environment:
       AWS_ACCESS_KEY_ID: AKIAIOSFODNN7EXAMPLE
       AWS_SECRET_ACCESS_KEY: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+      AWS_DISABLESSL: true
 
   - name: restore-cache-with-filesystem
     image: meltwater/drone-cache:v1.2.2
@@ -232,6 +239,7 @@ steps:
     environment:
       AWS_ACCESS_KEY_ID: AKIAIOSFODNN7EXAMPLE
       AWS_SECRET_ACCESS_KEY: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+      AWS_DISABLESSL: true
 
 services:
   - name: minio
