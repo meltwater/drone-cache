@@ -518,7 +518,6 @@ trigger:
 depends_on:
 - linux-amd64
 - linux-arm64
-- linux-arm
 - windows-1809-amd64
 - windows-1903-amd64
 - windows-1909-amd64
