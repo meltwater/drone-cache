@@ -501,7 +501,7 @@ func run(c *cli.Context) error {
 	}
 
 	logger := internal.NewLogger(logLevel, c.String("log.format"), "drone-cache")
-	level.Info(logger).Log("version", version, "commit", commit, "date", date)
+	level.Debug(logger).Log("version", version, "commit", commit, "date", date)
 
 	plg := plugin.New(log.With(logger, "component", "plugin"))
 	plg.Metadata = metadata.Metadata{

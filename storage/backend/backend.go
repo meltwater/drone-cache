@@ -57,19 +57,19 @@ func FromConfig(l log.Logger, backedType string, cfg Config) (Backend, error) {
 
 	switch backedType {
 	case Azure:
-		level.Warn(l).Log("msg", "using azure blob as backend")
+		level.Debug(l).Log("msg", "using azure blob as backend")
 		b, err = azure.New(log.With(l, "backend", Azure), cfg.Azure)
 	case S3:
-		level.Warn(l).Log("msg", "using aws s3 as backend")
+		level.Debug(l).Log("msg", "using aws s3 as backend")
 		b, err = s3.New(log.With(l, "backend", S3), cfg.S3, cfg.Debug)
 	case GCS:
-		level.Warn(l).Log("msg", "using gc storage as backend")
+		level.Debug(l).Log("msg", "using gc storage as backend")
 		b, err = gcs.New(log.With(l, "backend", GCS), cfg.GCS)
 	case FileSystem:
-		level.Warn(l).Log("msg", "using filesystem as backend")
+		level.Debug(l).Log("msg", "using filesystem as backend")
 		b, err = filesystem.New(log.With(l, "backend", FileSystem), cfg.FileSystem)
 	case SFTP:
-		level.Warn(l).Log("msg", "using sftp as backend")
+		level.Debug(l).Log("msg", "using sftp as backend")
 		b, err = sftp.New(log.With(l, "backend", SFTP), cfg.SFTP)
 	default:
 		return nil, errors.New("unknown backend")

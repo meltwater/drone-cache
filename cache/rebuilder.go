@@ -110,7 +110,7 @@ func (r rebuilder) rebuild(src, dst string) (err error) {
 	go func(wrt *int64) {
 		defer internal.CloseWithErrLogf(r.logger, pw, "pw close defer")
 
-		level.Info(r.logger).Log("msg", "archiving directory", "src", src)
+		level.Info(r.logger).Log("msg", "caching paths", "src", src)
 
 		written, err := r.a.Create([]string{src}, pw)
 		if err != nil {
