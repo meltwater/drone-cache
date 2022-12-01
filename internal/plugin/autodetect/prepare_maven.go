@@ -20,8 +20,8 @@ func (*mavenPreparer) PrepareRepo() (string, error) {
 	
 	if _, err := os.Stat(filepath.Join(configPath, fileName)); errors.Is(err, os.ErrNotExist) {
 		err := os.MkdirAll(configPath, os.ModePerm)
-		i
-		f err != nil {
+
+		if err != nil {
 			return "", err
 		}
 		f, err := os.Create(filepath.Join(configPath, fileName))
