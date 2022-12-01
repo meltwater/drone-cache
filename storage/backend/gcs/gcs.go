@@ -232,6 +232,7 @@ func setAuthenticationMethod(l log.Logger, c Config, opts []option.ClientOption)
 func credentials(l log.Logger, c Config) (*google.Credentials, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), c.Timeout)
 	defer cancel()
+	
 	if c.JSONKey != "" {
 		creds, err := google.CredentialsFromJSON(ctx, []byte(c.JSONKey), gcstorage.ScopeFullControl)
 		if err == nil {

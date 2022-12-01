@@ -605,7 +605,7 @@ func run(c *cli.Context) error {
 			Timeout: c.Duration("backend.operation-timeout"),
 		},
 		GCS: gcs.Config{
-			Bucket:     "harness_cache_local_test",
+			Bucket:     c.String("bucket"),
 			Endpoint:   c.String("endpoint"),
 			APIKey:     c.String("gcs.api-key"),
 			JSONKey:    c.String("gcs.json-key"),
