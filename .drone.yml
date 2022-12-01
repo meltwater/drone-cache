@@ -244,6 +244,7 @@ volumes:
 
 ---
 kind: pipeline
+type: docker
 name: linux-amd64
 
 platform:
@@ -489,6 +490,7 @@ depends_on:
 
 ---
 kind: pipeline
+type: docker
 name: notifications
 
 platform:
