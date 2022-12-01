@@ -268,13 +268,13 @@ func main() {
 			EnvVars: []string{"PLUGIN_OVERRIDE"},
 		},
 		&cli.BoolFlag{
-			Name:    "auto-detect, at",
+			Name:    "auto-detect",
 			Usage:   "automatically detect the cache directory and generate cache key",
 			Value:   false,
 			EnvVars: []string{"PLUGIN_AUTO_CACHE"},
 		},
 		&cli.StringFlag{
-			Name:    "account-id, id",
+			Name:    "account-id",
 			Usage:   "account-id used for automatic key generation",
 			EnvVars: []string{"PLUGIN_ACCOUNT_ID"},
 		},

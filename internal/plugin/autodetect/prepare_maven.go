@@ -13,7 +13,7 @@ func newMavenPreparer() *mavenPreparer {
 	return &mavenPreparer{}
 }
 func (*mavenPreparer) PrepareRepo() (string, error) {
-	configPath := filepath.Join(".mvn")
+	configPath := ".mvn"
 	fileName := "maven.config"
 	pathToCache := filepath.Join(".m2", "repository")
 	cmdToOverrideRepo := fmt.Sprintf(" -Dmaven.repo.local=%s ", pathToCache)
@@ -40,7 +40,7 @@ func (*mavenPreparer) PrepareRepo() (string, error) {
 		return pathToCache, err
 	}
 
-	f, err := os.OpenFile(configPath+fileName, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	f, err := os.OpenFile(filepath.Join(configPath, fileName), os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 
 	if err != nil {
 		return "", err
