@@ -39,6 +39,7 @@ func (*mavenPreparer) PrepareRepo() (string, error) {
 
 		return pathToCache, err
 	}
+
 	f, err := os.OpenFile(configPath+fileName, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 
 	if err != nil {

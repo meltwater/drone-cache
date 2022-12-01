@@ -14,7 +14,7 @@ type buildToolInfo struct {
 	preparer     RepoPreparer
 }
 
-func AutoDetectDirectoriesToCache() ([]string, []string, string, error) {
+func DetectDirectoriesToCache() ([]string, []string, string, error) {
 	var buildToolInfoMapping = []buildToolInfo{
 		{
 			globToDetect: "*pom.xml",
@@ -79,7 +79,7 @@ func calculateMd5FromFiles(fileList []string) (string, error) {
 		return "", err
 	}
 
-	hash := md5.New()
+	hash := md5.New() // #nosec
 	_, err = io.Copy(hash, file)
 
 	if err != nil {

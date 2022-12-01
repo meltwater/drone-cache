@@ -39,6 +39,7 @@ func (*gradlePreparer) PrepareRepo() (string, error) {
 	}
 	defer f.Close()
 	_, err = f.WriteString(cmdToOverrideRepo)
+
 	if err != nil {
 		return "", err
 	}
