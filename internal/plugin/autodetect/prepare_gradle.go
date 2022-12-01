@@ -1,4 +1,4 @@
-package auto_detect
+package autodetect
 
 import (
 	"errors"
@@ -23,15 +23,19 @@ func (*gradlePreparer) PrepareRepo() (string, error) {
 		}
 		defer f.Close()
 		_, err = f.WriteString(cmdToOverrideRepo)
-		return "", err
-	} else {
-		f, err := os.OpenFile(fileName, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 		if err != nil {
 			return "", err
 		}
-		defer f.Close()
-		_, err = f.WriteString(cmdToOverrideRepo)
-
+		return pathToCache, nil
+	}
+	f, err := os.OpenFile(fileName, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	if err != nil {
+		return "", err
+	}
+	defer f.Close()
+	_, err = f.WriteString(cmdToOverrideRepo)
+	if err != nil {
+		return "", err
 	}
 	return pathToCache, nil
 }

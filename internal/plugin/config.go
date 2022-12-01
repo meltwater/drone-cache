@@ -41,5 +41,5 @@ type Config struct {
 
 	// Cache Intelligence
 	AutoDetect bool
-	AccountId  string
+	AccountID  string
 }

@@ -4,7 +4,7 @@ package plugin
 import (
 	"errors"
 	"fmt"
-	"github.com/meltwater/drone-cache/internal/plugin/auto_detect"
+	"github.com/meltwater/drone-cache/internal/plugin/autodetect"
 	"os"
 	"path/filepath"
 	"strings"
@@ -94,7 +94,7 @@ func (p *Plugin) Exec() error { // nolint:funlen
 
 		options = append(options, cache.WithFallbackGenerator(keygen.NewHash(p.Metadata.Commit.Branch)))
 	} else if cfg.AutoDetect {
-		dirs, buildTools, hash, err := auto_detect.AutoDetectDirectoriesToCache()
+		dirs, buildTools, hash, err := autodetect.AutoDetectDirectoriesToCache()
 		if err != nil {
 			return fmt.Errorf("autodetect enabled but failed to detect, falling back to default, %w", err)
 		}
@@ -102,13 +102,12 @@ func (p *Plugin) Exec() error { // nolint:funlen
 		if len(p.Config.Mount) == 0 {
 			p.Config.Mount = dirs
 		}
-		generator = keygen.NewMetadata(p.logger, cfg.AccountId + "/" + hash, p.Metadata)
+		generator = keygen.NewMetadata(p.logger, cfg.AccountID + "/" + hash, p.Metadata)
 		if err := generator.Check(); err != nil {
 			return fmt.Errorf("parse failed, falling back to default, %w", err)
 		}
 
-		options = append(options, cache.WithFallbackGenerator(keygen.NewHash(cfg.AccountId + p.Metadata.Commit.Branch)))
-
+		options = append(options, cache.WithFallbackGenerator(keygen.NewHash(cfg.AccountID + p.Metadata.Commit.Branch)))
 	} else {
 		generator = keygen.NewHash(p.Metadata.Commit.Branch)
 		options = append(options, cache.WithFallbackGenerator(keygen.NewStatic(p.Metadata.Commit.Branch)))

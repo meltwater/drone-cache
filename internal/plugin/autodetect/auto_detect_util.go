@@ -1,4 +1,4 @@
-package auto_detect
+package autodetect
 
 import (
 	"crypto/md5"
@@ -11,37 +11,42 @@ import (
 type buildToolInfo struct {
 	globToDetect string
 	tool         string
-	dirToCache   string
 	preparer     RepoPreparer
 }
 
-var buildToolInfoMapping = []buildToolInfo{
-	{
-		globToDetect: "*pom.xml",
-		tool:         "maven",
-		preparer:     newMavenPreparer(),
-	},
-	{
-		globToDetect: "*build.gradle",
-		tool:         "gradle",
-		preparer:     newGradlePreparer(),
-	},
-}
 
 func AutoDetectDirectoriesToCache() ([]string, []string, string, error) {
+	var buildToolInfoMapping = []buildToolInfo{
+		{
+			globToDetect: "*pom.xml",
+			tool:         "maven",
+			preparer:     newMavenPreparer(),
+		},
+		{
+			globToDetect: "*build.gradle",
+			tool:         "gradle",
+			preparer:     newGradlePreparer(),
+		},
+	}
+
 	var directoriesToCache []string
+
 	var buildToolsDetected []string
+
 	var hashes string
+
 	for _, supportedTool := range buildToolInfoMapping {
 		hash, err := hashIfFileExist(supportedTool.globToDetect)
 		if err != nil {
 			return nil, nil, "", err
 		}
+
 		if hash != "" {
 			dirToCache, err := supportedTool.preparer.PrepareRepo()
 			if err != nil {
 				return nil, nil, "", err
 			}
+			
 			directoriesToCache = append(directoriesToCache, dirToCache)
 			buildToolsDetected = append(buildToolsDetected, supportedTool.tool)
 			hashes += hash
@@ -53,14 +58,12 @@ func AutoDetectDirectoriesToCache() ([]string, []string, string, error) {
 
 func hashIfFileExist(glob string) (string, error) {
 	matches, _ := filepath.Glob(glob)
-	var found []string
-	for _, match := range matches {
-		found = append(found, match)
-	}
-	if len(found) == 0 {
+
+	if len(matches) == 0 {
 		return "", nil
 	}
-	return calculateMd5FromFiles(found)
+
+	return calculateMd5FromFiles(matches)
 }
 
 func calculateMd5FromFiles(fileList []string) (string, error) {
@@ -72,6 +75,7 @@ func calculateMd5FromFiles(fileList []string) (string, error) {
 	}
 
 	defer file.Close()
+	
 	if err != nil {
 		return "", err
 	}

@@ -561,7 +561,7 @@ func run(c *cli.Context) error {
 		Rebuild:                    c.Bool("rebuild"),
 		Restore:                    c.Bool("restore"),
 		AutoDetect:                 c.Bool("auto-detect"),
-		AccountId:                  c.String("account-id"),
+		AccountID:                  c.String("account-id"),
 		RemoteRoot:                 c.String("remote-root"),
 		LocalRoot:                  c.String("local-root"),
 		Override:                   c.Bool("override"),
