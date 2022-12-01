@@ -1,7 +1,7 @@
 package autodetect
 
 import (
-	"crypto/md5"
+	"crypto/md5" // #nosec
 	"encoding/hex"
 	"io"
 	"os"

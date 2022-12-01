@@ -87,6 +87,7 @@ func (p *Plugin) Exec() error { // nolint:funlen
 	// }
 
 	var generator key.Generator
+
 	switch {
 	case cfg.CacheKeyTemplate != "":
 		{
