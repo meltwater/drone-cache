@@ -17,11 +17,13 @@ type Config struct {
 	CacheKeyTemplate string
 	RemoteRoot       string
 	LocalRoot        string
+	AccountID        string
 
 	// Modes
-	Debug   bool
-	Rebuild bool
-	Restore bool
+	Debug      bool
+	Rebuild    bool
+	Restore    bool
+	AutoDetect bool
 
 	// Optional
 	SkipSymlinks               bool
@@ -38,8 +40,4 @@ type Config struct {
 	SFTP       sftp.Config
 	Azure      azure.Config
 	GCS        gcs.Config
-
-	// Cache Intelligence
-	AutoDetect bool
-	AccountID  string
 }

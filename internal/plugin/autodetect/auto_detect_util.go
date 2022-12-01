@@ -14,7 +14,6 @@ type buildToolInfo struct {
 	preparer     RepoPreparer
 }
 
-
 func AutoDetectDirectoriesToCache() ([]string, []string, string, error) {
 	var buildToolInfoMapping = []buildToolInfo{
 		{
@@ -46,7 +45,7 @@ func AutoDetectDirectoriesToCache() ([]string, []string, string, error) {
 			if err != nil {
 				return nil, nil, "", err
 			}
-			
+
 			directoriesToCache = append(directoriesToCache, dirToCache)
 			buildToolsDetected = append(buildToolsDetected, supportedTool.tool)
 			hashes += hash
@@ -75,7 +74,7 @@ func calculateMd5FromFiles(fileList []string) (string, error) {
 	}
 
 	defer file.Close()
-	
+
 	if err != nil {
 		return "", err
 	}
@@ -98,5 +97,6 @@ func shortestPath(input []string) (shortest string) {
 			size = len(v)
 		}
 	}
+
 	return
 }

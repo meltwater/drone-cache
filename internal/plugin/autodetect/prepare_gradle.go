@@ -16,6 +16,7 @@ func (*gradlePreparer) PrepareRepo() (string, error) {
 	fileName := "gradle.properties"
 	pathToCache := ".gradle"
 	cmdToOverrideRepo := fmt.Sprintf("systemProp.gradle.user.home=/%s/\norg.gradle.caching=true\n", pathToCache)
+
 	if _, err := os.Stat(fileName); errors.Is(err, os.ErrNotExist) {
 		f, err := os.Create(fileName)
 		if err != nil {
@@ -23,12 +24,16 @@ func (*gradlePreparer) PrepareRepo() (string, error) {
 		}
 		defer f.Close()
 		_, err = f.WriteString(cmdToOverrideRepo)
+
 		if err != nil {
 			return "", err
 		}
+
 		return pathToCache, nil
 	}
+
 	f, err := os.OpenFile(fileName, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+
 	if err != nil {
 		return "", err
 	}
@@ -37,5 +42,6 @@ func (*gradlePreparer) PrepareRepo() (string, error) {
 	if err != nil {
 		return "", err
 	}
+
 	return pathToCache, nil
 }
