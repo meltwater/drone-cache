@@ -38,4 +38,8 @@ type Config struct {
 	SFTP       sftp.Config
 	Azure      azure.Config
 	GCS        gcs.Config
+
+	// Cache Intelligence
+	AutoDetect bool
+	AccountId  string
 }

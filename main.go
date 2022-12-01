@@ -267,6 +267,17 @@ func main() {
 			Value:   true,
 			EnvVars: []string{"PLUGIN_OVERRIDE"},
 		},
+		&cli.BoolFlag{
+			Name:    "auto-detect, at",
+			Usage:   "automatically detect the cache directory and generate cache key",
+			Value:   false,
+			EnvVars: []string{"PLUGIN_AUTO_CACHE"},
+		},
+		&cli.StringFlag{
+			Name:    "account-id, id",
+			Usage:   "account-id used for automatic key generation",
+			EnvVars: []string{"PLUGIN_ACCOUNT_ID"},
+		},
 		// CACHE-KEYS
 		// REBUILD-KEYS
 		// RESTORE-KEYS
@@ -549,6 +560,8 @@ func run(c *cli.Context) error {
 		Mount:                      c.StringSlice("mount"),
 		Rebuild:                    c.Bool("rebuild"),
 		Restore:                    c.Bool("restore"),
+		AutoDetect:                 c.Bool("auto-detect"),
+		AccountId:                  c.String("account-id"),
 		RemoteRoot:                 c.String("remote-root"),
 		LocalRoot:                  c.String("local-root"),
 		Override:                   c.Bool("override"),
@@ -592,7 +605,7 @@ func run(c *cli.Context) error {
 			Timeout: c.Duration("backend.operation-timeout"),
 		},
 		GCS: gcs.Config{
-			Bucket:     c.String("bucket"),
+			Bucket:     "harness_cache_local_test",
 			Endpoint:   c.String("endpoint"),
 			APIKey:     c.String("gcs.api-key"),
 			JSONKey:    c.String("gcs.json-key"),
