@@ -303,11 +303,11 @@ depends_on:
 
 ---
 kind: pipeline
+type: vm
 name: linux-arm64
 
-platform:
-  os: linux
-  arch: arm64
+pool:
+  use: ubuntu_arm64
 
 steps:
 - name: build-push
