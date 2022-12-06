@@ -41,20 +41,20 @@ steps:
     environment:
       CGO_ENABLED: 0
 
-  - name: test
-    image: golang:1.18.2-alpine3.16
-    commands:
-      - go test -mod=vendor -short -cover -tags=integration ./...
-    environment:
-      CGO_ENABLED: 0
-      TEST_S3_ENDPOINT: http://minio:9000
-      TEST_GCS_ENDPOINT: http://fakegcs:4443/storage/v1/
-      TEST_STORAGE_EMULATOR_HOST: fakegcs:4443
-      TEST_SFTP_HOST: sftp
-      TEST_AZURITE_URL: azurite:10000
-    volumes:
-      - name: testdata
-        path: /drone/src/tmp/testdata/cache
+  # - name: test
+  #   image: golang:1.18.2-alpine3.16
+  #   commands:
+  #     - go test -mod=vendor -short -cover -tags=integration ./...
+  #   environment:
+  #     CGO_ENABLED: 0
+  #     TEST_S3_ENDPOINT: http://minio:9000
+  #     TEST_GCS_ENDPOINT: http://fakegcs:4443/storage/v1/
+  #     TEST_STORAGE_EMULATOR_HOST: fakegcs:4443
+  #     TEST_SFTP_HOST: sftp
+  #     TEST_AZURITE_URL: azurite:10000
+  #   volumes:
+  #     - name: testdata
+  #       path: /drone/src/tmp/testdata/cache
 
   # - name: generate
   #   image: golang:1.14.1-alpine3.11
