@@ -1,8 +1,0 @@
-# escape=`
-FROM mcr.microsoft.com/windows/nanoserver:1903
-USER ContainerAdministrator
-
-ENV GODEBUG=netdns=go
-
-ADD release/windows/amd64/drone-cache.exe C:/drone-cache.exe
-ENTRYPOINT [ "C:\\drone-cache.exe" ]
