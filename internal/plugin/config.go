@@ -17,11 +17,13 @@ type Config struct {
 	CacheKeyTemplate string
 	RemoteRoot       string
 	LocalRoot        string
+	AccountID        string
 
 	// Modes
-	Debug   bool
-	Rebuild bool
-	Restore bool
+	Debug      bool
+	Rebuild    bool
+	Restore    bool
+	AutoDetect bool
 
 	// Optional
 	SkipSymlinks               bool
