@@ -118,7 +118,6 @@ func TestCreate(t *testing.T) {
 				test.Expected(t, err, tc.err)
 				return
 			}
-
 			for _, src := range absSrcs {
 				test.Ok(t, os.RemoveAll(src))
 			}
@@ -128,6 +127,7 @@ func TestCreate(t *testing.T) {
 
 			_, err = extract(tc.tgz, archivePath, extDir)
 			test.Ok(t, err)
+
 			test.EqualDirs(t, extDir, testRootMounted, relativeSrcs)
 
 			for _, src := range absSrcs {
@@ -295,7 +295,6 @@ func TestExtract(t *testing.T) {
 }
 
 // Helpers
-
 func create(a *Archive, srcs []string, dst string) (int64, error) {
 	pr, pw := io.Pipe()
 	defer pr.Close()
@@ -304,12 +303,12 @@ func create(a *Archive, srcs []string, dst string) (int64, error) {
 	go func(w *int64) {
 		defer pw.Close()
 
-		written, err := a.Create(srcs, pw)
+		localWritten, err := a.Create(srcs, pw, false)
 		if err != nil {
 			pw.CloseWithError(err)
 		}
 
-		*w = written
+		*w = localWritten
 	}(&written)
 
 	content, err := ioutil.ReadAll(pr)

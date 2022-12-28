@@ -23,7 +23,7 @@ const (
 type Archive interface {
 	// Create writes content of the given source to an archive, returns written bytes.
 	// Similar to io.WriterTo.
-	Create(srcs []string, w io.Writer) (int64, error)
+	Create(srcs []string, w io.Writer, isRelativePath bool) (int64, error)
 
 	// Extract reads content from the given archive reader and restores it to the destination, returns written bytes.
 	// Similar to io.ReaderFrom.
