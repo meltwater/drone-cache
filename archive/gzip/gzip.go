@@ -26,6 +26,8 @@ func New(logger log.Logger, root string, skipSymlinks bool, compressionLevel int
 }
 
 // Create writes content of the given source to an archive, returns written bytes.
+// If isRelativePath is true, it clones using the path, else it clones using a path
+// combining archive's root with the path.
 func (a *Archive) Create(srcs []string, w io.Writer, isRelativePath bool) (int64, error) {
 	gw, err := gzip.NewWriterLevel(w, a.compressionLevel)
 	if err != nil {
