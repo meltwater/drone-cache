@@ -1,0 +1,3 @@
+run:
+  go:
+    module: github.com/meltwater/drone-cache
