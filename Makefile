@@ -40,7 +40,7 @@ all: drone-cache
 .PHONY: setup
 setup: ## Setups dev environment
 setup: vendor ; $(info $(M) running setup for development )
-	$(Q) make $(GOTEST) $(EMBEDMD) $(LICHE) $(GOLANGCI_LINT) $(BINGO)
+	$(Q) make $(GOTEST) $(EMBEDMD) $(LICHE) $(BINGO)
 
 drone-cache: ## Runs drone-cache target
 drone-cache: vendor main.go $(wildcard *.go) $(wildcard */*.go) ; $(info $(M) running drone-cache )
@@ -126,17 +126,6 @@ test-e2e: $(GOTEST) ; $(info $(M) running test-e2e )
 	$(DOCKER_COMPOSE) up -d && sleep 1
 	-$(GOTEST) -race -cover -tags=integration -v ./internal/plugin
 	$(DOCKER_COMPOSE) down -v
-
-.PHONY: lint
-lint: ## Runs golangci-lint analysis
-lint: $(GOLANGCI_LINT) ; $(info $(M) running lint )
-	# Check .golangci.yml for configuration
-	$(Q) $(GOLANGCI_LINT) run -v --enable-all --skip-dirs tmp -c .golangci.yml
-
-.PHONY: fix
-fix: ## Runs golangci-lint fix
-fix: $(GOLANGCI_LINT) format ; $(info $(M) running fix )
-	$(Q) $(GOLANGCI_LINT) run --fix --enable-all --skip-dirs tmp -c .golangci.yml
 
 .PHONY: format
 format: ## Runs gofmt
