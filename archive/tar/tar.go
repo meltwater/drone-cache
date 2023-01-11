@@ -39,7 +39,9 @@ func New(logger log.Logger, root string, skipSymlinks bool) *Archive {
 }
 
 // Create writes content of the given source to an archive, returns written bytes.
-func (a *Archive) Create(srcs []string, w io.Writer) (int64, error) {
+// If isRelativePath is true, it clones using the path, else it clones using a path
+// combining archive's root with the path.
+func (a *Archive) Create(srcs []string, w io.Writer, isRelativePath bool) (int64, error) {
 	tw := tar.NewWriter(w)
 	defer internal.CloseWithErrLogf(a.logger, tw, "tar writer")
 
@@ -51,7 +53,7 @@ func (a *Archive) Create(srcs []string, w io.Writer) (int64, error) {
 			return written, fmt.Errorf("make sure file or directory readable <%s>: %v,, %w", src, err, ErrSourceNotReachable)
 		}
 
-		if err := filepath.Walk(src, writeToArchive(tw, a.root, a.skipSymlinks, &written)); err != nil {
+		if err := filepath.Walk(src, writeToArchive(tw, a.root, a.skipSymlinks, &written, isRelativePath, a.logger)); err != nil {
 			return written, fmt.Errorf("walk, add all files to archive, %w", err)
 		}
 	}
@@ -60,8 +62,10 @@ func (a *Archive) Create(srcs []string, w io.Writer) (int64, error) {
 }
 
 // nolint: lll
-func writeToArchive(tw *tar.Writer, root string, skipSymlinks bool, written *int64) func(string, os.FileInfo, error) error {
+func writeToArchive(tw *tar.Writer, root string, skipSymlinks bool, written *int64, isRelativePath bool, logger log.Logger) func(string, os.FileInfo, error) error {
 	return func(path string, fi os.FileInfo, err error) error {
+		level.Info(logger).Log("path", path, "root", root) //nolint: errcheck
+
 		if err != nil {
 			return err
 		}
@@ -90,6 +94,8 @@ func writeToArchive(tw *tar.Writer, root string, skipSymlinks bool, written *int
 		var name string
 		if strings.HasPrefix(path, getRootPathPrefix()) {
 			name, err = filepath.Abs(path)
+		} else if isRelativePath {
+			name = path
 		} else {
 			name, err = relative(root, path)
 		}
