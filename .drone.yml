@@ -380,7 +380,7 @@ steps:
     environment:
       CGO_ENABLED: "0"
   - name: docker
-    image: plugins/docker
+    image: plugins/docker@sha256:f0233d950ae87ee6cb5500b2d5497fe02aa338201c0bdce2619f443fd174cfa4
     settings:
       dockerfile: docker/Dockerfile.windows.1809
       repo: plugins/cache
