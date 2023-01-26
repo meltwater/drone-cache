@@ -26,6 +26,16 @@ func DetectDirectoriesToCache() ([]string, []string, string, error) {
 			tool:         "gradle",
 			preparer:     newGradlePreparer(),
 		},
+		{
+			globToDetect: "*WORKSPACE",
+			tool:         "bazel",
+			preparer:     newBazelPreparer(),
+		},
+		{
+			globToDetect: "*package.json",
+			tool:         "node",
+			preparer:     newNodePreparer(),
+		},
 	}
 
 	var directoriesToCache []string
