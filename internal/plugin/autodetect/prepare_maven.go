@@ -40,7 +40,7 @@ func (*mavenPreparer) PrepareRepo() (string, error) {
 		return pathToCache, err
 	}
 
-	f, err := os.OpenFile(filepath.Join(configPath, fileName), os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	f, err := os.OpenFile(filepath.Join(configPath, fileName), os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644) //nolint:gomnd
 
 	if err != nil {
 		return "", err

@@ -32,7 +32,7 @@ func (*gradlePreparer) PrepareRepo() (string, error) {
 		return pathToCache, nil
 	}
 
-	f, err := os.OpenFile(fileName, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	f, err := os.OpenFile(fileName, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644) //nolint:gomnd
 
 	if err != nil {
 		return "", err
