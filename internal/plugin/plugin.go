@@ -89,32 +89,39 @@ func (p *Plugin) Exec() error { // nolint:funlen
 	var generator key.Generator
 
 	switch {
-	case cfg.CacheKeyTemplate != "":
-		{
-			generator = keygen.NewMetadata(p.logger, cfg.CacheKeyTemplate, p.Metadata)
-			if err := generator.Check(); err != nil {
-				return fmt.Errorf("parse failed, falling back to default, %w", err)
-			}
-
-			options = append(options, cache.WithFallbackGenerator(keygen.NewHash(p.Metadata.Commit.Branch)))
-		}
 	case cfg.AutoDetect:
 		{
-			dirs, buildTools, hash, err := autodetect.DetectDirectoriesToCache()
+			dirs, buildTools, cacheKey, err := autodetect.DetectDirectoriesToCache()
 			if err != nil {
 				return fmt.Errorf("autodetect enabled but failed to detect, falling back to default, %w", err)
 			}
-			p.logger.Log("msg", "build tools detected: "+strings.Join(buildTools, ", "))
+			if len(buildTools) > 0 {
+				p.logger.Log("msg", "build tools detected: "+strings.Join(buildTools, ", ")) //nolint: errcheck
+			} else {
+				p.logger.Log("msg", "no supported build tool detected") //nolint: errcheck
+			}
 			if len(p.Config.Mount) == 0 {
 				p.Config.Mount = dirs
 			}
-			generator = keygen.NewMetadata(p.logger, cfg.AccountID+"/"+hash, p.Metadata)
+			if cfg.CacheKeyTemplate != "" {
+				cacheKey = cfg.CacheKeyTemplate
+			} else if cacheKey == "" {
+				cacheKey = "default"
+			}
+			generator = keygen.NewMetadata(p.logger, cfg.AccountID+"/"+cacheKey, p.Metadata)
 			if err := generator.Check(); err != nil {
 				return fmt.Errorf("parse failed, falling back to default, %w", err)
 			}
 
 			options = append(options, cache.WithFallbackGenerator(keygen.NewHash(cfg.AccountID+p.Metadata.Commit.Branch)))
 		}
+	case cfg.CacheKeyTemplate != "":
+		generator = keygen.NewMetadata(p.logger, cfg.CacheKeyTemplate, p.Metadata)
+		if err := generator.Check(); err != nil {
+			return fmt.Errorf("parse failed, falling back to default, %w", err)
+		}
+
+		options = append(options, cache.WithFallbackGenerator(keygen.NewHash(p.Metadata.Commit.Branch)))
 	default:
 		{
 			generator = keygen.NewHash(p.Metadata.Commit.Branch)
