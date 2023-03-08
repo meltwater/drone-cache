@@ -41,6 +41,11 @@ func DetectDirectoriesToCache(skipPrepare bool) ([]string, []string, string, err
 			tool:         "yarn",
 			preparer:     newYarnPreparer(),
 		},
+		{
+			globToDetect: "*go.mod",
+			tool:         "golang",
+			preparer:     newGoPreparer(),
+		},
 	}
 
 	var directoriesToCache []string
