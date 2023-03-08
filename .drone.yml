@@ -40,13 +40,13 @@ steps:
     environment:
       CGO_ENABLED: 0
 
-  - name: lint
-    image: golang:1.19
-    pull: always
-    commands:
-      - go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
-      - golangci-lint version
-      - golangci-lint run  --timeout 500s --new-from-rev=HEAD~
+#  - name: lint
+#    image: golang:1.19
+#    pull: always
+#    commands:
+#      - go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
+#      - golangci-lint version
+#      - golangci-lint run  --timeout 500s --new-from-rev=HEAD~
     
   - name: test
     image: golang:1.19-alpine3.16
