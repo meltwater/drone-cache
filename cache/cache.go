@@ -52,7 +52,7 @@ func New(logger log.Logger, s storage.Storage, a archive.Archive, g key.Generato
 
 	return &cache{
 		NewRebuilder(log.With(logger, "component", "rebuilder"), s, a, g,
-			options.fallbackGenerator, options.namespace, options.override),
+			options.fallbackGenerator, options.namespace, options.override, options.gracefulDetect),
 		NewRestorer(log.With(logger, "component", "restorer"), s, a, g,
 			options.fallbackGenerator, options.namespace, options.failRestoreIfKeyNotPresent),
 		NewFlusher(log.With(logger, "component", "flusher"), s, time.Hour),

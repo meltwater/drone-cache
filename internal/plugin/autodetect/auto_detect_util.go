@@ -14,7 +14,7 @@ type buildToolInfo struct {
 	preparer     RepoPreparer
 }
 
-func DetectDirectoriesToCache() ([]string, []string, string, error) {
+func DetectDirectoriesToCache(skipPrepare bool) ([]string, []string, string, error) {
 	var buildToolInfoMapping = []buildToolInfo{
 		{
 			globToDetect: "*pom.xml",
@@ -36,6 +36,11 @@ func DetectDirectoriesToCache() ([]string, []string, string, error) {
 			tool:         "node",
 			preparer:     newNodePreparer(),
 		},
+		{
+			globToDetect: "*yarn.lock",
+			tool:         "yarn",
+			preparer:     newYarnPreparer(),
+		},
 	}
 
 	var directoriesToCache []string
@@ -50,7 +55,7 @@ func DetectDirectoriesToCache() ([]string, []string, string, error) {
 			return nil, nil, "", err
 		}
 
-		if hash != "" {
+		if hash != "" && !skipPrepare {
 			dirToCache, err := supportedTool.preparer.PrepareRepo()
 			if err != nil {
 				return nil, nil, "", err

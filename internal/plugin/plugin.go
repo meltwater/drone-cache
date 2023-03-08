@@ -91,7 +91,8 @@ func (p *Plugin) Exec() error { // nolint:funlen
 	switch {
 	case cfg.AutoDetect:
 		{
-			dirs, buildTools, cacheKey, err := autodetect.DetectDirectoriesToCache()
+			pathOverridden := len(p.Config.Mount) > 0
+			dirs, buildTools, cacheKey, err := autodetect.DetectDirectoriesToCache(pathOverridden)
 			if err != nil {
 				return fmt.Errorf("autodetect enabled but failed to detect, falling back to default, %w", err)
 			}
@@ -100,8 +101,11 @@ func (p *Plugin) Exec() error { // nolint:funlen
 			} else {
 				p.logger.Log("msg", "no supported build tool detected") //nolint: errcheck
 			}
-			if len(p.Config.Mount) == 0 {
+			if !pathOverridden {
 				p.Config.Mount = dirs
+				options = append(options, cache.WithGracefulDetect(true))
+			} else {
+				options = append(options, cache.WithGracefulDetect(false))
 			}
 			if cfg.CacheKeyTemplate != "" {
 				cacheKey = cfg.CacheKeyTemplate

@@ -9,6 +9,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/dustin/go-humanize"
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/log/level"
 
@@ -74,6 +75,7 @@ func (r restorer) Restore(dsts []string) error {
 		src := filepath.Join(namespace, key, dst)
 
 		level.Info(r.logger).Log("msg", "restoring directory", "local", dst, "remote", src)
+		level.Debug(r.logger).Log("msg", "restoring directory", "remote", src)
 
 		wg.Add(1)
 
@@ -105,7 +107,7 @@ func (r restorer) restore(src, dst string) (err error) {
 	go func() {
 		defer internal.CloseWithErrLogf(r.logger, pw, "pw close defer")
 
-		level.Info(r.logger).Log("msg", "downloading archived directory", "remote", src, "local", dst)
+		level.Debug(r.logger).Log("msg", "downloading archived directory", "remote", src, "local", dst)
 
 		if err := r.s.Get(src, pw); err != nil {
 			if err := pw.CloseWithError(fmt.Errorf("get file from storage backend, pipe writer failed, %w", err)); err != nil {
@@ -114,7 +116,7 @@ func (r restorer) restore(src, dst string) (err error) {
 		}
 	}()
 
-	level.Info(r.logger).Log("msg", "extracting archived directory", "remote", src, "local", dst)
+	level.Debug(r.logger).Log("msg", "extracting archived directory", "remote", src, "local", dst)
 
 	written, err := r.a.Extract(dst, pr)
 	if err != nil {
@@ -125,6 +127,8 @@ func (r restorer) restore(src, dst string) (err error) {
 
 		return err
 	}
+
+	level.Info(r.logger).Log("msg", "downloaded to local", "directory", dst, "cache size", humanize.Bytes(uint64(written)))
 
 	level.Debug(r.logger).Log(
 		"msg", "archive extracted",

@@ -26,7 +26,7 @@ func TestDetectDirectoriesToCacheMaven(t *testing.T) {
 	defer f.Close()
 	_, err = f.WriteString(testFileContent)
 	test.Ok(t, err)
-	directoriesToCache, buildToolsDetected, hashes, err := DetectDirectoriesToCache()
+	directoriesToCache, buildToolsDetected, hashes, err := DetectDirectoriesToCache(false)
 	test.Ok(t, err)
 	test.Ok(t, os.RemoveAll(pomFile))
 	expectedCacheDir := []string{toolMavenDir}
@@ -54,7 +54,7 @@ func TestDetectDirectoriesToCacheMavenMultiMaven(t *testing.T) {
 	_, err = f2.WriteString(testFileContent2)
 
 	test.Ok(t, err)
-	directoriesToCache, buildToolsDetected, hashes, err := DetectDirectoriesToCache()
+	directoriesToCache, buildToolsDetected, hashes, err := DetectDirectoriesToCache(false)
 
 	test.Ok(t, err)
 	test.Ok(t, os.RemoveAll(pomFile))
@@ -76,7 +76,7 @@ func TestDetectDirectoriesToCacheBazel(t *testing.T) {
 	_, err = f.WriteString(testFileContent)
 	test.Ok(t, err)
 
-	directoriesToCache, buildToolsDetected, hashes, err := DetectDirectoriesToCache()
+	directoriesToCache, buildToolsDetected, hashes, err := DetectDirectoriesToCache(false)
 
 	test.Ok(t, os.RemoveAll(bazelBuildFile))
 	test.Ok(t, err)
@@ -105,7 +105,7 @@ func TestDetectDirectoriesToCacheCombined(t *testing.T) {
 	_, err = f2.WriteString(testFileContent2)
 
 	test.Ok(t, err)
-	directoriesToCache, buildToolsDetected, hashes, err := DetectDirectoriesToCache()
+	directoriesToCache, buildToolsDetected, hashes, err := DetectDirectoriesToCache(false)
 
 	test.Ok(t, os.RemoveAll(bazelBuildFile))
 	test.Ok(t, os.RemoveAll(pomFile))

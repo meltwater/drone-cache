@@ -45,7 +45,7 @@ func NewMetadata(logger log.Logger, tmpl string, data metadata.Metadata) *Metada
 // Generate generates key from given template as parameter or fallbacks hash.
 func (g *Metadata) Generate(_ ...string) (string, error) {
 	// NOTICE: for now only consume a single template which will be changed.
-	level.Info(g.logger).Log("msg", "using provided cache key template")
+	level.Debug(g.logger).Log("msg", "using provided cache key template")
 
 	if g.tmpl == "" {
 		return "", errors.New("cache key template is empty")

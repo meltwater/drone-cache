@@ -27,13 +27,14 @@ type rebuilder struct {
 	g  key.Generator
 	fg key.Generator
 
-	namespace string
-	override  bool
+	namespace      string
+	override       bool
+	gracefulDetect bool
 }
 
 // NewRebuilder creates a new cache.Rebuilder.
-func NewRebuilder(logger log.Logger, s storage.Storage, a archive.Archive, g key.Generator, fg key.Generator, namespace string, override bool) Rebuilder { // nolint:lll
-	return rebuilder{logger, a, s, g, fg, namespace, override}
+func NewRebuilder(logger log.Logger, s storage.Storage, a archive.Archive, g key.Generator, fg key.Generator, namespace string, override bool, gracefulDetect bool) Rebuilder { // nolint:lll
+	return rebuilder{logger, a, s, g, fg, namespace, override, gracefulDetect}
 }
 
 // Rebuild rebuilds cache from the files provided with given paths.
@@ -55,7 +56,10 @@ func (r rebuilder) Rebuild(srcs []string) error {
 
 	for _, src := range srcs {
 		if _, err := os.Lstat(src); err != nil {
-			return fmt.Errorf("source <%s>, make sure file or directory exists and readable, %w", src, err)
+			if !r.gracefulDetect {
+				return fmt.Errorf("source <%s>, make sure file or directory exists and readable, %w", src, err)
+			}
+			level.Warn(r.logger).Log("msg", fmt.Sprintf("source directory %s does not exist", src), "err", fmt.Errorf("source <%s>, make sure file or directory exists and readable, %w", src, err))
 		}
 
 		dst := filepath.Join(namespace, key, src)
@@ -72,7 +76,8 @@ func (r rebuilder) Rebuild(srcs []string) error {
 			}
 		}
 
-		level.Info(r.logger).Log("msg", "rebuilding cache for directory", "local", src, "remote", dst)
+		level.Info(r.logger).Log("msg", "rebuilding cache for directory", "local", src)
+		level.Debug(r.logger).Log("msg", "rebuilding cache for directory", "remote", dst)
 
 		wg.Add(1)
 
@@ -99,14 +104,14 @@ func (r rebuilder) Rebuild(srcs []string) error {
 // rebuild pushes the archived file to the cache.
 func (r rebuilder) rebuild(src, dst string) (err error) {
 	isRelativePath := strings.HasPrefix(src, "./")
-	level.Info(r.logger).Log("msg", "rebuild", "src", src, "relativePath", isRelativePath) //nolint: errcheck
+	level.Debug(r.logger).Log("msg", "rebuild", "src", src, "relativePath", isRelativePath) //nolint: errcheck
 	src = filepath.Clean(src)
 	if !isRelativePath {
 		src, err = filepath.Abs(src)
 		if err != nil {
 			return fmt.Errorf("clean source path, %w", err)
 		}
-		level.Info(r.logger).Log("msg", "src is adjusted", "src", src) //nolint: errcheck
+		level.Debug(r.logger).Log("msg", "src is adjusted", "src", src) //nolint: errcheck
 	}
 
 	pr, pw := io.Pipe()
@@ -117,7 +122,7 @@ func (r rebuilder) rebuild(src, dst string) (err error) {
 	go func(wrt *int64) {
 		defer internal.CloseWithErrLogf(r.logger, pw, "pw close defer")
 
-		level.Info(r.logger).Log("msg", "caching paths", "src", src)
+		level.Debug(r.logger).Log("msg", "caching paths", "src", src)
 
 		localWritten, err := r.a.Create([]string{src}, pw, isRelativePath)
 		if err != nil {
@@ -129,7 +134,7 @@ func (r rebuilder) rebuild(src, dst string) (err error) {
 		*wrt += localWritten
 	}(&written)
 
-	level.Info(r.logger).Log("msg", "uploading archived directory", "local", src, "remote", dst)
+	level.Debug(r.logger).Log("msg", "uploading archived directory", "local", src, "remote", dst)
 
 	sw := &statWriter{}
 	tr := io.TeeReader(pr, sw)
@@ -142,6 +147,8 @@ func (r rebuilder) rebuild(src, dst string) (err error) {
 
 		return err
 	}
+
+	level.Info(r.logger).Log("msg", "uploaded cache", "src", src, "total", humanize.Bytes(uint64(sw.written)), "comressed", humanize.Bytes(uint64(written)))
 
 	level.Debug(r.logger).Log(
 		"msg", "archive created",

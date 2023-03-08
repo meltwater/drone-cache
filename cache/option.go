@@ -7,6 +7,7 @@ type options struct {
 	fallbackGenerator          key.Generator
 	override                   bool
 	failRestoreIfKeyNotPresent bool
+	gracefulDetect             bool
 }
 
 // Option overrides behavior of Archive.
@@ -38,6 +39,13 @@ func WithFallbackGenerator(g key.Generator) Option {
 func WithOverride(override bool) Option {
 	return optionFunc(func(o *options) {
 		o.override = override
+	})
+}
+
+// WithGracefulDetect sets option to fail sve if directory does not exist.
+func WithGracefulDetect(gracefulDetect bool) Option {
+	return optionFunc(func(o *options) {
+		o.gracefulDetect = gracefulDetect
 	})
 }
 

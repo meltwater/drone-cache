@@ -64,7 +64,7 @@ func (a *Archive) Create(srcs []string, w io.Writer, isRelativePath bool) (int64
 // nolint: lll
 func writeToArchive(tw *tar.Writer, root string, skipSymlinks bool, written *int64, isRelativePath bool, logger log.Logger) func(string, os.FileInfo, error) error {
 	return func(path string, fi os.FileInfo, err error) error {
-		level.Info(logger).Log("path", path, "root", root) //nolint: errcheck
+		level.Debug(logger).Log("path", path, "root", root) //nolint: errcheck
 
 		if err != nil {
 			return err
