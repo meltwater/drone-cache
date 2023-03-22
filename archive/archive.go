@@ -6,6 +6,7 @@ import (
 
 	"github.com/meltwater/drone-cache/archive/gzip"
 	"github.com/meltwater/drone-cache/archive/tar"
+	"github.com/meltwater/drone-cache/archive/zstd"
 
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/log/level"
@@ -14,6 +15,7 @@ import (
 const (
 	Gzip = "gzip"
 	Tar  = "tar"
+	Zstd = "zstd"
 
 	DefaultCompressionLevel = flate.DefaultCompression
 	DefaultArchiveFormat    = Tar
@@ -45,6 +47,8 @@ func FromFormat(logger log.Logger, root string, format string, opts ...Option) A
 	switch format {
 	case Gzip:
 		return gzip.New(logger, root, options.skipSymlinks, options.compressionLevel)
+	case Zstd:
+		return zstd.New(logger, root, options.skipSymlinks, options.compressionLevel)
 	case Tar:
 		return tar.New(logger, root, options.skipSymlinks)
 	default:
