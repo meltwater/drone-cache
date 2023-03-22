@@ -148,7 +148,7 @@ func (r rebuilder) rebuild(src, dst string) (err error) {
 		return err
 	}
 
-	level.Info(r.logger).Log("msg", "uploaded cache", "src", src, "total", humanize.Bytes(uint64(sw.written)), "comressed", humanize.Bytes(uint64(written)))
+	level.Info(r.logger).Log("msg", "uploaded cache", "src", src, "size before compression", humanize.Bytes(uint64(sw.written)), "size after compression", humanize.Bytes(uint64(written)))
 
 	level.Debug(r.logger).Log(
 		"msg", "archive created",
