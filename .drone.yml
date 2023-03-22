@@ -488,28 +488,41 @@ depends_on:
 
 ---
 kind: pipeline
-type: docker
+type: vm
 name: release artifacts
+
+pool:
+  use: ubuntu
 
 steps:
   - name: build
     image: golang:1.19
     commands:
-      - GOOS=linux   GOARCH=amd64   go build -ldflags "-X main.version=${DRONE_TAG##v}" -o release/plugin-linux-amd64
-      - GOOS=linux   GOARCH=arm64   go build -ldflags "-X main.version=${DRONE_TAG##v}" -o release/plugin-linux-arm64
-      - GOOS=darwin  GOARCH=amd64   go build -ldflags "-X main.version=${DRONE_TAG##v}" -o release/plugin-darwin-amd64
-      - GOOS=darwin  GOARCH=arm64   go build -ldflags "-X main.version=${DRONE_TAG##v}" -o release/plugin-darwin-arm64
-      - GOOS=windows GOARCH=amd64   go build -ldflags "-X main.version=${DRONE_TAG##v}" -o release/plugin-windows-amd64.exe
+      - GOOS=linux   GOARCH=amd64   go build -ldflags "-s -w -X main.version=${DRONE_TAG##v}" -o release/plugin-linux-amd64
+      - GOOS=linux   GOARCH=arm64   go build -ldflags "-s -w -X main.version=${DRONE_TAG##v}" -o release/plugin-linux-arm64
+      - GOOS=darwin  GOARCH=amd64   go build -ldflags "-s -w -X main.version=${DRONE_TAG##v}" -o release/plugin-darwin-amd64
+      - GOOS=darwin  GOARCH=arm64   go build -ldflags "-s -w -X main.version=${DRONE_TAG##v}" -o release/plugin-darwin-arm64
+      - GOOS=windows GOARCH=amd64   go build -ldflags "-s -w -X main.version=${DRONE_TAG##v}" -o release/plugin-windows-amd64.exe
+
+  - name: zstd-compress
+    commands:
+      - sudo apt-get update -y
+      - sudo apt-get install -y zstd
+      - zstd release/plugin-linux-amd64
+      - zstd release/plugin-linux-arm64
+      - zstd release/plugin-darwin-arm64
+      - zstd release/plugin-darwin-amd64
+      - zstd release/plugin-windows-amd64.exe
 
   - name: release
     image: plugins/github-release
     settings:
       files:
-        - release/plugin-linux-amd64
-        - release/plugin-linux-arm64
-        - release/plugin-darwin-amd64
-        - release/plugin-darwin-arm64
-        - release/plugin-windows-amd64.exe
+        - release/plugin-linux-amd64.zst
+        - release/plugin-linux-arm64.zst
+        - release/plugin-darwin-amd64.zst
+        - release/plugin-darwin-arm64.zst
+        - release/plugin-windows-amd64.exe.zst
       api_key:
         from_secret: github_token
 trigger:
