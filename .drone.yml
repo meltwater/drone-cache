@@ -518,7 +518,7 @@ steps:
         - release/plugin-linux-amd64.zst
         - release/plugin-linux-arm64.zst
         - release/plugin-darwin-arm64.zst
-        - release/plugin-windows-amd64.exe.zst
+        - release/plugin-windows-amd64.zst
       api_key:
         from_secret: github_token
 trigger:
