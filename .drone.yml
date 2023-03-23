@@ -500,7 +500,7 @@ steps:
       - GOOS=linux   GOARCH=amd64   go build -ldflags "-s -w -X main.version=${DRONE_TAG##v}" -o release/plugin-linux-amd64
       - GOOS=linux   GOARCH=arm64   go build -ldflags "-s -w -X main.version=${DRONE_TAG##v}" -o release/plugin-linux-arm64
       - GOOS=darwin  GOARCH=arm64   go build -ldflags "-s -w -X main.version=${DRONE_TAG##v}" -o release/plugin-darwin-arm64
-      - GOOS=windows GOARCH=amd64   go build -ldflags "-s -w -X main.version=${DRONE_TAG##v}" -o release/plugin-windows-amd64.exe
+      - GOOS=windows GOARCH=amd64   go build -ldflags "-s -w -X main.version=${DRONE_TAG##v}" -o release/plugin-windows-amd64
 
   - name: zstd-compress
     commands:
@@ -509,7 +509,7 @@ steps:
       - zstd release/plugin-linux-amd64
       - zstd release/plugin-linux-arm64
       - zstd release/plugin-darwin-arm64
-      - zstd release/plugin-windows-amd64.exe
+      - zstd release/plugin-windows-amd64
 
   - name: release
     image: plugins/github-release
