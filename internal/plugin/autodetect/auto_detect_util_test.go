@@ -29,7 +29,8 @@ func TestDetectDirectoriesToCacheMaven(t *testing.T) {
 	directoriesToCache, buildToolsDetected, hashes, err := DetectDirectoriesToCache(false)
 	test.Ok(t, err)
 	test.Ok(t, os.RemoveAll(pomFile))
-	expectedCacheDir := []string{toolMavenDir}
+	path, _ := filepath.Abs(toolMavenDir)
+	expectedCacheDir := []string{path}
 	expectedDetectedTool := []string{toolMaven}
 	test.Equals(t, directoriesToCache, expectedCacheDir)
 	test.Equals(t, buildToolsDetected, expectedDetectedTool)
@@ -60,7 +61,8 @@ func TestDetectDirectoriesToCacheMavenMultiMaven(t *testing.T) {
 	test.Ok(t, os.RemoveAll(pomFile))
 	test.Ok(t, os.RemoveAll(filepath.Join(nestedDirectory, pomFile)))
 
-	expectedCacheDir := []string{toolMavenDir}
+	path, _ := filepath.Abs(toolMavenDir)
+	expectedCacheDir := []string{path}
 	expectedDetectedTool := []string{toolMaven}
 
 	test.Equals(t, directoriesToCache, expectedCacheDir)
@@ -111,7 +113,8 @@ func TestDetectDirectoriesToCacheCombined(t *testing.T) {
 	test.Ok(t, os.RemoveAll(pomFile))
 	test.Ok(t, err)
 
-	expectedCacheDir := []string{toolMavenDir, toolGradleDir}
+	path1, _ := filepath.Abs(toolMavenDir)
+	expectedCacheDir := []string{path1, toolGradleDir}
 	expectedDetectedTool := []string{toolMaven, toolGradle}
 
 	test.Equals(t, directoriesToCache, expectedCacheDir)

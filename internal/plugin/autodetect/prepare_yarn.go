@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"path/filepath"
 )
 
 type yarnPreparer struct{}
@@ -11,16 +12,16 @@ type yarnPreparer struct{}
 func newYarnPreparer() *yarnPreparer {
 	return &yarnPreparer{}
 }
-func (*yarnPreparer) PrepareRepo() (string, error) {
-	pathToCache := ".yarn"
+func (*yarnPreparer) PrepareRepo(dir string) (string, error) {
+	pathToCache := filepath.Join(dir, ".yarn")
 	// for yarn 1.x
-	err := prepareYarn(pathToCache, ".yarnrc", "\n--cache-folder %s\n")
+	err := prepareYarn(pathToCache, filepath.Join(dir, ".yarnrc"), "\n--cache-folder %s\n")
 	if err != nil {
 		return "", err
 	}
 
 	// for yarn 2.x
-	err = prepareYarn(pathToCache, ".yarnrc.yaml", "\ncacheFolder: \"%s\"\n")
+	err = prepareYarn(pathToCache, filepath.Join(dir, ".yarnrc.yaml"), "\ncacheFolder: \"%s\"\n")
 	if err != nil {
 		return "", err
 	}

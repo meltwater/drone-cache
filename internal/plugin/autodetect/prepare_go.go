@@ -6,6 +6,6 @@ func newGoPreparer() *goPreparer {
 	return &goPreparer{}
 }
 
-func (*goPreparer) PrepareRepo() (string, error) {
+func (*goPreparer) PrepareRepo(dir string) (string, error) {
 	return ".go", nil
 }

@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"path/filepath"
 )
 
 type bazelPreparer struct{}
@@ -12,9 +13,9 @@ func newBazelPreparer() *bazelPreparer {
 	return &bazelPreparer{}
 }
 
-func (*bazelPreparer) PrepareRepo() (string, error) {
-	fileName := ".bazelrc"
-	pathToCache := ".bazel"
+func (*bazelPreparer) PrepareRepo(dir string) (string, error) {
+	fileName := filepath.Join(dir, ".bazelrc")
+	pathToCache := filepath.Join(dir, ".bazel")
 	cmdToOverrideRepo := fmt.Sprintf("build --test_tmpdir=%s\ntest --test_tmpdir=%s", pathToCache, pathToCache)
 
 	if _, err := os.Stat(fileName); errors.Is(err, os.ErrNotExist) {

@@ -1,11 +1,13 @@
 package autodetect
 
+import "path/filepath"
+
 type nodePreparer struct{}
 
 func newNodePreparer() *nodePreparer {
 	return &nodePreparer{}
 }
 
-func (*nodePreparer) PrepareRepo() (string, error) {
-	return "node_modules", nil
+func (*nodePreparer) PrepareRepo(dir string) (string, error) {
+	return filepath.Join(dir, "node_modules"), nil
 }

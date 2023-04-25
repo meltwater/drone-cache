@@ -12,10 +12,10 @@ type mavenPreparer struct{}
 func newMavenPreparer() *mavenPreparer {
 	return &mavenPreparer{}
 }
-func (*mavenPreparer) PrepareRepo() (string, error) {
-	configPath := ".mvn"
+func (*mavenPreparer) PrepareRepo(dir string) (string, error) {
+	configPath := filepath.Join(dir, ".mvn")
 	fileName := "maven.config"
-	pathToCache := filepath.Join(".m2", "repository")
+	pathToCache := filepath.Join(dir, ".m2", "repository")
 	cmdToOverrideRepo := fmt.Sprintf(" -Dmaven.repo.local=%s ", pathToCache)
 
 	if _, err := os.Stat(filepath.Join(configPath, fileName)); errors.Is(err, os.ErrNotExist) {

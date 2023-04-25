@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"path/filepath"
 )
 
 type gradlePreparer struct{}
@@ -12,8 +13,8 @@ func newGradlePreparer() *gradlePreparer {
 	return &gradlePreparer{}
 }
 
-func (*gradlePreparer) PrepareRepo() (string, error) {
-	fileName := "gradle.properties"
+func (*gradlePreparer) PrepareRepo(dir string) (string, error) {
+	fileName := filepath.Join(dir, "gradle.properties")
 	pathToCache := ".gradle"
 	cmdToOverrideRepo := fmt.Sprintf("systemProp.gradle.user.home=/%s/\norg.gradle.caching=true\n", pathToCache)
 

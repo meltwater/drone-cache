@@ -55,19 +55,21 @@ func DetectDirectoriesToCache(skipPrepare bool) ([]string, []string, string, err
 	var hashes string
 
 	for _, supportedTool := range buildToolInfoMapping {
-		hash, err := hashIfFileExist(supportedTool.globToDetect)
+		hash, dir, err := hashIfFileExist(supportedTool.globToDetect)
 		if err != nil {
 			return nil, nil, "", err
 		}
 		if hash == "" {
-			// Find in subdirectory if not exist in root
-			hash, err = hashIfFileExist(filepath.Join("**", supportedTool.globToDetect))
+			hash, dir, err = hashIfFileExist(filepath.Join("**", supportedTool.globToDetect))
 			if err != nil {
 				return nil, nil, "", err
 			}
 		}
+		if err != nil {
+			return nil, nil, "", err
+		}
 		if hash != "" && !skipPrepare {
-			dirToCache, err := supportedTool.preparer.PrepareRepo()
+			dirToCache, err := supportedTool.preparer.PrepareRepo(dir)
 			if err != nil {
 				return nil, nil, "", err
 			}
@@ -81,38 +83,44 @@ func DetectDirectoriesToCache(skipPrepare bool) ([]string, []string, string, err
 	return directoriesToCache, buildToolsDetected, hashes, nil
 }
 
-func hashIfFileExist(glob string) (string, error) {
+func hashIfFileExist(glob string) (string, string, error) {
 	matches, _ := filepath.Glob(glob)
 
 	if len(matches) == 0 {
-		return "", nil
+		return "", "", nil
 	}
 
 	return calculateMd5FromFiles(matches)
 }
 
-func calculateMd5FromFiles(fileList []string) (string, error) {
+func calculateMd5FromFiles(fileList []string) (string, string, error) {
 	rootMostFile := shortestPath(fileList)
 	file, err := os.Open(rootMostFile)
 
 	if err != nil {
-		return "", err
+		return "", "", err
+	}
+
+	dir, err := filepath.Abs(filepath.Dir(rootMostFile))
+
+	if err != nil {
+		return "", "", err
 	}
 
 	defer file.Close()
 
 	if err != nil {
-		return "", err
+		return "", "", err
 	}
 
 	hash := md5.New() // #nosec
 	_, err = io.Copy(hash, file)
 
 	if err != nil {
-		return "", err
+		return "", "", err
 	}
 
-	return hex.EncodeToString(hash.Sum(nil)), nil
+	return hex.EncodeToString(hash.Sum(nil)), dir, nil
 }
 
 func shortestPath(input []string) (shortest string) {
