@@ -61,7 +61,7 @@ func DetectDirectoriesToCache(skipPrepare bool) ([]string, []string, string, err
 		}
 		if hash == "" {
 			// Find in subdirectory if not exist in root
-			hash, err = hashIfFileExist(filepath.Join("*", supportedTool.globToDetect))
+			hash, err = hashIfFileExist(filepath.Join("**", supportedTool.globToDetect))
 			if err != nil {
 				return nil, nil, "", err
 			}
