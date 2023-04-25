@@ -17,32 +17,32 @@ type buildToolInfo struct {
 func DetectDirectoriesToCache(skipPrepare bool) ([]string, []string, string, error) {
 	var buildToolInfoMapping = []buildToolInfo{
 		{
-			globToDetect: "*pom.xml",
+			globToDetect: "pom.xml",
 			tool:         "maven",
 			preparer:     newMavenPreparer(),
 		},
 		{
-			globToDetect: "*build.gradle",
+			globToDetect: "build.gradle",
 			tool:         "gradle",
 			preparer:     newGradlePreparer(),
 		},
 		{
-			globToDetect: "*WORKSPACE",
+			globToDetect: "WORKSPACE",
 			tool:         "bazel",
 			preparer:     newBazelPreparer(),
 		},
 		{
-			globToDetect: "*package.json",
+			globToDetect: "package.json",
 			tool:         "node",
 			preparer:     newNodePreparer(),
 		},
 		{
-			globToDetect: "*yarn.lock",
+			globToDetect: "yarn.lock",
 			tool:         "yarn",
 			preparer:     newYarnPreparer(),
 		},
 		{
-			globToDetect: "*go.mod",
+			globToDetect: "go.mod",
 			tool:         "golang",
 			preparer:     newGoPreparer(),
 		},
@@ -59,7 +59,13 @@ func DetectDirectoriesToCache(skipPrepare bool) ([]string, []string, string, err
 		if err != nil {
 			return nil, nil, "", err
 		}
-
+		if hash == "" {
+			// Find in subdirectory if not exist in root
+			hash, err = hashIfFileExist(filepath.Join("*", supportedTool.globToDetect))
+			if err != nil {
+				return nil, nil, "", err
+			}
+		}
 		if hash != "" && !skipPrepare {
 			dirToCache, err := supportedTool.preparer.PrepareRepo()
 			if err != nil {
