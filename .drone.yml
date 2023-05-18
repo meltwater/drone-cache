@@ -28,7 +28,7 @@ steps:
       - mc admin policy set minio userpolicy user=foo
 
   - name: build
-    image: golang:1.18.4
+    image: golang:1.19
     commands:
       - make drone-cache
     environment:
@@ -42,7 +42,7 @@ steps:
       CGO_ENABLED: 0
 
   - name: test
-    image: golang:1.18.4
+    image: golang:1.19
     commands:
       - go test -mod=vendor -short -cover -tags=integration ./...
     environment:
