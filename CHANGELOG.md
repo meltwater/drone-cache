@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Modified handling for S3 of Assume Role for case of running Drone pipeline with an EC2 Instance Role
+
 ### Removed
 
 ## [1.4.0] - 2022-09-21

@@ -60,8 +60,31 @@ func New(l log.Logger, c Config, debug bool) (*Backend, error) {
 			stsConf.DisableSSL = nil
 		}
 
-		conf.Credentials = credentials.NewStaticCredentials(c.Key, c.Secret, "")
-		crds := assumeRole(l, stsConf, c.RoleArn)
+		var crds credentials.Value
+		if c.Key != "" && c.Secret != "" {
+			// Use static credentials to assume role if set
+			conf.Credentials = credentials.NewStaticCredentials(c.Key, c.Secret, "")
+			crds = assumeRole(l, stsConf, c.RoleArn)
+		} else {
+			// Use EC2 Instance Role credentials to assume role
+			sess, err := session.NewSession(&aws.Config{
+				Region:                        conf.Region,
+				Endpoint:                      conf.Endpoint,
+				DisableSSL:                    conf.DisableSSL,
+				CredentialsChainVerboseErrors: aws.Bool(true),
+			})
+			if err != nil {
+				return nil, err
+			}
+
+			crds, err = stscreds.NewCredentials(sess, c.RoleArn, func(p *stscreds.AssumeRoleProvider) {
+				p.RoleSessionName = "drone-cache"
+			}).Get()
+			if err != nil {
+				return nil, err
+			}
+		}
+
 		conf.Credentials = credentials.NewStaticCredentials(crds.AccessKeyID, crds.SecretAccessKey, crds.SessionToken)
 	}
 
