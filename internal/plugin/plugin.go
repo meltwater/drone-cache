@@ -98,6 +98,8 @@ func (p *Plugin) Exec() error { // nolint:funlen
 			}
 			if len(buildTools) > 0 {
 				p.logger.Log("msg", "build tools detected: "+strings.Join(buildTools, ", ")) //nolint: errcheck
+			} else if pathOverridden {
+				p.logger.Log("msg", "using provided cache path") //nolint: errcheck
 			} else {
 				p.logger.Log("msg", "no supported build tool detected") //nolint: errcheck
 			}
