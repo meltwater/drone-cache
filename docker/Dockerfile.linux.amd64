@@ -1,4 +1,4 @@
-FROM golang:1.17.3-alpine3.13 AS builder
+FROM golang:1.20-alpine3.17 AS builder
 RUN apk add --update --no-cache ca-certificates tzdata && update-ca-certificates
 
 FROM scratch as runner
