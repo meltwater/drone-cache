@@ -16,7 +16,7 @@ func (*mavenPreparer) PrepareRepo(dir string) (string, error) {
 	configPath := filepath.Join(dir, ".mvn")
 	fileName := "maven.config"
 	pathToCache := filepath.Join(dir, ".m2", "repository")
-	cmdToOverrideRepo := fmt.Sprintf(" -Dmaven.repo.local=%s ", pathToCache)
+	cmdToOverrideRepo := fmt.Sprintf("-Dmaven.repo.local=%s ", pathToCache)
 
 	if _, err := os.Stat(filepath.Join(configPath, fileName)); errors.Is(err, os.ErrNotExist) {
 		err := os.MkdirAll(configPath, os.ModePerm)
