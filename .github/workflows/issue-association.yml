@@ -1,0 +1,20 @@
+
+---
+# Automatically Generated File, DO NOT MODIFY (Maintained By Terraform)
+# Code: github.com/meltwater/foundation-github/blob/main/foundation/
+name: "Issues: Add to Project"
+
+on:
+  issues:
+    types:
+      - opened
+
+jobs:
+  add-to-project:
+    name: Add issue to A-Team Debt, Bugs & OSS
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/add-to-project@v0.5.0
+        with:
+          project-url: https://github.com/orgs/meltwater/projects/64
+          github-token: ${{ secrets.REPO_ISSUES_TOKEN }}
