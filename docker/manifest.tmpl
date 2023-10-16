@@ -41,3 +41,9 @@ manifests:
       architecture: amd64
       os: windows
       version: 1909
+  -
+    image: plugins/cache:{{#if build.tag}}{{trimPrefix "v" build.tag}}-{{/if}}windows-ltsc2022-amd64
+    platform:
+      architecture: amd64
+      os: windows
+      version: ltsc2022
