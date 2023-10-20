@@ -17,6 +17,14 @@ body:
       description: What you observed, with as much detail as you can provide (pictures help)...
     validations:
       required: true
+  - type: input
+    id: version
+    attributes:
+      label: Version(s) Affected
+      description: If this is a released product, what version are you utilizing currently?
+      placeholder: ex. v1.0.0
+    validations:
+      required: false
   - type: textarea
     id: steps_to_reproduce
     attributes:
