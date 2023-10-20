@@ -17,6 +17,14 @@ body:
       description: Technical debt can include architecture, code, documentation, infrastructure, process, services, tests or more.  Ideally we are looking for some problem, inefficiency, trade-off or obsoleted _thing_ that needs to be addressed before we can achieve engineering excellence...
     validations:
       required: true
+  - type: input
+    id: version
+    attributes:
+      label: Version(s) Affected
+      description: If this is a released product, what version are you utilizing currently?
+      placeholder: ex. v1.0.0
+    validations:
+      required: false
   - type: textarea
     id: code
     attributes:
