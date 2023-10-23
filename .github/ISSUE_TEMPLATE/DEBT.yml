@@ -32,8 +32,6 @@ body:
       description: |
         Having code / process references is imperative to ensure all of the technical debt is addressed...
         > **Pro Tip**: Select a block of code (using line numbers), choose 'Copy permalink' from the ellipsis menu and paste into the report text to create a full great codeblock and file reference.  Here is [more information](https://docs.github.com/en/get-started/writing-on-github/working-with-advanced-formatting/creating-a-permanent-link-to-a-code-snippet) on how this works.
-      value: |
-        1. 
     validations:
       required: true
   - type: markdown
