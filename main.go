@@ -375,7 +375,6 @@ func main() {
 		&cli.StringFlag{
 			Name:    "acl",
 			Usage:   "upload files with acl (private, public-read, ...)",
-			Value:   "private",
 			EnvVars: []string{"PLUGIN_ACL", "AWS_ACL"},
 		},
 		&cli.StringFlag{

@@ -68,13 +68,18 @@ func New(l log.Logger, c Config, debug bool) (*Backend, error) {
 		client = s3.New(sess)
 	}
 
-	return &Backend{
+	backend := &Backend{
 		logger:     l,
 		bucket:     c.Bucket,
-		acl:        c.ACL,
 		encryption: c.Encryption,
 		client:     client,
-	}, nil
+	}
+
+	if c.ACL != "" {
+		backend.acl = c.ACL
+	}
+
+	return backend, nil
 }
 
 // Get writes downloaded content to the given writer.
