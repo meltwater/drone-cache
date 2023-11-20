@@ -162,7 +162,10 @@ func (p *Plugin) Exec() error { // nolint:funlen
 		options...,
 	)
 
-	// 4. Select mode
+	// 4. Expand the mount paths.
+	p.Config.Mount = expandConfigPath(p.Config.Mount)
+
+	// 5. Select mode
 	if cfg.Rebuild {
 		if err := c.Rebuild(p.Config.Mount); err != nil {
 			level.Debug(p.logger).Log("err", fmt.Sprintf("%+v\n", err))
