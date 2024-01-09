@@ -6,6 +6,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## Unreleased
+[#256](https://github.com/meltwater/drone-cache/pull/257) Fixed inputs for Azure
 
 ### Added
 [#230](https://github.com/meltwater/drone-cache/pull/233) Added command line flag to enable/disable SSL for AWS S3
