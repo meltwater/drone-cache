@@ -3,7 +3,7 @@ module github.com/meltwater/drone-cache
 require (
 	cloud.google.com/go/storage v1.30.1
 	github.com/Azure/azure-storage-blob-go v0.15.0
-	github.com/aws/aws-sdk-go v1.44.226
+	github.com/aws/aws-sdk-go v1.49.16
 	github.com/dustin/go-humanize v1.0.1
 	github.com/go-kit/kit v0.12.0
 	github.com/go-kit/log v0.2.1
@@ -11,7 +11,7 @@ require (
 	github.com/klauspost/compress v1.16.3
 	github.com/pkg/sftp v1.13.5
 	github.com/urfave/cli/v2 v2.25.0
-	golang.org/x/crypto v0.7.0
+	golang.org/x/crypto v0.14.0
 	golang.org/x/oauth2 v0.6.0
 	google.golang.org/api v0.114.0
 )
@@ -36,9 +36,9 @@ require (
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/xrash/smetrics v0.0.0-20201216005158-039620a65673 // indirect
 	go.opencensus.io v0.24.0 // indirect
-	golang.org/x/net v0.8.0 // indirect
-	golang.org/x/sys v0.6.0 // indirect
-	golang.org/x/text v0.8.0 // indirect
+	golang.org/x/net v0.17.0 // indirect
+	golang.org/x/sys v0.13.0 // indirect
+	golang.org/x/text v0.13.0 // indirect
 	golang.org/x/xerrors v0.0.0-20220907171357-04be3eba64a2 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
 	google.golang.org/genproto v0.0.0-20230320184635-7606e756e683 // indirect
