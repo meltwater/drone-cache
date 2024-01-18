@@ -132,7 +132,7 @@ GLOBAL OPTIONS:
    --archive-format value                archive format to use to store the cache directories (tar, gzip, zstd) (default: "tar") [$PLUGIN_ARCHIVE_FORMAT]
    --azure.account-key value             Azure Blob Storage Account Key [$PLUGIN_ACCOUNT_KEY, $AZURE_ACCOUNT_KEY]
    --azure.account-name value            Azure Blob Storage Account Name [$PLUGIN_ACCOUNT_NAME, $AZURE_ACCOUNT_NAME]
-   --azure.blob-container-name value     Azure Blob Storage container name [$PLUGIN_CONTAINER, $AZURE_CONTAINER_NAME]
+   --azure.container-name value          Azure Blob Storage container name [$PLUGIN_CONTAINER, $AZURE_CONTAINER_NAME]
    --azure.blob-max-retry-requets value  Azure Blob Storage Max Retry Requests (default: 4) [$AZURE_BLOB_MAX_RETRY_REQUESTS]
    --azure.blob-storage-url value        Azure Blob Storage URL (default: "blob.core.windows.net") [$AZURE_BLOB_STORAGE_URL]
    --backend value                       cache backend to use in plugin (s3, filesystem, sftp, azure, gcs) (default: "s3") [$PLUGIN_BACKEND]

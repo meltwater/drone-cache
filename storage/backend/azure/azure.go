@@ -46,12 +46,12 @@ func New(l log.Logger, c Config) (*Backend, error) {
 	// 3. Azurite has different URL pattern than production Azure Blob Storage.
 	var blobURL *url.URL
 	if c.Azurite {
-		fmt.Println("Container Name: %s", c.ContainerName)
+		fmt.Println("Container Name: ", c.ContainerName)
 		level.Info(l).Log("Container name: ", c.ContainerName)
 		blobURL, err = url.Parse(fmt.Sprintf("http://%s/%s/%s", c.BlobStorageURL, c.AccountName, c.ContainerName))
 	} else {
 		// add print statement
-		fmt.Println("Container Name: %s", c.ContainerName)
+		fmt.Println("Container Name: ", c.ContainerName)
 		level.Info(l).Log("Container name: ", c.ContainerName)
 		blobURL, err = url.Parse(fmt.Sprintf("https://%s.%s/%s", c.AccountName, c.BlobStorageURL, c.ContainerName))
 	}
