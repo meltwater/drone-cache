@@ -426,7 +426,7 @@ func main() {
 			EnvVars: []string{"PLUGIN_ACCOUNT_KEY", "AZURE_ACCOUNT_KEY"},
 		},
 		&cli.StringFlag{
-			Name:    "azure.blob-container-name",
+			Name:    "azure.container-name",
 			Usage:   "Azure Blob Storage container name",
 			EnvVars: []string{"PLUGIN_CONTAINER", "AZURE_CONTAINER_NAME"},
 		},
