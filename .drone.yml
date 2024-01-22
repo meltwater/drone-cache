@@ -32,7 +32,7 @@ steps:
   - name: build
     # there is an issue in golang 1.17.7-alpine3.15 -- with make files so using 1.17.3 here
     # https://gitlab.alpinelinux.org/alpine/aports/-/issues/12396
-    image: golang:1.21.0-alpine3.18
+    image: golang:1.21.5-alpine3.18
     commands:
       - apk add --update make git
       - make drone-cache
@@ -48,7 +48,7 @@ steps:
 #      - golangci-lint run  --timeout 500s --new-from-rev=HEAD~
     
   - name: test
-    image: golang:1.21.0-alpine3.18
+    image: golang:1.21.5-alpine3.18
     commands:
       - go test -mod=vendor -short -cover -tags=integration ./...
     environment:
