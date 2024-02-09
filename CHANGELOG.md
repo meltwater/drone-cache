@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+- [#72](https://github.com/drone-plugins/drone-meltwater-cache/pull/72) Fixed inputs for Azure
 - [#133](https://github.com/meltwater/drone-cache/pull/133) bacnkend/s3: Fixed Anonymous Credentials Error on public buckets. 
   - Fixes [#132](https://github.com/meltwater/drone-cache/issues/132)
 - [#138](https://github.com/meltwater/drone-cache/pull/138) backend/gcs: Fix GCS to pass credentials correctly when `GCS_ENDPOINT` is not set.

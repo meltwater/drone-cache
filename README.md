@@ -190,7 +190,7 @@ GLOBAL OPTIONS:
                                              (See https://cloud.google.com/storage/docs/encryption for details.) [$PLUGIN_GCS_ENCRYPTION_KEY, $GCS_ENCRYPTION_KEY]
    --azure.account-name value            Azure Blob Storage Account Name [$PLUGIN_ACCOUNT_NAME, $AZURE_ACCOUNT_NAME]
    --azure.account-key value             Azure Blob Storage Account Key [$PLUGIN_ACCOUNT_KEY, $AZURE_ACCOUNT_KEY]
-   --azure.blob-container-name value     Azure Blob Storage container name [$PLUGIN_CONTAINER, $AZURE_CONTAINER_NAME]
+   --azure.container-name value          Azure Blob Storage container name [$PLUGIN_CONTAINER, $AZURE_CONTAINER_NAME]
    --azure.blob-storage-url value        Azure Blob Storage URL (default: "blob.core.windows.net") [$AZURE_BLOB_STORAGE_URL]
    --azure.blob-max-retry-requets value  Azure Blob Storage Max Retry Requests (default: 4) [$AZURE_BLOB_MAX_RETRY_REQUESTS]
    --sftp.cache-root value               sftp root directory [$SFTP_CACHE_ROOT]
