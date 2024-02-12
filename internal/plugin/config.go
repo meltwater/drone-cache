@@ -31,6 +31,7 @@ type Config struct {
 	FailRestoreIfKeyNotPresent bool
 	CompressionLevel           int
 	StorageOperationTimeout    time.Duration
+	DisableCacheKeySeparator   bool
 
 	Mount []string
 
