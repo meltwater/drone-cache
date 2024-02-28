@@ -146,6 +146,7 @@ func (p *Plugin) Exec() error { // nolint:funlen
 		GCS:        cfg.GCS,
 		S3:         cfg.S3,
 		SFTP:       cfg.SFTP,
+		Harness:    cfg.Harness,
 	})
 	if err != nil {
 		return fmt.Errorf("initialize backend <%s>, %w", cfg.Backend, err)
