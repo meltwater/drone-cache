@@ -8,7 +8,7 @@ import (
 
 // readerHasher generic md5 hash generater from io.Reader.
 func readerHasher(readers ...io.Reader) (string, error) {
-	// Use go1.14 new hashmap functions.
+	// Use go1.22 new hashmap functions.
 	h := md5.New() // #nosec
 
 	for _, r := range readers {
