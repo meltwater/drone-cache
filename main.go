@@ -320,10 +320,10 @@ func main() {
 			EnvVars: []string{"PLUGIN_FAIL_RESTORE_IF_KEY_NOT_PRESENT"},
 		},
 		&cli.BoolFlag{
-			Name:    "disable-cache-key-separator",
-			Usage:   "Disable adding of / as the cache key suffix. (defaults to false)",
+			Name:    "enable-cache-key-separator",
+			Usage:   "Enable adding of / as the cache key suffix. (defaults to false)",
 			Value:   false,
-			EnvVars: []string{"PLUGIN_DISABLE_SEPARATOR"},
+			EnvVars: []string{"PLUGIN_ENABLE_SEPARATOR"},
 		},
 
 		// Backends Configs
@@ -573,7 +573,7 @@ func run(c *cli.Context) error {
 		LocalRoot:                  c.String("local-root"),
 		Override:                   c.Bool("override"),
 		FailRestoreIfKeyNotPresent: c.Bool("fail-restore-if-key-not-present"),
-		DisableCacheKeySeparator:   c.Bool("disable-cache-key-separator"),
+		EnableCacheKeySeparator:    c.Bool("enable-cache-key-separator"),
 
 		StorageOperationTimeout: c.Duration("backend.operation-timeout"),
 		FileSystem: filesystem.Config{

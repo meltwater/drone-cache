@@ -8,7 +8,7 @@ type options struct {
 	override                   bool
 	failRestoreIfKeyNotPresent bool
 	gracefulDetect             bool
-	disableCacheKeySeparator   bool
+	enableCacheKeySeparator    bool
 }
 
 // Option overrides behavior of Archive.
@@ -57,9 +57,9 @@ func WithFailRestoreIfKeyNotPresent(b bool) Option {
 	})
 }
 
-// WithDisableCacheKeySeparator disables addition of '/' to the specified cache key.
-func WithDisableCacheKeySeparator(b bool) Option {
+// WithEnableCacheKeySeparator enables addition of '/' to the specified cache key.
+func WithEnableCacheKeySeparator(b bool) Option {
 	return optionFunc(func(o *options) {
-		o.disableCacheKeySeparator = b
+		o.enableCacheKeySeparator = b
 	})
 }

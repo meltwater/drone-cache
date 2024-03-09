@@ -28,14 +28,14 @@ type restorer struct {
 	g  key.Generator
 	fg key.Generator
 
-	namespace                string
-	failIfKeyNotPresent      bool
-	disableCacheKeySeparator bool
+	namespace               string
+	failIfKeyNotPresent     bool
+	enableCacheKeySeparator bool
 }
 
 // NewRestorer creates a new cache.Restorer.
-func NewRestorer(logger log.Logger, s storage.Storage, a archive.Archive, g key.Generator, fg key.Generator, namespace string, failIfKeyNotPresent bool, disableCacheKeySeparator bool) Restorer { // nolint:lll
-	return restorer{logger, a, s, g, fg, namespace, failIfKeyNotPresent, disableCacheKeySeparator}
+func NewRestorer(logger log.Logger, s storage.Storage, a archive.Archive, g key.Generator, fg key.Generator, namespace string, failIfKeyNotPresent bool, enableCacheKeySeparator bool) Restorer { // nolint:lll
+	return restorer{logger, a, s, g, fg, namespace, failIfKeyNotPresent, enableCacheKeySeparator}
 }
 
 // Restore restores files from the cache provided with given paths.
@@ -57,7 +57,7 @@ func (r restorer) Restore(dsts []string) error {
 
 	if len(dsts) == 0 {
 		prefix := filepath.Join(namespace, key)
-		if !strings.HasSuffix(prefix, getSeparator()) && !r.disableCacheKeySeparator {
+		if !strings.HasSuffix(prefix, getSeparator()) && r.enableCacheKeySeparator {
 			prefix = prefix + getSeparator()
 		}
 		entries, err := r.s.List(prefix)
