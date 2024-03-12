@@ -68,7 +68,11 @@ func (r restorer) Restore(dsts []string) error {
 			}
 
 			for _, e := range entries {
-				dsts = append(dsts, strings.TrimPrefix(e.Path, prefix))
+				if r.enableCacheKeySeparator {
+					dsts = append(dsts, strings.TrimPrefix(e.Path, prefix))
+				} else {
+					dsts = append(dsts, strings.TrimPrefix(e.Path, prefix+getSeparator()))
+				}
 			}
 		} else if err != common.ErrNotImplemented {
 			return err
