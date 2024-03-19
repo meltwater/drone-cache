@@ -12,6 +12,7 @@ import (
 	"github.com/meltwater/drone-cache/storage/backend/azure"
 	"github.com/meltwater/drone-cache/storage/backend/filesystem"
 	"github.com/meltwater/drone-cache/storage/backend/gcs"
+	"github.com/meltwater/drone-cache/storage/backend/harness"
 	"github.com/meltwater/drone-cache/storage/backend/s3"
 	"github.com/meltwater/drone-cache/storage/backend/sftp"
 	"github.com/meltwater/drone-cache/storage/common"
@@ -28,6 +29,8 @@ const (
 	S3 = "s3"
 	// SFTP type of the corresponding backend represented as string constant.
 	SFTP = "sftp"
+	//Harness type of the corresponding backend represented as string constant.
+	Harness = "harness"
 )
 
 // Backend implements operations for caching files.
@@ -62,6 +65,9 @@ func FromConfig(l log.Logger, backedType string, cfg Config) (Backend, error) {
 	case S3:
 		level.Debug(l).Log("msg", "using aws s3 as backend")
 		b, err = s3.New(log.With(l, "backend", S3), cfg.S3, cfg.Debug)
+	case Harness:
+		level.Debug(l).Log("msg", "using harness as backend")
+		b, err = harness.New(log.With(l, "backend", Harness), cfg.Harness, cfg.Debug)
 	case GCS:
 		level.Debug(l).Log("msg", "using gc storage as backend")
 		b, err = gcs.New(log.With(l, "backend", GCS), cfg.GCS)

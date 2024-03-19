@@ -14,6 +14,7 @@ import (
 	"github.com/meltwater/drone-cache/storage/backend/azure"
 	"github.com/meltwater/drone-cache/storage/backend/filesystem"
 	"github.com/meltwater/drone-cache/storage/backend/gcs"
+	"github.com/meltwater/drone-cache/storage/backend/harness"
 	"github.com/meltwater/drone-cache/storage/backend/s3"
 	"github.com/meltwater/drone-cache/storage/backend/sftp"
 
@@ -504,6 +505,16 @@ func main() {
 			Usage:   "sftp port",
 			EnvVars: []string{"SFTP_PORT"},
 		},
+		&cli.StringFlag{
+			Name:    "cache-service-token",
+			Usage:   "cache service token",
+			EnvVars: []string{"PLUGIN_CACHE_SERVICE_BEARER_TOKEN"},
+		},
+		&cli.StringFlag{
+			Name:    "cache-service-baseurl",
+			Usage:   "cache service base url",
+			EnvVars: []string{"PLUGIN_CACHE_SERVICE_BASE_URL"},
+		},
 	}
 
 	if err := app.Run(os.Args); err != nil {
@@ -619,6 +630,11 @@ func run(c *cli.Context) error {
 			JSONKey:    c.String("gcs.json-key"),
 			Encryption: c.String("gcs.encryption-key"),
 			Timeout:    c.Duration("backend.operation-timeout"),
+		},
+		Harness: harness.Config{
+			AccountID:     c.String("account-id"),
+			Token:         c.String("cache-service-token"),
+			ServerBaseURL: c.String("cache-service-baseurl"),
 		},
 
 		SkipSymlinks: c.Bool("skip-symlinks"),

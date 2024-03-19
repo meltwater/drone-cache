@@ -4,6 +4,7 @@ import (
 	"github.com/meltwater/drone-cache/storage/backend/azure"
 	"github.com/meltwater/drone-cache/storage/backend/filesystem"
 	"github.com/meltwater/drone-cache/storage/backend/gcs"
+	"github.com/meltwater/drone-cache/storage/backend/harness"
 	"github.com/meltwater/drone-cache/storage/backend/s3"
 	"github.com/meltwater/drone-cache/storage/backend/sftp"
 )
@@ -17,4 +18,5 @@ type Config struct {
 	SFTP       sftp.Config
 	Azure      azure.Config
 	GCS        gcs.Config
+	Harness    harness.Config
 }
