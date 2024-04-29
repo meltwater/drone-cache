@@ -9,11 +9,13 @@ import (
 	"strings"
 
 	"github.com/meltwater/drone-cache/internal"
+	"github.com/meltwater/drone-cache/internal/gcp"
 	"github.com/meltwater/drone-cache/storage/common"
 
 	gcstorage "cloud.google.com/go/storage"
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/log/level"
+	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
 	"google.golang.org/api/iterator"
 	"google.golang.org/api/option"
@@ -46,7 +48,15 @@ func New(l log.Logger, c Config) (*Backend, error) {
 		}
 	}
 
-	opts = setAuthenticationMethod(l, c, opts)
+	if c.OIDCTokenID != "" && c.ProjectNumber != "" && c.PoolID != "" && c.ProviderID != "" && c.ServiceAccountEmail != "" {
+		oidcToken, err := gcp.GetFederalToken(c.OIDCTokenID, c.ProjectNumber, c.PoolID, c.ProviderID)
+		if err != nil {
+			return nil, fmt.Errorf("OIDC token retrieval failed: %w", err)
+		}
+		opts = append(opts, option.WithTokenSource(oauth2.StaticTokenSource(&oauth2.Token{AccessToken: oidcToken})))
+	} else {
+		opts = setAuthenticationMethod(l, c, opts)
+	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), c.Timeout)
 	defer cancel()
