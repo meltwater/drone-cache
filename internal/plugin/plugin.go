@@ -160,6 +160,8 @@ func (p *Plugin) Exec() error { // nolint:funlen
 			archive.WithCompressionLevel(cfg.CompressionLevel),
 		),
 		generator,
+		cfg.Backend,
+		cfg.AccountID,
 		options...,
 	)
 

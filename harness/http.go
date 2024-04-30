@@ -14,6 +14,7 @@ const (
 	RestoreEndpoint = "/cache/intel/download?accountId=%s&cacheKey=%s"
 	StoreEndpoint   = "/cache/intel/upload?accountId=%s&cacheKey=%s"
 	ExistsEndpoint  = "/cache/intel/exists?accountId=%s&cacheKey=%s"
+	ListEndpoint    = "/cache/intel/list?accountId=%s&cacheKey=%s"
 )
 
 // NewHTTPClient returns a new HTTPClient.
@@ -55,6 +56,12 @@ func (c *HTTPClient) GetDownloadURL(ctx context.Context, key string) (string, er
 // getExistsURL will get the 'exists' presigned url from cache service
 func (c *HTTPClient) GetExistsURL(ctx context.Context, key string) (string, error) {
 	path := fmt.Sprintf(ExistsEndpoint, c.AccountID, key)
+	return c.getLink(ctx, c.Endpoint+path)
+}
+
+// getListURL will get the 'list' presigned url from cache service
+func (c *HTTPClient) GetListURL(ctx context.Context, key string) (string, error) {
+	path := fmt.Sprintf(ListEndpoint, c.AccountID, key)
 	return c.getLink(ctx, c.Endpoint+path)
 }
 
