@@ -3,10 +3,12 @@ package harness
 import (
 	"bytes"
 	"context"
-	"errors"
+	"encoding/xml"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"net/http"
+	"time"
 
 	"github.com/go-kit/kit/log"
 	"github.com/meltwater/drone-cache/harness"
@@ -89,8 +91,69 @@ func (b *Backend) Exists(ctx context.Context, key string) (bool, error) {
 }
 
 func (b *Backend) List(ctx context.Context, key string) ([]common.FileEntry, error) {
-	// not implemented
-	return nil, errors.New("list operation not implemented")
+	var allEntries []common.FileEntry
+	continuationToken := ""
+	for {
+		preSignedURL, err := b.client.GetListURL(ctx, key, continuationToken)
+		if err != nil {
+			return nil, err
+		}
+
+		res, err := b.do(ctx, "GET", preSignedURL, nil)
+		if err != nil {
+			return nil, err
+		}
+		defer res.Body.Close()
+
+		body, err := ioutil.ReadAll(res.Body)
+		if err != nil {
+			return nil, err
+		}
+
+		// Unmarshal XML response
+		var result ListBucketResult
+		if err := xml.Unmarshal(body, &result); err != nil {
+			return nil, err
+		}
+
+		// Process entries
+		var entries []common.FileEntry
+		for _, content := range result.Contents {
+			lastModified, err := time.Parse(time.RFC3339, content.LastModified)
+			if err != nil {
+				return nil, err
+			}
+			entries = append(entries, common.FileEntry{
+				Path:         content.Key,
+				Size:         content.Size,
+				LastModified: lastModified,
+			})
+		}
+
+		allEntries = append(allEntries, entries...)
+
+		if !result.IsTruncated {
+			// If there are no more files to fetch, break the loop
+			break
+		}
+
+		continuationToken = result.NextContinuationToken
+	}
+
+	return allEntries, nil
+}
+
+type ListBucketResult struct {
+	XMLName               xml.Name  `xml:"ListBucketResult"`
+	Contents              []Content `xml:"Contents"`
+	IsTruncated           bool      `xml:"IsTruncated"`
+	NextContinuationToken string    `xml:"NextContinuationToken"`
+}
+
+type Content struct {
+	Key          string `xml:"Key"`
+	LastModified string `xml:"LastModified"`
+	Size         int64  `xml:"Size"`
 }
 
 func (b *Backend) do(ctx context.Context, method, url string, body io.Reader) (*http.Response, error) {

@@ -22,4 +22,6 @@ type Client interface {
 	GetDownloadURL(ctx context.Context, key string) (string, error)
 
 	GetExistsURL(ctx context.Context, key string) (string, error)
+
+	GetListURL(ctx context.Context, key, continuationToken string) (string, error)
 }

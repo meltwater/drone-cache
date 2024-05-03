@@ -31,11 +31,13 @@ type restorer struct {
 	namespace               string
 	failIfKeyNotPresent     bool
 	enableCacheKeySeparator bool
+	backend                 string
+	accountID               string
 }
 
 // NewRestorer creates a new cache.Restorer.
-func NewRestorer(logger log.Logger, s storage.Storage, a archive.Archive, g key.Generator, fg key.Generator, namespace string, failIfKeyNotPresent bool, enableCacheKeySeparator bool) Restorer { // nolint:lll
-	return restorer{logger, a, s, g, fg, namespace, failIfKeyNotPresent, enableCacheKeySeparator}
+func NewRestorer(logger log.Logger, s storage.Storage, a archive.Archive, g key.Generator, fg key.Generator, namespace string, failIfKeyNotPresent bool, enableCacheKeySeparator bool, backend, accountID string) Restorer { // nolint:lll
+	return restorer{logger, a, s, g, fg, namespace, failIfKeyNotPresent, enableCacheKeySeparator, backend, accountID}
 }
 
 // Restore restores files from the cache provided with given paths.
@@ -54,7 +56,6 @@ func (r restorer) Restore(dsts []string) error {
 		errs      = &internal.MultiError{}
 		namespace = filepath.ToSlash(filepath.Clean(r.namespace))
 	)
-
 	if len(dsts) == 0 {
 		prefix := filepath.Join(namespace, key)
 		if !strings.HasSuffix(prefix, getSeparator()) && r.enableCacheKeySeparator {
@@ -65,6 +66,9 @@ func (r restorer) Restore(dsts []string) error {
 		if err == nil {
 			if r.failIfKeyNotPresent && len(entries) == 0 {
 				return fmt.Errorf("key %s does not exist", prefix)
+			}
+			if r.backend == "harness" {
+				prefix = r.accountID + "/intel/" + prefix
 			}
 
 			for _, e := range entries {
