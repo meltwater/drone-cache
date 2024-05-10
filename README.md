@@ -16,6 +16,14 @@ For detailed usage information and a list of available options please take a loo
 
 If you want to learn more about the story behind `drone-cache`, you can read our blogpost [Making Drone Builds 10 Times Faster!](https://underthehood.meltwater.com/blog/2019/04/10/making-drone-builds-10-times-faster/)!
 
+### Git Leaks
+
+Run the following script to install git-leaks support to this repo.
+```
+chmod +x ./git-hooks/install.sh
+./git-hooks/install.sh
+```
+
 ## Supported Storage Backends
 
 * [AWS S3](https://aws.amazon.com/s3/)

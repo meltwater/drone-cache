@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+
+GL_SCRIPT_PATH="$HOME/.git_template/hooks/git-leaks-pre-commit.sh"
+
+pushd `dirname $0` > /dev/null && cd ../.. && BASEDIR=$(pwd -L) && popd > /dev/null
+BASENAME=`basename $0`
+
+if git rev-parse --verify HEAD >/dev/null 2>&1
+then
+    against=HEAD
+else
+    #Initial commit : diff against an empty tree object
+    against=4b825dc642cb6eb9a060e54bf8d69288fbee4904
+fi
+
+GIT_LEAKS_PRE_COMMIT=hook.pre-commit.gitleaks
+if [ "`git config $GIT_LEAKS_PRE_COMMIT`" == "false" ]
+then
+    echo -e '\033[0;31m' checking git leaks is disabled - to enable: '\033[0;37m'git config --unset $GIT_LEAKS_PRE_COMMIT '\033[0m'
+    echo -e '\033[0;34m' checking git leaks  ... to enable: '\033[0;37m'git config --add $GIT_LEAKS_PRE_COMMIT true '\033[0m'
+else
+    echo -e '\033[0;34m' checking for git leaks...
+    [ -f "${GL_SCRIPT_PATH}" ] && . ${GL_SCRIPT_PATH} || echo "ERROR: Hook Script Not Found..." && exit 404
+fi
