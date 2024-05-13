@@ -44,7 +44,17 @@ func New(l log.Logger, c Config, debug bool) (*Backend, error) {
 	if c.Key != "" && c.Secret != "" { // nolint:gocritic
 		conf.Credentials = credentials.NewStaticCredentials(c.Key, c.Secret, "")
 	} else if c.AssumeRoleARN != "" {
-		conf.Credentials = assumeRole(c.AssumeRoleARN, c.AssumeRoleSessionName)
+		if c.OIDCTokenID != "" {
+			// Assume role with OIDC
+			creds, err := assumeRoleWithWebIdentity(c.AssumeRoleARN, c.AssumeRoleSessionName, c.OIDCTokenID)
+			if err != nil {
+				level.Error(l).Log("msg", "failed to assume role with OIDC", "error", err)
+				return nil, err
+			}
+			conf.Credentials = creds
+		} else {
+			conf.Credentials = assumeRole(c.AssumeRoleARN, c.AssumeRoleSessionName)
+		}
 	} else {
 		level.Warn(l).Log("msg", "aws key and/or Secret not provided (falling back to anonymous credentials)")
 	}
@@ -194,4 +204,34 @@ func assumeRole(roleArn, roleSessionName string) *credentials.Credentials {
 	}
 
 	return credentials.NewCredentials(stsProvider)
+}
+
+func assumeRoleWithWebIdentity(roleArn, roleSessionName, webIdentityToken string) (*credentials.Credentials, error) {
+	// Create a new session
+	sess, err := session.NewSession()
+	if err != nil {
+		return nil, fmt.Errorf("failed to create AWS session: %v", err)
+	}
+
+	// Create a new STS client
+	svc := sts.New(sess)
+
+	// Prepare the input parameters for the STS call
+	duration := int64(time.Hour / time.Second)
+	input := &sts.AssumeRoleWithWebIdentityInput{
+		RoleArn:          aws.String(roleArn),
+		RoleSessionName:  aws.String(roleSessionName),
+		WebIdentityToken: aws.String(webIdentityToken),
+		DurationSeconds:  aws.Int64(duration),
+	}
+
+	// Call the AssumeRoleWithWebIdentity function
+	result, err := svc.AssumeRoleWithWebIdentity(input)
+	if err != nil {
+		return nil, fmt.Errorf("failed to assume role with web identity: %v", err)
+	}
+
+	// Create credentials using the response from STS
+	newCreds := credentials.NewStaticCredentials(*result.Credentials.AccessKeyId, *result.Credentials.SecretAccessKey, *result.Credentials.SessionToken)
+	return newCreds, nil
 }

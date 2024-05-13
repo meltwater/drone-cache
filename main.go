@@ -357,6 +357,13 @@ func main() {
 			EnvVars: []string{"PLUGIN_FILESYSTEM_CACHE_ROOT", "FILESYSTEM_CACHE_ROOT"},
 		},
 
+		// OIDC
+		&cli.StringFlag{
+			Name:    "oidc-token-id",
+			Usage:   "OIDC token ID for assuming role with web identity",
+			EnvVars: []string{"PLUGIN_OIDC_TOKEN_ID"},
+		},
+
 		// S3 specific Config flags
 
 		&cli.StringFlag{
@@ -591,17 +598,19 @@ func run(c *cli.Context) error {
 			CacheRoot: c.String("filesystem.cache-root"),
 		},
 		S3: s3.Config{
-			ACL:           c.String("acl"),
-			Bucket:        c.String("bucket"),
-			Encryption:    c.String("encryption"),
-			Endpoint:      c.String("endpoint"),
-			Key:           c.String("access-key"),
-			PathStyle:     c.Bool("path-style"),
-			Region:        c.String("region"),
-			Secret:        c.String("secret-key"),
-			StsEndpoint:   c.String("sts-endpoint"),
-			AssumeRoleARN: c.String("assume-role-arn"),
-			UserRoleArn:   c.String("user-role-arn"),
+			ACL:                   c.String("acl"),
+			Bucket:                c.String("bucket"),
+			Encryption:            c.String("encryption"),
+			Endpoint:              c.String("endpoint"),
+			Key:                   c.String("access-key"),
+			PathStyle:             c.Bool("path-style"),
+			Region:                c.String("region"),
+			Secret:                c.String("secret-key"),
+			StsEndpoint:           c.String("sts-endpoint"),
+			AssumeRoleARN:         c.String("assume-role-arn"),
+			AssumeRoleSessionName: c.String("assume-role-session-name"),
+			UserRoleArn:           c.String("user-role-arn"),
+			OIDCTokenID:           c.String("oidc-token-id"),
 		},
 		Azure: azure.Config{
 			AccountName:    c.String("azure.account-name"),

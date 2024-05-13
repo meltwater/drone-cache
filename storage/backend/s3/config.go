@@ -19,6 +19,7 @@ type Config struct {
 	AssumeRoleARN         string // if "", do not assume IAM role i.e. use the IAM user.
 	AssumeRoleSessionName string
 	UserRoleArn           string
+	OIDCTokenID           string
 
 	// us-east-1
 	// us-west-1
