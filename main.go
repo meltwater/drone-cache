@@ -444,6 +444,26 @@ func main() {
 			(See https://cloud.google.com/storage/docs/encryption for details.)`,
 			EnvVars: []string{"PLUGIN_GCS_ENCRYPTION_KEY", "GCS_ENCRYPTION_KEY"},
 		},
+		&cli.StringFlag{
+			Name:    "oidc-project-number",
+			Usage:   `OIDC GCP PROJECT NUMBER`,
+			EnvVars: []string{"PLUGIN_PROJECT_NUMBER"},
+		},
+		&cli.StringFlag{
+			Name:    "oidc-pool-id",
+			Usage:   `OIDC GCP WORKLOAD POOL ID`,
+			EnvVars: []string{"PLUGIN_POOL_ID"},
+		},
+		&cli.StringFlag{
+			Name:    "oidc-provider-id",
+			Usage:   `GCP OIDC PROVIDER ID`,
+			EnvVars: []string{"PLUGIN_PROVIDER_ID"},
+		},
+		&cli.StringFlag{
+			Name:    "oidc-service-account-email",
+			Usage:   `GCP OIDC SERVICE ACCOUNT EMAIL`,
+			EnvVars: []string{"PLUGIN_SERVICE_ACCOUNT_EMAIL"},
+		},
 
 		// Azure specific Config flags
 
@@ -633,12 +653,17 @@ func run(c *cli.Context) error {
 			Timeout: c.Duration("backend.operation-timeout"),
 		},
 		GCS: gcs.Config{
-			Bucket:     c.String("bucket"),
-			Endpoint:   c.String("endpoint"),
-			APIKey:     c.String("gcs.api-key"),
-			JSONKey:    c.String("gcs.json-key"),
-			Encryption: c.String("gcs.encryption-key"),
-			Timeout:    c.Duration("backend.operation-timeout"),
+			Bucket:              c.String("bucket"),
+			Endpoint:            c.String("endpoint"),
+			APIKey:              c.String("gcs.api-key"),
+			JSONKey:             c.String("gcs.json-key"),
+			Encryption:          c.String("gcs.encryption-key"),
+			Timeout:             c.Duration("backend.operation-timeout"),
+			OIDCTokenID:         c.String("oidc-token-id"),
+			ProjectNumber:       c.String("oidc-project-number"),
+			PoolID:              c.String("oidc-pool-id"),
+			ProviderID:          c.String("oidc-provider-id"),
+			ServiceAccountEmail: c.String("oidc-service-account-email"),
 		},
 		Harness: harness.Config{
 			AccountID:     c.String("account-id"),
