@@ -20,6 +20,7 @@ type Config struct {
 	AssumeRoleSessionName string
 	UserRoleArn           string
 	OIDCTokenID           string
+	ExternalID            string
 
 	// us-east-1
 	// us-west-1

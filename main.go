@@ -419,6 +419,11 @@ func main() {
 			Usage:   "AWS user role",
 			EnvVars: []string{"PLUGIN_USER_ROLE_ARN", "AWS_USER_ROLE_ARN"},
 		},
+		&cli.StringFlag{
+			Name:   "external-id",
+			Usage:  "external ID to use when assuming role",
+			EnvVars: []string{"PLUGIN_EXTERNAL_ID"},
+		},
 
 		// GCS specific Configs flags
 
@@ -631,6 +636,7 @@ func run(c *cli.Context) error {
 			AssumeRoleSessionName: c.String("assume-role-session-name"),
 			UserRoleArn:           c.String("user-role-arn"),
 			OIDCTokenID:           c.String("oidc-token-id"),
+			ExternalID:            c.String("external-id"),
 		},
 		Azure: azure.Config{
 			AccountName:    c.String("azure.account-name"),

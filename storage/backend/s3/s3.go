@@ -53,7 +53,7 @@ func New(l log.Logger, c Config, debug bool) (*Backend, error) {
 			}
 			conf.Credentials = creds
 		} else {
-			conf.Credentials = assumeRole(c.AssumeRoleARN, c.AssumeRoleSessionName)
+			conf.Credentials = assumeRole(c.AssumeRoleARN, c.AssumeRoleSessionName, c.ExternalID)
 		}
 	} else {
 		level.Warn(l).Log("msg", "aws key and/or Secret not provided (falling back to anonymous credentials)")
@@ -193,7 +193,7 @@ func (b *Backend) List(ctx context.Context, p string) ([]common.FileEntry, error
 	return entries, err
 }
 
-func assumeRole(roleArn, roleSessionName string) *credentials.Credentials {
+func assumeRole(roleArn, roleSessionName string, externalID string) *credentials.Credentials {
 	client := sts.New(session.New()) // nolint:staticcheck
 	duration := time.Hour * 1
 	stsProvider := &stscreds.AssumeRoleProvider{
@@ -203,6 +203,10 @@ func assumeRole(roleArn, roleSessionName string) *credentials.Credentials {
 		RoleSessionName: roleSessionName,
 	}
 
+	if externalID != "" {
+		stsProvider.ExternalID = &externalID
+	}
+	
 	return credentials.NewCredentials(stsProvider)
 }
 
