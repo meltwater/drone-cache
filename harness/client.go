@@ -3,6 +3,7 @@ package harness
 import (
 	"context"
 	"fmt"
+	"github.com/meltwater/drone-cache/storage/common"
 )
 
 // Error is a custom error struct
@@ -23,5 +24,5 @@ type Client interface {
 
 	GetExistsURL(ctx context.Context, key string) (string, error)
 
-	GetListURL(ctx context.Context, key, continuationToken string) (string, error)
+	GetEntriesList(ctx context.Context, prefix string) ([]common.FileEntry, error)
 }

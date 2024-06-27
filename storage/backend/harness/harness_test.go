@@ -6,6 +6,7 @@ package harness
 import (
 	"bytes"
 	"context"
+	"encoding/json"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -33,8 +34,13 @@ func (m *MockClient) GetExistsURL(ctx context.Context, key string) (string, erro
 	return m.URL, nil
 }
 
-func (m *MockClient) GetListURL(ctx context.Context, key, continuationToken string) (string, error) {
-	return m.URL, nil
+func (m *MockClient) GetEntriesList(ctx context.Context, key string) ([]common.FileEntry, error) {
+	mockEntries := []common.FileEntry{
+		{Path: "file1.txt", Size: 1024, LastModified: time.Date(2024, 5, 1, 12, 0, 0, 0, time.UTC)},
+		{Path: "file2.txt", Size: 2048, LastModified: time.Date(2024, 5, 2, 12, 0, 0, 0, time.UTC)},
+	}
+
+	return mockEntries, nil
 }
 
 func TestGet(t *testing.T) {
@@ -184,32 +190,19 @@ func TestNotExistsWithout404(t *testing.T) {
 func TestList(t *testing.T) {
 	logger := log.NewNopLogger()
 
-	// Mock XML response
-	xmlResponse := `
-	<ListBucketResult>
-		<Contents>
-			<Key>file1.txt</Key>
-			<LastModified>2024-05-01T12:00:00Z</LastModified>
-			<Size>1024</Size>
-		</Contents>
-		<Contents>
-			<Key>file2.txt</Key>
-			<LastModified>2024-05-02T12:00:00Z</LastModified>
-			<Size>2048</Size>
-		</Contents>
-		<IsTruncated>false</IsTruncated>
-	</ListBucketResult>
-	`
+	mockEntries := []common.FileEntry{
+		{Path: "file1.txt", Size: 1024, LastModified: time.Date(2024, 5, 1, 12, 0, 0, 0, time.UTC)},
+		{Path: "file2.txt", Size: 2048, LastModified: time.Date(2024, 5, 2, 12, 0, 0, 0, time.UTC)},
+	}
+	mockResponseBody, _ := json.Marshal(mockEntries)
 
-	// Create a mock HTTP server
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
-		_, _ = io.WriteString(w, xmlResponse)
+		_, _ = w.Write(mockResponseBody)
 	})
 	server := httptest.NewServer(handler)
 	defer server.Close()
 
-	// Create a mock client
 	mockClient := &MockClient{
 		URL: server.URL,
 	}
@@ -219,28 +212,18 @@ func TestList(t *testing.T) {
 		client: mockClient,
 	}
 
-	// Execute List method
-	entries, err := backend.List(context.Background(), "test-key")
+	entries, err := backend.List(context.Background(), "test-prefix")
 
-	// Check for errors
 	if err != nil {
 		t.Errorf("List method returned an unexpected error: %v", err)
 	}
 
-	// Check the number of entries
-	if len(entries) != 2 {
-		t.Errorf("List method returned unexpected number of entries: got %d, want %d", len(entries), 2)
-	}
-
-	// Check the content of the entries
-	expectedEntries := []common.FileEntry{
-		{Path: "file1.txt", Size: 1024, LastModified: time.Date(2024, 5, 1, 12, 0, 0, 0, time.UTC)},
-		{Path: "file2.txt", Size: 2048, LastModified: time.Date(2024, 5, 2, 12, 0, 0, 0, time.UTC)},
+	if len(entries) != len(mockEntries) {
+		t.Errorf("List method returned unexpected number of entries: got %d, want %d", len(entries), len(mockEntries))
 	}
 	for i, entry := range entries {
-		if entry != expectedEntries[i] {
-			t.Errorf("List method returned unexpected entry at index %d: got %+v, want %+v", i, entry, expectedEntries[i])
+		if entry.Path != mockEntries[i].Path || entry.Size != mockEntries[i].Size || !entry.LastModified.Equal(mockEntries[i].LastModified) {
+			t.Errorf("List method returned unexpected entry at index %d: got %+v, want %+v", i, entry, mockEntries[i])
 		}
 	}
 }
-
