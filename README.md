@@ -1,6 +1,8 @@
 # ⚠️ Deprecation Warning ⚠️
 This repository has been deprecated and will no longer be maintained. We recommend users to migrate to alternative solutions, but do not have recommendations for such at this time. Thank you for your understanding.
 
+[Explore the list of other Drone Plugins provided by Harness](https://developer.harness.io/docs/continuous-integration/use-ci/use-drone-plugins/explore-ci-plugins/)
+
 # drone-cache
 [![Latest Release](https://img.shields.io/github/release/meltwater/drone-cache.svg?)](https://github.com/meltwater/drone-cache/releases/latest) [![Maintenance](https://img.shields.io/maintenance/yes/2022.svg)](https://github.com/meltwater/drone-cache/commits/master) ![GitHub](https://img.shields.io/github/license/meltwater/drone-cache) [![drone](https://cloud.drone.io/api/badges/meltwater/drone-cache/status.svg)](https://cloud.drone.io/meltwater/drone-cache) ![release](https://github.com/meltwater/drone-cache/workflows/release/badge.svg) ![snapshot](https://github.com/meltwater/drone-cache/workflows/snapshot/badge.svg)
 
